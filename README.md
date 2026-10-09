@@ -10,6 +10,7 @@
 
 ```json
 {
+  "$schema": "./trip.schema.json",
   "id": "fukuoka",
   "title": "福岡散步繪本",
   "subtitle": "八天的吃喝散步路線",
@@ -35,12 +36,23 @@
 
 JSON 的規則比較嚴格：要用雙引號，最後一筆後面不能有逗號。寫錯時頁面會直接顯示是第幾行出錯。
 
+完整的欄位規格在 `data/trip.schema.json`。用 VS Code 編輯 `trip.json` 時會自動套用：輸入欄位名稱有自動完成，填錯會畫紅線。
+
+改完可以先檢查一次（需要 Node.js，不用安裝套件）：
+
+```sh
+node tools/check-trip.mjs
+```
+
+它會檢查 JSON 語法、欄位格式、`id` 有沒有重複、天數標題，以及有沒有字型沒收錄的字，並指出是第幾行。
+
 ## 換成另一趟旅程
 
 1. 換掉 `data/trip.json`，記得改 `id`，蓋章紀錄才不會跟舊旅程混在一起
 2. 改 `manifest.webmanifest` 的 `name`、`short_name`（主畫面上的 App 名稱）
 3. 想換主畫面圖示的話，換掉 `icons/` 裡的圖
-4. 照下一段重新產生字型
+4. 執行 `node tools/check-trip.mjs` 確認格式正確
+5. 照下一段重新產生字型
 
 ## 新加的字顯示成系統字型
 
@@ -68,10 +80,13 @@ python3 -m http.server 8000
 | 檔案 | 用途 |
 |---|---|
 | `data/trip.json` | 行程資料 |
+| `data/trip.schema.json` | 行程資料的格式規格 |
 | `index.html` | 頁面 |
 | `sw.js` | 離線快取（Service Worker）；改了字型、圖示等檔案時要把 `VERSION` 加 1 |
 | `manifest.webmanifest` | 加到主畫面的名稱、圖示、顏色 |
 | `icons/` | 主畫面圖示 |
-| `fonts/` | jf open 粉圓（Huninn）子集，SIL Open Font License 1.1 |
+| `fonts/` | jf open 粉圓（Huninn）子集，SIL Open Font License 1.1；`.chars.txt` 是收錄的字元清單 |
 | `vendor/leaflet/` | Leaflet 1.9.4，BSD-2-Clause |
+| `tools/check-trip.mjs` | 檢查 `trip.json` |
 | `tools/subset-font.py` | 重新產生字型子集 |
+| `AGENTS.md`、`CLAUDE.md` | 給 AI 程式助理看的專案說明 |

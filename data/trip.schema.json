@@ -1,0 +1,112 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$comment": "data/trip.json 的格式規格。tools/check-trip.mjs 會用這份檔案檢查；VS Code 也會用它提供自動完成和錯誤提示。",
+  "title": "旅行繪本行程資料",
+  "type": "object",
+  "required": ["id", "title", "items"],
+  "additionalProperties": false,
+  "properties": {
+    "$schema": {
+      "type": "string",
+      "description": "給編輯器用的格式規格位置，頁面不會讀取"
+    },
+    "id": {
+      "type": "string",
+      "pattern": "^[A-Za-z0-9_-]+$",
+      "patternErrorMessage": "只能用英文、數字、底線和連字號，例如 fukuoka 或 kyoto-2026",
+      "description": "這趟旅程的代號。「去過」的蓋章紀錄依這個代號分開存，換旅程時要改"
+    },
+    "title": {
+      "type": "string",
+      "minLength": 1,
+      "description": "封面標題，也是瀏覽器分頁標題"
+    },
+    "subtitle": {
+      "type": "string",
+      "description": "封面副標，後面會自動接「共 N 個地點」"
+    },
+    "_說明": {
+      "type": "string",
+      "description": "給編輯的人看的備註，頁面不會讀取"
+    },
+    "days": {
+      "type": "array",
+      "description": "每天的標題。沒寫到的天數只會顯示 Day N",
+      "items": {
+        "type": "object",
+        "required": ["day", "name"],
+        "additionalProperties": false,
+        "properties": {
+          "day": { "type": "integer", "minimum": 1, "description": "第幾天，從 1 開始" },
+          "name": { "type": "string", "description": "這一天的標題，例如「天神」" }
+        }
+      }
+    },
+    "items": {
+      "type": "array",
+      "description": "所有地點。順序不重要，頁面會依天數和時間排序",
+      "items": { "$ref": "#/definitions/item" }
+    }
+  },
+  "definitions": {
+    "item": {
+      "type": "object",
+      "required": ["id", "day", "title"],
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "type": "string",
+          "minLength": 1,
+          "description": "地點代號，不可重複。蓋章紀錄靠它對應，已經有人蓋過章的地點不要改 id"
+        },
+        "day": {
+          "type": "integer",
+          "minimum": 1,
+          "description": "第幾天"
+        },
+        "time": {
+          "type": "string",
+          "pattern": "^(|([01][0-9]|2[0-3]):[0-5][0-9])$",
+          "patternErrorMessage": "時間格式是 HH:MM，例如 09:30；不確定可以留空",
+          "description": "預計時間，同一天依這個排序；留空會排在最後並顯示「未定」"
+        },
+        "title": {
+          "type": "string",
+          "minLength": 1,
+          "description": "地點名稱"
+        },
+        "category": {
+          "type": "string",
+          "enum": ["景點", "美食", "甜點", "購物", "交通", ""],
+          "description": "分類，決定圖示和顏色。「甜點」在畫面上顯示為「點心」，「交通」包含住宿；留空會當成景點"
+        },
+        "gmap": {
+          "type": "string",
+          "pattern": "^(|https?://.+)$",
+          "patternErrorMessage": "要是 http:// 或 https:// 開頭的網址，或留空",
+          "description": "Google 地圖連結。留空時導航會改用經緯度"
+        },
+        "lat": {
+          "type": "number",
+          "minimum": -90,
+          "maximum": 90,
+          "description": "緯度。和 lng 都有填才會出現在地圖上"
+        },
+        "lng": {
+          "type": "number",
+          "minimum": -180,
+          "maximum": 180,
+          "description": "經度"
+        },
+        "desc": {
+          "type": "string",
+          "description": "描述。「營業時間:」和「最早可訂位時間：」後面的文字會自動拆成獨立一行"
+        },
+        "price": {
+          "type": "string",
+          "description": "價位，例如 ¥2,000-3,000；可留空"
+        }
+      }
+    }
+  }
+}

@@ -1,4 +1,5 @@
 {
+  "$schema": "./trip.schema.json",
   "id": "fukuoka",
   "title": "福岡散步繪本",
   "subtitle": "八天的吃喝散步路線",
