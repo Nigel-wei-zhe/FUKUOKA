@@ -62,6 +62,7 @@
             --c-sweet: #F2C1D3;
             --c-shop: #F5D58A;
             --c-move: #A9D2E0;
+            --c-stay: #C8B6E2;
             --on-cat: #3E302A;
 
             --hill: #DCE8CB;
@@ -101,6 +102,7 @@
             --c-sweet: #E6A8C2;
             --c-shop: #F3C766;
             --c-move: #8EC1D6;
+            --c-stay: #A996D1;
             --on-cat: #1E2436;
 
             --hill: #2B3552;
@@ -185,6 +187,339 @@
         .app { max-width: 1280px; margin: 0 auto; }
         .list-col { padding-bottom: calc(var(--tabbar-h) + env(safe-area-inset-bottom) + 24px); }
 
+        /* ---------- 首頁（天氣與今日行程） ---------- */
+        .home-pane {
+            display: none;
+            padding: calc(env(safe-area-inset-top) + 12px) 16px calc(var(--tabbar-h) + env(safe-area-inset-bottom) + 24px);
+            max-width: 680px;
+            margin: 0 auto;
+        }
+        html[data-view="home"] .home-pane { display: block; }
+        html[data-view="home"] .list-col,
+        html[data-view="home"] .map-pane { display: none; }
+
+        html[data-view="list"] .home-pane,
+        html[data-view="list"] .map-pane { display: none; }
+        html[data-view="list"] .list-col { display: block; }
+
+        .home-hero-wrap {
+            margin: -12px -16px 14px;
+        }
+        .home-hero-wrap .hero-text {
+            padding-right: 76px;
+        }
+
+        /* 天氣看板 */
+        .weather-card {
+            margin-bottom: 20px;
+            padding: 16px 18px;
+            border: 2px solid var(--ink);
+            border-radius: var(--r-card);
+            background: var(--card);
+            box-shadow: var(--shadow);
+        }
+        .weather-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 12px;
+        }
+        .weather-city-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            font-size: calc(14px * var(--fs));
+            font-weight: bold;
+            color: var(--ink);
+        }
+        .weather-city-badge .ico { width: 18px; height: 18px; color: var(--stamp); }
+        .weather-status-tag {
+            font-size: calc(12px * var(--fs));
+            color: var(--ink-soft);
+        }
+        .weather-body {
+            display: grid;
+            grid-template-columns: auto 1fr auto;
+            align-items: center;
+            gap: 16px;
+        }
+        .weather-icon-box {
+            display: grid;
+            place-items: center;
+            width: 52px;
+            height: 52px;
+            border-radius: 50%;
+            background: var(--paper-2);
+            color: var(--lamp);
+            border: 2px solid var(--line-strong);
+        }
+        .weather-icon-box .ico { width: 32px; height: 32px; }
+        .weather-temp-main {
+            display: flex;
+            align-items: baseline;
+            gap: 4px;
+        }
+        .weather-temp-now {
+            font-size: calc(34px * var(--fs));
+            font-weight: 700;
+            line-height: 1;
+            letter-spacing: -0.02em;
+        }
+        .weather-desc-text {
+            font-size: calc(14px * var(--fs));
+            color: var(--ink-soft);
+            margin-top: 2px;
+        }
+        .weather-range-box {
+            text-align: right;
+            font-size: calc(13px * var(--fs));
+            line-height: 1.4;
+            color: var(--ink-soft);
+        }
+        .weather-range-box strong {
+            color: var(--ink);
+            font-weight: 600;
+        }
+        .weather-tips {
+            margin-top: 12px;
+            padding-top: 10px;
+            border-top: 1.5px dashed var(--line);
+            font-size: calc(13px * var(--fs));
+            color: var(--ink-soft);
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .weather-tips .ico { width: 16px; height: 16px; flex-shrink: 0; color: var(--link); }
+
+        /* 首頁今日行程區塊 */
+        .home-section-head {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 12px;
+        }
+        .home-section-head h2 {
+            font-size: calc(18px * var(--fs));
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .home-section-head h2 .ico { width: 22px; height: 22px; color: var(--link); }
+        .home-day-selector {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .home-day-btn {
+            padding: 4px 10px;
+            border: 2px solid var(--line-strong);
+            border-radius: var(--r-chip);
+            background: var(--card);
+            font-size: calc(13px * var(--fs));
+            color: var(--ink);
+        }
+        .home-day-btn:active { transform: scale(.95); }
+
+        .home-timeline {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            margin-top: 10px;
+        }
+        .timeline-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
+            padding: 12px 14px;
+            border: 2px solid var(--line-strong);
+            border-radius: var(--r-chip);
+            background: var(--card);
+            box-shadow: 0 2px 0 var(--line);
+            text-decoration: none;
+            color: var(--ink);
+            transition: transform .12s ease, border-color .15s ease, background-color .15s ease;
+        }
+        .timeline-item:active {
+            transform: scale(.985);
+            border-color: var(--ink);
+        }
+        .timeline-item.is-visited {
+            opacity: .85;
+            background: var(--paper-2);
+        }
+        .timeline-left {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            min-width: 0;
+            flex: 1;
+        }
+        .timeline-time {
+            font-size: calc(13px * var(--fs));
+            font-weight: 700;
+            color: var(--ink);
+            width: 44px;
+            flex-shrink: 0;
+        }
+        .timeline-cat-pill {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            padding: 2px 8px;
+            border-radius: 10px;
+            font-size: calc(11px * var(--fs));
+            font-weight: 600;
+            background: var(--cat, var(--paper));
+            color: var(--on-cat);
+            flex-shrink: 0;
+        }
+        .timeline-cat-pill .ico { width: 13px; height: 13px; }
+        .timeline-title {
+            font-size: calc(14px * var(--fs));
+            font-weight: 600;
+            color: var(--ink);
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        .timeline-item.is-visited .timeline-title {
+            text-decoration: line-through;
+            color: var(--ink-soft);
+        }
+        .timeline-right {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            flex-shrink: 0;
+        }
+        .timeline-stamp-pill {
+            font-size: calc(11px * var(--fs));
+            color: var(--stamp);
+            font-weight: 600;
+            padding: 2px 6px;
+            border: 1px solid var(--stamp);
+            border-radius: 8px;
+        }
+        .timeline-nav-icon {
+            display: grid;
+            place-items: center;
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            background: var(--paper-2);
+            color: var(--link);
+            border: 1.5px solid var(--line-strong);
+        }
+        .timeline-nav-icon .ico { width: 15px; height: 15px; }
+
+        /* 同時段多地點折疊組件 (details/summary) */
+        .timeline-group {
+            border: 2px solid var(--line-strong);
+            border-radius: var(--r-chip);
+            background: var(--card);
+            box-shadow: 0 2px 0 var(--line);
+            overflow: hidden;
+        }
+        .timeline-summary {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
+            padding: 12px 14px;
+            cursor: pointer;
+            list-style: none;
+            user-select: none;
+        }
+        .timeline-summary::-webkit-details-marker { display: none; }
+        /* 整合數量與收合箭頭的單一徽章按鈕 */
+        .timeline-count-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 2px;
+            padding: 3px 6px 3px 8px;
+            border-radius: 12px;
+            font-size: calc(11.5px * var(--fs));
+            font-weight: 700;
+            line-height: 1;
+            background: var(--paper-2);
+            color: var(--ink);
+            border: 1.5px solid var(--line-strong);
+            flex-shrink: 0;
+            transition: background-color .15s ease, border-color .15s ease;
+        }
+        .timeline-count-btn .ico {
+            width: 14px;
+            height: 14px;
+            color: var(--ink-soft);
+            transition: transform .2s ease;
+        }
+        .timeline-group[open] .timeline-count-btn {
+            background: var(--card);
+            border-color: var(--ink);
+        }
+        .timeline-group[open] .timeline-count-btn .ico {
+            transform: rotate(180deg);
+        }
+        .timeline-group-items {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+            padding: 4px 10px 10px;
+            background: var(--paper);
+            border-top: 1.5px dashed var(--line-strong);
+        }
+        .timeline-sub-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 10px;
+            padding: 9px 12px;
+            border: 1.5px solid var(--line-strong);
+            border-radius: 12px;
+            background: var(--card);
+            text-decoration: none;
+            color: var(--ink);
+            transition: transform .12s ease;
+        }
+        .timeline-sub-item:active {
+            transform: scale(.985);
+        }
+        .timeline-sub-item.is-visited {
+            opacity: .85;
+            background: var(--paper-2);
+        }
+        .timeline-sub-item .timeline-title {
+            font-size: calc(13.5px * var(--fs));
+        }
+        .today-empty {
+            padding: 24px 16px;
+            text-align: center;
+            border: 2px dashed var(--line-strong);
+            border-radius: var(--r-card);
+            background: var(--card);
+            color: var(--ink-soft);
+            font-size: calc(14px * var(--fs));
+        }
+        .today-view-all-btn {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            width: 100%;
+            margin-top: 16px;
+            padding: 12px;
+            border: 2px solid var(--ink);
+            border-radius: var(--r-card);
+            background: var(--card);
+            color: var(--ink);
+            font-size: calc(14px * var(--fs));
+            box-shadow: var(--shadow);
+            font-weight: 600;
+        }
+        .today-view-all-btn:active { transform: scale(.98); }
+
         /* ---------- 封面插畫 ---------- */
         .hero { position: relative; padding-top: env(safe-area-inset-top); }
         .hero-text { padding: 22px 76px 4px 20px; }
@@ -225,6 +560,15 @@
             border: 2px solid var(--card);
             border-radius: 50%;
             background: var(--stamp);
+        }
+        /* 設定按鈕只有在首頁顯示（桌機寬螢幕維持顯示） */
+        html:not([data-view="home"]) .menu-btn {
+            display: none !important;
+        }
+        @media (min-width: 960px) {
+            html:not([data-view="home"]) .menu-btn {
+                display: grid !important;
+            }
         }
 
         /* ---------- 下方彈出的 Sheet（設定、地點詳細） ---------- */
@@ -295,31 +639,6 @@
             background: var(--paper);
             border-bottom: 2px dashed var(--line-strong);
         }
-        .search {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            margin: 0 76px 10px 16px;
-            padding: 0 6px 0 12px;
-            height: 44px;
-            border: 2px solid var(--line-strong);
-            border-radius: var(--r-chip);
-            background: var(--card);
-            color: var(--ink-soft);
-        }
-        .search:focus-within { border-color: var(--ink); }
-        .search input {
-            flex: 1;
-            min-width: 0;
-            height: 100%;
-            border: 0;
-            outline: 0;
-            background: transparent;
-            color: var(--ink);
-            font-size: calc(16px * var(--fs)); /* 16px 避免 iOS 聚焦時自動放大 */
-        }
-        .search input::placeholder { color: var(--ink-soft); opacity: .85; }
-        .search input::-webkit-search-cancel-button { display: none; }
         .icon-btn {
             display: grid;
             place-items: center;
@@ -527,6 +846,11 @@
             color: var(--ink);
             border: 1px solid var(--line-strong);
         }
+        .tag--stay {
+            background: color-mix(in srgb, var(--c-stay) 28%, var(--card));
+            color: var(--ink);
+            border: 1px solid var(--line-strong);
+        }
         .tag-pill .ico { width: 12px; height: 12px; }
 
         .card-desc { margin-top: 6px; font-size: calc(14px * var(--fs)); color: var(--ink-soft); overflow-wrap: anywhere; }
@@ -690,7 +1014,7 @@
             mask: repeating-linear-gradient(135deg, var(--cat) 0 5px, transparent 5px 6px, var(--cat) 6px 11px) top / 100% 7px;
         }
 
-        /* 交通住宿：車票質感頂邊 */
+        /* 交通：車票質感頂邊 */
         .card--move::before {
             content: "";
             position: absolute;
@@ -722,6 +1046,35 @@
         .card--move .card-desc { margin-top: 8px; }
         .route { display: flex; flex-wrap: wrap; align-items: center; gap: 2px 8px; }
         .route-arrow { display: inline-grid; color: var(--ink-soft); }
+
+        /* 住宿：溫馨旅宿屋簷飾條與精緻門牌風格 */
+        .card--stay::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 8px;
+            background: var(--cat);
+            -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='32' height='8'%3E%3Cpath d='M0 0h32v2l-8 5-8-5-8 5-8-5z'/%3E%3C/svg%3E") repeat-x 0 0 / 32px 8px;
+            mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='32' height='8'%3E%3Cpath d='M0 0h32v2l-8 5-8-5-8 5-8-5z'/%3E%3C/svg%3E") repeat-x 0 0 / 32px 8px;
+        }
+        .card--stay .card-cat {
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            color: var(--ink);
+            font-weight: 600;
+        }
+        .card--stay .card-cat::before {
+            content: "";
+            display: inline-block;
+            width: 7px;
+            height: 7px;
+            border-radius: 2px;
+            background: var(--cat);
+            transform: rotate(45deg);
+        }
 
         /* 內容撐開剩下的高度，按鈕列才會固定在卡片底部 */
         .card-body { flex: 1 0 auto; }
@@ -830,22 +1183,73 @@
             z-index: 50;
             inset: 0 0 calc(var(--tabbar-h) + env(safe-area-inset-bottom)) 0;
             display: none;
-            padding: calc(env(safe-area-inset-top) + 74px) 12px 12px;
+            flex-direction: column;
+            gap: 8px;
+            padding: calc(env(safe-area-inset-top) + 12px) 12px 12px;
             background: var(--paper);
         }
-        html[data-view="map"] .map-pane { display: block; }
+        html[data-view="map"] .map-pane { display: flex; }
         html[data-view="map"] body { overflow: hidden; }
-        .map-head {
-            position: absolute;
-            top: calc(env(safe-area-inset-top) + 18px);
-            left: 20px;
-            right: 76px;
+
+        .map-top {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+            flex-shrink: 0;
         }
-        .map-head h2 { font-size: calc(20px * var(--fs)); line-height: 1.3; }
-        .map-head p { font-size: calc(13px * var(--fs)); color: var(--ink-soft); }
+        .map-head {
+            padding: 0 4px;
+        }
+        @media (min-width: 960px) {
+            .map-head { padding-right: 64px; }
+        }
+        .map-head h2 { font-size: calc(18px * var(--fs)); line-height: 1.3; }
+        .map-head p { font-size: calc(12.5px * var(--fs)); color: var(--ink-soft); }
+
+        .map-day-scroller {
+            display: flex;
+            gap: 6px;
+            overflow-x: auto;
+            padding: 2px 2px 4px;
+            scroll-snap-type: x proximity;
+            scrollbar-width: none;
+            -webkit-overflow-scrolling: touch;
+        }
+        .map-day-scroller::-webkit-scrollbar { display: none; }
+
+        .map-day-chip {
+            flex: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            min-height: 36px;
+            padding: 4px 12px;
+            border: 2px solid var(--line-strong);
+            border-radius: 999px;
+            background: var(--card);
+            font-size: calc(13px * var(--fs));
+            color: var(--ink);
+            white-space: nowrap;
+            cursor: pointer;
+            transition: transform .15s ease, background-color .15s ease, border-color .15s ease;
+        }
+        .map-day-chip:active { transform: scale(.95); }
+        .map-day-chip[aria-pressed="true"] {
+            border-color: var(--ink);
+            background: var(--accent);
+            color: var(--on-accent);
+            box-shadow: 0 2px 0 var(--line);
+            font-weight: 700;
+        }
+        .map-day-chip small {
+            font-size: calc(11px * var(--fs));
+            opacity: .85;
+        }
+
         .map-frame {
             position: relative;
-            height: 100%;
+            flex: 1 1 0;
+            min-height: 0;
             border: 2px solid var(--ink);
             border-radius: var(--r-card);
             overflow: hidden;
@@ -997,23 +1401,24 @@
                 display: grid;
                 grid-template-columns: minmax(400px, 480px) minmax(0, 1fr);
             }
+            .home-pane { display: none !important; }
             .list-col {
+                display: block !important;
                 padding-bottom: 40px;
                 border-right: 2px dashed var(--line-strong);
             }
             .tabbar { display: none; }
             .hero-text { padding-right: 20px; }
-            .search { margin-right: 16px; }
             .map-pane {
                 position: sticky;
                 top: 0;
                 z-index: 1;
-                display: block;
+                display: flex !important;
                 height: 100dvh;
-                padding: 90px 20px 20px;
+                padding: 16px 20px 20px;
             }
-            .map-head { left: 28px; top: 26px; }
-            html[data-view="map"] body { overflow: auto; }
+            html[data-view="map"] body,
+            html[data-view="home"] body { overflow: auto; }
             .sheet { bottom: 16px; }
         }
 
@@ -1035,8 +1440,13 @@
         <symbol id="i-arrow" viewBox="0 0 24 24"><path d="M4 12h15M14 7l5 5-5 5"/></symbol>
         <symbol id="i-bag" viewBox="0 0 24 24"><path d="M5 8.5h14l-1.2 11.5H6.2z"/><path d="M9 8.5V7a3 3 0 0 1 6 0v1.5"/></symbol>
         <symbol id="i-train" viewBox="0 0 24 24"><path d="M7 3.5h10a2 2 0 0 1 2 2v9.5a3 3 0 0 1-3 3H8a3 3 0 0 1-3-3V5.5a2 2 0 0 1 2-2z"/><path d="M7.5 7h9v4.2h-9z"/><path d="M8.6 14.6h.01M15.4 14.6h.01"/><path d="M8.3 18l-2 3M15.7 18l2 3"/></symbol>
+        <symbol id="i-bed" viewBox="0 0 24 24"><path d="M3 7v13M21 12v8M3 16h18M3 12h11a2 2 0 0 1 2 2v2M6 12V9.5A1.5 1.5 0 0 1 7.5 8h2A1.5 1.5 0 0 1 11 9.5V12"/></symbol>
         <symbol id="i-search" viewBox="0 0 24 24"><circle cx="10.8" cy="10.8" r="6.3"/><path d="M20 20l-4.6-4.6"/></symbol>
+        <symbol id="i-chevron-down" viewBox="0 0 24 24"><path d="M6 9l6 6 6-6"/></symbol>
         <symbol id="i-close" viewBox="0 0 24 24"><path d="M6.5 6.5l11 11M17.5 6.5l-11 11"/></symbol>
+        <symbol id="i-home" viewBox="0 0 24 24"><path d="M3 10.5L12 3l9 7.5V20a1.5 1.5 0 0 1-1.5 1.5h-5A1.5 1.5 0 0 1 13 20v-5h-2v5a1.5 1.5 0 0 1-1.5 1.5h-5A1.5 1.5 0 0 1 3 20z"/></symbol>
+        <symbol id="i-cloud" viewBox="0 0 24 24"><path d="M6.5 19a4.5 4.5 0 0 1-.5-8.97A7 7 0 0 1 19.5 12a4.5 4.5 0 0 1-2 8.5z"/></symbol>
+        <symbol id="i-rain" viewBox="0 0 24 24"><path d="M6.5 15a4.5 4.5 0 0 1-.5-8.97A7 7 0 0 1 19.5 8a4.5 4.5 0 0 1-2 8.5z"/><path d="M8 18l-1.5 3M12 18l-1.5 3M16 18l-1.5 3"/></symbol>
         <symbol id="i-sun" viewBox="0 0 24 24"><circle cx="12" cy="12" r="4.6"/><path fill="none" d="M12 2.6v2.2M12 19.2v2.2M2.6 12h2.2M19.2 12h2.2M5.4 5.4l1.5 1.5M17.1 17.1l1.5 1.5M5.4 18.6l1.5-1.5M17.1 6.9l1.5-1.5"/></symbol>
         <symbol id="i-moon" viewBox="0 0 24 24"><path d="M19.5 14.6A7.8 7.8 0 0 1 9.4 4.5a7.8 7.8 0 1 0 10.1 10.1z"/><path fill="none" d="M17 3.5v2.4M15.8 4.7h2.4"/></symbol>
         <symbol id="i-book" viewBox="0 0 24 24"><path d="M3 5.6c3-1.1 6-.9 9 1.1 3-2 6-2.2 9-1.1V19c-3-1.1-6-.9-9 1.1-3-2-6-2.2-9-1.1z"/><path d="M12 6.7v13.4"/></symbol>
@@ -1123,8 +1533,59 @@
     </dialog>
 
     <div class="app">
+        <!-- 首頁：封面插畫、天氣看板、今日行程 -->
+        <section id="home-pane" class="home-pane" aria-label="首頁概覽">
+            <div class="home-hero-wrap" id="home-hero-container"></div>
+
+            <!-- 天氣看板 -->
+            <section class="weather-card" id="weather-card" aria-label="當天天氣資訊">
+                <div class="weather-header">
+                    <span class="weather-city-badge">
+                        <svg class="ico"><use href="#i-pin"/></svg>
+                        <span id="weather-city-name">福岡市 (Hakata)</span>
+                    </span>
+                    <span class="weather-status-tag" id="weather-date-label">今日預報</span>
+                </div>
+                <div class="weather-body">
+                    <div class="weather-icon-box" id="weather-icon-box">
+                        <svg class="ico"><use id="weather-icon-use" href="#i-sun"/></svg>
+                    </div>
+                    <div>
+                        <div class="weather-temp-main">
+                            <span class="weather-temp-now" id="weather-temp">16°</span>
+                        </div>
+                        <div class="weather-desc-text" id="weather-desc">晴朗舒適</div>
+                    </div>
+                    <div class="weather-range-box">
+                        <div>最高 <strong id="weather-max">18°</strong></div>
+                        <div>最低 <strong id="weather-min">11°</strong></div>
+                        <div>降雨 <strong id="weather-rain">10%</strong></div>
+                    </div>
+                </div>
+                <div class="weather-tips">
+                    <svg class="ico"><use href="#i-bowl"/></svg>
+                    <span id="weather-outfit-tip">早晚偏涼風大，建議穿薄長袖並攜帶防風保暖外套。</span>
+                </div>
+            </section>
+
+            <!-- 當日行程 -->
+            <section class="home-today-section">
+                <div class="home-section-head">
+                    <h2><svg class="ico"><use href="#i-calendar"/></svg><span id="home-today-title">今日行程 (Day 1)</span></h2>
+                    <div class="home-day-selector">
+                        <button class="home-day-btn" id="home-prev-day-btn" type="button" aria-label="切換前一天">前一天</button>
+                        <button class="home-day-btn" id="home-next-day-btn" type="button" aria-label="切換後一天">後一天</button>
+                    </div>
+                </div>
+                <div id="home-today-list" class="today-stops-wrap"></div>
+                <button class="today-view-all-btn" id="home-view-all-btn" type="button">
+                    <svg class="ico"><use href="#i-book"/></svg>前往完整行程清單
+                </button>
+            </section>
+        </section>
+
         <div class="list-col">
-            <header class="hero">
+            <header class="hero" id="main-hero">
                 <div class="hero-text">
                     <h1 id="trip-title"></h1>
                     <p class="hero-sub"><span id="trip-subtitle"></span>共 <strong id="total-count">0</strong> 個地點</p>
@@ -1217,14 +1678,6 @@
             </header>
 
             <div class="toolbar">
-                <label class="search">
-                    <svg class="ico"><use href="#i-search"/></svg>
-                    <span class="sr-only">搜尋</span>
-                    <input id="search-input" type="search" placeholder="找店名、景點或備註" autocomplete="off" enterkeyhint="search">
-                    <button id="search-clear" class="icon-btn" type="button" aria-label="清除搜尋" hidden>
-                        <svg class="ico"><use href="#i-close"/></svg>
-                    </button>
-                </label>
                 <nav id="day-tabs" class="scroller" aria-label="選擇天數"></nav>
                 <div id="cat-chips" class="scroller cats" role="group" aria-label="選擇類別"></div>
             </div>
@@ -1234,9 +1687,12 @@
         </div>
 
         <section id="map-pane" class="map-pane" aria-label="地圖">
-            <div class="map-head">
-                <h2 id="map-title">全部地點</h2>
-                <p>點圖釘看店家資訊，按「導航」開 Google 地圖</p>
+            <div class="map-top">
+                <div class="map-head">
+                    <h2 id="map-title">全部地點</h2>
+                    <p id="map-sub">點圖釘看店家資訊，按「導航」開 Google 地圖</p>
+                </div>
+                <nav id="map-day-tabs" class="map-day-scroller" aria-label="選擇地圖天數"></nav>
             </div>
             <div class="map-frame">
                 <div id="map"></div>
@@ -1248,7 +1704,10 @@
     </div>
 
     <nav class="tabbar" aria-label="切換畫面">
-        <button class="tab" type="button" data-view="list" aria-pressed="true">
+        <button class="tab" type="button" data-view="home" aria-pressed="true">
+            <span class="tab-ico"><svg class="ico"><use href="#i-home"/></svg></span>首頁
+        </button>
+        <button class="tab" type="button" data-view="list" aria-pressed="false">
             <span class="tab-ico"><svg class="ico"><use href="#i-book"/></svg></span>行程
         </button>
         <button class="tab" type="button" data-view="map" aria-pressed="false">
@@ -1286,11 +1745,12 @@
             '景點': { label: '景點', icon: 'torii', color: 'var(--c-sight)', kind: 'sight', priceLabel: '門票' },
             '美食': { label: '美食', icon: 'bowl', color: 'var(--c-food)', kind: 'food', priceLabel: '預算' },
             '購物': { label: '購物', icon: 'bag', color: 'var(--c-shop)', kind: 'shop', priceLabel: '價位' },
-            '交通': { label: '交通住宿', icon: 'train', color: 'var(--c-move)', kind: 'move', priceLabel: '票價' }
+            '交通': { label: '交通', icon: 'train', color: 'var(--c-move)', kind: 'move', priceLabel: '票價' },
+            '住宿': { label: '住宿', icon: 'bed', color: 'var(--c-stay)', kind: 'stay', priceLabel: '房價' }
         };
         // 舊資料的分類名稱
-        const categoryAlias = { '甜點': '美食' };
-        const tapeColors = ['var(--c-food)', 'var(--c-move)', 'var(--c-sight)', 'var(--c-shop)', 'var(--c-sweet)'];
+        const categoryAlias = { '甜點': '美食', '飯店': '住宿', '旅館': '住宿', '酒店': '住宿' };
+        const tapeColors = ['var(--c-food)', 'var(--c-move)', 'var(--c-stay)', 'var(--c-sight)', 'var(--c-shop)', 'var(--c-sweet)'];
 
         // 地圖底圖：OpenStreetMap，免費、不需金鑰
         // （原本的 CARTO 底圖現在要 API key，沒有金鑰會出現浮水印）
@@ -1353,6 +1813,9 @@
             if (/排隊/.test(text)) {
                 tags.push({ type: 'queue', text: '排隊名店', icon: 'bowl' });
             }
+            if (/Check-in|入住|登記入住/i.test(text)) {
+                tags.push({ type: 'stay', text: 'Check-in', icon: 'bed' });
+            }
 
             // 清理標籤重複字眼後的一句話摘要
             let summary = text
@@ -1388,6 +1851,7 @@
                 .concat(Object.entries(categoryConfig).map(([key, c]) =>
                     `<button class="cat-chip" type="button" data-cat="${key}" aria-pressed="false" style="--cat:${c.color}"><span class="dot">${icon(c.icon)}</span>${c.label}</button>`));
             $('#cat-chips').innerHTML = chips.join('');
+            renderMapDayTabs();
         }
 
         function syncPressed(container, attr, value) {
@@ -1530,9 +1994,9 @@
                 bindChoices(list);
             }
 
-            const dayInfo = days.find((d) => d.day == state.day);
-            $('#map-title').textContent = dayInfo ? `Day ${dayInfo.day} ${dayInfo.name}` : '全部地點';
-            updateMarkers();
+            if (desktopMQ.matches) {
+                setMapDay(state.day, true);
+            }
         }
 
         function updateCounts() {
@@ -1550,12 +2014,61 @@
         let map = null;
         let markerLayer = null;
         const markersById = new Map();
+        let mapDay = 'all';
+
+        function getMapItems() {
+            return items.filter((it) => {
+                if (!it.lat || !it.lng) return false;
+                if (mapDay === 'all') return true;
+                return it.day == mapDay;
+            });
+        }
+
+        function renderMapDayTabs() {
+            const container = $('#map-day-tabs');
+            if (!container) return;
+            const totalWithCoords = items.filter((it) => it.lat && it.lng).length;
+            const tabs = [
+                `<button class="map-day-chip" type="button" data-day="all" aria-pressed="${String(mapDay === 'all')}">全部 <small>${totalWithCoords}</small></button>`
+            ];
+            days.forEach((d) => {
+                const count = items.filter((it) => it.day == d.day && it.lat && it.lng).length;
+                tabs.push(
+                    `<button class="map-day-chip" type="button" data-day="${d.day}" aria-pressed="${String(mapDay == d.day)}">Day ${d.day} ${esc(d.name)} <small>${count}</small></button>`
+                );
+            });
+            container.innerHTML = tabs.join('');
+        }
+
+        function setMapDay(targetDay, fit = true) {
+            mapDay = targetDay;
+            document.querySelectorAll('.map-day-chip').forEach((btn) => {
+                btn.setAttribute('aria-pressed', String(btn.dataset.day == mapDay));
+            });
+
+            const dayInfo = days.find((d) => d.day == mapDay);
+            const pins = getMapItems();
+            if (mapDay === 'all') {
+                $('#map-title').textContent = '全部地點';
+                $('#map-sub').textContent = `共 ${pins.length} 個地點圖釘 · 點圖釘看資訊與導航`;
+                const fitBtn = $('#map-fit');
+                if (fitBtn) fitBtn.innerHTML = `${icon('fit')}顯示全部圖釘`;
+            } else {
+                $('#map-title').textContent = dayInfo ? `Day ${dayInfo.day} ${dayInfo.name}` : `Day ${mapDay}`;
+                $('#map-sub').textContent = `共 ${pins.length} 個地點圖釘 · 點圖釘看資訊與導航`;
+                const fitBtn = $('#map-fit');
+                if (fitBtn) fitBtn.innerHTML = `${icon('fit')}重設當日視角`;
+            }
+
+            updateMarkers(fit);
+        }
 
         function initMap(fit = true) {
             if (map || !window.L) return;
             map = L.map('map', { zoomControl: true }).setView([33.5902, 130.4207], 11);
             L.tileLayer(TILE_URL, { attribution: TILE_ATTRIBUTION, maxZoom: 19 }).addTo(map);
             markerLayer = L.layerGroup().addTo(map);
+            renderMapDayTabs();
             updateMarkers(fit);
         }
 
@@ -1574,8 +2087,8 @@
             markerLayer.clearLayers();
             markersById.clear();
             const bounds = [];
-            currentList.forEach((item) => {
-                if (!item.lat || !item.lng) return;
+            const pins = getMapItems();
+            pins.forEach((item) => {
                 const c = catOf(item);
                 const marker = L.marker([item.lat, item.lng], {
                     title: item.title,
@@ -1600,6 +2113,9 @@
             if (!item) return;
             const fresh = !map;
             if (!desktopMQ.matches) setView('map', { init: false });
+            if (mapDay !== 'all' && mapDay != item.day) {
+                setMapDay(item.day, false);
+            }
             initMap(false); // 第一次開地圖就直接定位到這個點，不先縮放到全部圖釘
             if (!map) return;
             map.invalidateSize();
@@ -1615,13 +2131,23 @@
             }
         }
 
-        // ---------- 行程／地圖切換（手機） ----------
+        // ---------- 畫面切換（首頁／行程／地圖） ----------
         function setView(view, opts = {}) {
+            if (!['home', 'list', 'map'].includes(view)) view = 'home';
             root.dataset.view = view;
             document.querySelectorAll('.tab').forEach((t) => t.setAttribute('aria-pressed', String(t.dataset.view === view)));
+            if (opts.updateHash !== false) {
+                try {
+                    if (location.hash !== `#${view}`) history.replaceState(null, '', `#${view}`);
+                } catch (e) {}
+            }
             if (view === 'map' && opts.init !== false) {
                 initMap();
+                renderMapDayTabs();
                 setTimeout(() => map && map.invalidateSize(), 50);
+            }
+            if (view === 'home') {
+                renderHome();
             }
         }
 
@@ -1715,24 +2241,6 @@
             scrollToList();
         });
 
-        let searchTimer;
-        $('#search-input').addEventListener('input', (e) => {
-            clearTimeout(searchTimer);
-            $('#search-clear').hidden = !e.target.value;
-            searchTimer = setTimeout(() => {
-                state.query = e.target.value.trim();
-                render();
-            }, 120);
-        });
-        $('#search-clear').addEventListener('click', () => {
-            const input = $('#search-input');
-            input.value = '';
-            $('#search-clear').hidden = true;
-            state.query = '';
-            render();
-            input.focus();
-        });
-
         $('#itinerary-list').addEventListener('click', (e) => {
             const btn = e.target.closest('[data-act]');
             if (!btn) return;
@@ -1741,8 +2249,6 @@
                 state.day = 'all';
                 state.cat = 'all';
                 state.query = '';
-                $('#search-input').value = '';
-                $('#search-clear').hidden = true;
                 syncPressed($('#day-tabs'), 'day', 'all');
                 syncPressed($('#cat-chips'), 'cat', 'all');
                 render();
@@ -1842,10 +2348,204 @@
             else detailModal.setAttribute('open', '');
         }
 
+        // ---------- 首頁當天天氣與當日行程邏輯 ----------
+        let currentHomeDay = 1;
+
+        const weatherCodes = {
+            0: { desc: '晴天朗朗', icon: 'i-sun', outfit: '天氣晴朗舒適，早晚偏涼建議攜帶薄外套。' },
+            1: { desc: '晴時多雲', icon: 'i-sun', outfit: '氣候宜人，早晚溫差大，洋蔥式穿搭最合適。' },
+            2: { desc: '多雲舒適', icon: 'i-cloud', outfit: '雲量稍多但舒適，適合戶外逛街散步。' },
+            3: { desc: '陰天微涼', icon: 'i-cloud', outfit: '陰天偏涼風大，建議穿薄長袖並攜帶防風外套。' },
+            45: { desc: '有晨霧', icon: 'i-cloud', outfit: '清晨能見度低且偏冷，注意保暖。' },
+            48: { desc: '有霧氣', icon: 'i-cloud', outfit: '天氣偏濕冷，建議備齊外套保暖。' },
+            51: { desc: '毛毛細雨', icon: 'i-rain', outfit: '偶有零星細雨，建議攜帶輕便折疊傘。' },
+            53: { desc: '局部細雨', icon: 'i-rain', outfit: '出門記得隨身攜帶雨傘防雨。' },
+            55: { desc: '偶陣雨', icon: 'i-rain', outfit: '有短暫陣雨，備傘為宜，室內行程備案佳。' },
+            61: { desc: '微弱小雨', icon: 'i-rain', outfit: '降雨機率高，出門請帶傘，注意路面濕滑。' },
+            63: { desc: '陣雨綿綿', icon: 'i-rain', outfit: '雨勢明顯，鞋襪易濕，建議安排室內或地下街景點。' },
+            65: { desc: '較大雨勢', icon: 'i-rain', outfit: '雨勢偏大，建議走天神地下街或大型商場逛街。' },
+            80: { desc: '陣雨', icon: 'i-rain', outfit: '短暫陣雨，隨身攜帶雨具即可。' },
+            81: { desc: '強陣雨', icon: 'i-rain', outfit: '陣雨偏大，建議先在室內或咖啡廳稍作停留。' }
+        };
+
+        const cityCoords = {
+            '抵達福岡/博多': { name: '福岡市 (博多)', lat: 33.5902, lng: 130.4207 },
+            '天神購物': { name: '福岡市 (天神)', lat: 33.5916, lng: 130.3989 },
+            '糸島海岸': { name: '糸島市 (Itoshima)', lat: 33.5597, lng: 130.1986 },
+            '由布院溫泉': { name: '由布市 (由布院)', lat: 33.2642, lng: 131.3556 },
+            '由布院/博多': { name: '由布 / 博多', lat: 33.5902, lng: 130.4207 },
+            '小倉城/門司港': { name: '北九州市 (小倉)', lat: 33.8834, lng: 130.8752 },
+            '太宰府/竈門神社': { name: '太宰府市 (Dazaifu)', lat: 33.5215, lng: 130.5348 },
+            '柳橋市場/返台': { name: '福岡市 (博多)', lat: 33.5902, lng: 130.4207 }
+        };
+
+        async function fetchWeatherForDay(dayNum) {
+            const dayInfo = days.find((d) => d.day === dayNum);
+            const city = (dayInfo && cityCoords[dayInfo.name]) || { name: '福岡市 (Hakata)', lat: 33.5902, lng: 130.4207 };
+            $('#weather-city-name').textContent = city.name;
+            $('#weather-date-label').textContent = dayInfo ? `Day ${dayNum} ${dayInfo.name}` : `Day ${dayNum} 預報`;
+
+            // 檢查快取
+            const cacheKey = `fukuoka:weather:${dayNum}`;
+            let cached = null;
+            try {
+                const raw = localStorage.getItem(cacheKey);
+                if (raw) cached = JSON.parse(raw);
+            } catch (e) {}
+
+            // 快取如果小於 2 小時直接套用
+            if (cached && (Date.now() - cached.time < 7200000)) {
+                applyWeatherUI(cached.data);
+                return;
+            }
+
+            try {
+                const url = `https://api.open-meteo.com/v1/forecast?latitude=${city.lat}&longitude=${city.lng}&current_weather=true&daily=temperature_2m_max,temperature_2m_min,precipitation_probability_max,weathercode&timezone=Asia%2FTokyo`;
+                const res = await fetch(url);
+                if (!res.ok) throw new Error('API 回應錯誤');
+                const data = await res.json();
+                const cur = data.current_weather || {};
+                const daily = data.daily || {};
+                const wCode = cur.weathercode != null ? cur.weathercode : (daily.weathercode && daily.weathercode[0]);
+                const payload = {
+                    temp: Math.round(cur.temperature != null ? cur.temperature : 16),
+                    max: Math.round(daily.temperature_2m_max ? daily.temperature_2m_max[0] : 18),
+                    min: Math.round(daily.temperature_2m_min ? daily.temperature_2m_min[0] : 11),
+                    rain: Math.round(daily.precipitation_probability_max ? daily.precipitation_probability_max[0] : 10),
+                    code: wCode || 0
+                };
+                try {
+                    localStorage.setItem(cacheKey, JSON.stringify({ time: Date.now(), data: payload }));
+                } catch (e) {}
+                applyWeatherUI(payload);
+            } catch (err) {
+                // 離線或讀取失敗時，若有舊快取套用舊快取，否則套用 11 月標準氣候
+                if (cached) {
+                    applyWeatherUI(cached.data);
+                } else {
+                    applyWeatherUI({ temp: 16, max: 18, min: 11, rain: 10, code: 0 });
+                }
+            }
+        }
+
+        function applyWeatherUI(w) {
+            const info = weatherCodes[w.code] || weatherCodes[0];
+            $('#weather-temp').textContent = `${w.temp}°`;
+            $('#weather-max').textContent = `${w.max}°`;
+            $('#weather-min').textContent = `${w.min}°`;
+            $('#weather-rain').textContent = `${w.rain}%`;
+            $('#weather-desc').textContent = info.desc;
+            $('#weather-icon-use').setAttribute('href', `#${info.icon}`);
+            $('#weather-outfit-tip').textContent = info.outfit;
+        }
+
+        function renderHome() {
+            if (!items || !items.length) return;
+            const dayInfo = days.find((d) => d.day === currentHomeDay);
+            $('#home-today-title').textContent = dayInfo ? `Day ${currentHomeDay} ${dayInfo.name}` : `Day ${currentHomeDay} 行程`;
+
+            const dayItems = items.filter((i) => i.day === currentHomeDay);
+            const container = $('#home-today-list');
+            if (!dayItems.length) {
+                container.innerHTML = `<div class="today-empty"><p>這一天尚未安排行程。</p></div>`;
+            } else {
+                const groups = groupStops(dayItems);
+                container.innerHTML = `
+                    <div class="home-timeline">
+                        ${groups.map((group) => {
+                            const first = group[0];
+                            const c = catOf(first);
+                            const timeStr = first.time ? esc(first.time) : '未定';
+
+                            // 只有 1 個地點：維持簡潔單列（點擊直達 Google Maps）
+                            if (group.length === 1) {
+                                const isVisited = visited.has(first.id);
+                                const link = mapLink(first);
+                                return `
+                                    <a class="timeline-item${isVisited ? ' is-visited' : ''}" href="${esc(link)}" target="_blank" rel="noopener" aria-label="${esc(first.title)}：開啟 Google 地圖導航">
+                                        <div class="timeline-left">
+                                            <span class="timeline-time">${timeStr}</span>
+                                            <span class="timeline-cat-pill" style="--cat:${c.color}">${icon(c.icon)}${esc(c.label)}</span>
+                                            <span class="timeline-title">${esc(first.title)}</span>
+                                        </div>
+                                        <div class="timeline-right">
+                                            ${isVisited ? '<span class="timeline-stamp-pill">去過</span>' : ''}
+                                            <span class="timeline-nav-icon" title="開啟導航">${icon('nav')}</span>
+                                        </div>
+                                    </a>`;
+                            }
+
+                            // 同時段有多個地點（擇一選項）：收合呈現並標註數量
+                            const visitedCount = group.filter((it) => visited.has(it.id)).length;
+                            const countText = group.length > 9 ? '9+' : String(group.length);
+                            return `
+                                <details class="timeline-group">
+                                    <summary class="timeline-summary">
+                                        <div class="timeline-left">
+                                            <span class="timeline-time">${timeStr}</span>
+                                            <span class="timeline-cat-pill" style="--cat:${c.color}">${icon(c.icon)}${esc(c.label)}</span>
+                                            <span class="timeline-title">${esc(first.title)}</span>
+                                        </div>
+                                        <div class="timeline-right">
+                                            ${visitedCount ? `<span class="timeline-stamp-pill">${visitedCount} 去過</span>` : ''}
+                                            <span class="timeline-count-btn" title="${group.length} 個地點">${countText}${icon('chevron-down')}</span>
+                                        </div>
+                                    </summary>
+                                    <div class="timeline-group-items">
+                                        ${group.map((item) => {
+                                            const isV = visited.has(item.id);
+                                            const link = mapLink(item);
+                                            return `
+                                                <a class="timeline-sub-item${isV ? ' is-visited' : ''}" href="${esc(link)}" target="_blank" rel="noopener" aria-label="${esc(item.title)}：開啟 Google 地圖導航">
+                                                    <span class="timeline-title">${esc(item.title)}</span>
+                                                    <div class="timeline-right">
+                                                        ${isV ? '<span class="timeline-stamp-pill">去過</span>' : ''}
+                                                        <span class="timeline-nav-icon" title="開啟導航">${icon('nav')}</span>
+                                                    </div>
+                                                </a>`;
+                                        }).join('')}
+                                    </div>
+                                </details>`;
+                        }).join('')}
+                    </div>`;
+            }
+
+            fetchWeatherForDay(currentHomeDay);
+        }
+
+        $('#home-prev-day-btn').addEventListener('click', () => {
+            if (!days.length) return;
+            const minDay = days[0].day;
+            const maxDay = days[days.length - 1].day;
+            currentHomeDay = currentHomeDay > minDay ? currentHomeDay - 1 : maxDay;
+            renderHome();
+        });
+
+        $('#home-next-day-btn').addEventListener('click', () => {
+            if (!days.length) return;
+            const minDay = days[0].day;
+            const maxDay = days[days.length - 1].day;
+            currentHomeDay = currentHomeDay < maxDay ? currentHomeDay + 1 : minDay;
+            renderHome();
+        });
+
+        $('#home-view-all-btn').addEventListener('click', () => {
+            state.day = currentHomeDay;
+            syncPressed($('#day-tabs'), 'day', state.day);
+            render();
+            setView('list');
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        });
+
         document.querySelectorAll('.tab').forEach((tab) => {
             tab.addEventListener('click', () => setView(tab.dataset.view));
         });
         $('#map-fit').addEventListener('click', () => updateMarkers(true));
+        $('#map-day-tabs').addEventListener('click', (e) => {
+            const btn = e.target.closest('.map-day-chip');
+            if (!btn) return;
+            setMapDay(btn.dataset.day, true);
+        });
 
         desktopMQ.addEventListener('change', (e) => {
             if (e.matches) {
@@ -2057,6 +2757,13 @@
             document.title = trip.title;
             $('#trip-title').textContent = trip.title;
             $('#trip-subtitle').textContent = trip.subtitle ? `${trip.subtitle}，` : '';
+
+            // 將繪本封面掛載到首頁
+            const homeHeroContainer = $('#home-hero-container');
+            const mainHero = $('#main-hero');
+            if (homeHeroContainer && mainHero && !homeHeroContainer.contains(mainHero)) {
+                homeHeroContainer.appendChild(mainHero);
+            }
         }
 
         function showTripError(err) {
@@ -2071,13 +2778,32 @@
         }
 
         // ---------- 啟動 ----------
+        function initRouting() {
+            const hash = location.hash.replace('#', '');
+            const initialView = ['home', 'list', 'map'].includes(hash) ? hash : 'home';
+            if (desktopMQ.matches) {
+                setView('list', { updateHash: false });
+                initMap();
+            } else {
+                setView(initialView, { updateHash: Boolean(hash) });
+            }
+        }
+
+        window.addEventListener('hashchange', () => {
+            const next = location.hash.replace('#', '');
+            if (['home', 'list', 'map'].includes(next) && next !== root.dataset.view) {
+                setView(next, { updateHash: false });
+            }
+        });
+
         loadTrip()
             .then((data) => {
                 applyTrip(data);
                 renderFilters();
                 updateCounts();
                 render();
-                if (desktopMQ.matches) initMap();
+                renderHome();
+                initRouting();
             })
             .catch((err) => {
                 console.error(err);
