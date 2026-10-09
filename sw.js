@@ -1,7 +1,7 @@
 // 福岡散步繪本 Service Worker
-// 只改 data/trip.json、data/info.json 或 index.html 時不用動這裡（這兩個是「網路優先」，連得上就會拿到新版）。
+// 只改 data/*.json 或 index.html 時不用動這裡（這兩個是「網路優先」，連得上就會拿到新版）。
 // 換了字型、圖示、Leaflet 等其他檔案時，把 VERSION 加 1，手機才會重新下載。
-const VERSION = 'v15';
+const VERSION = 'v16';
 const CORE_CACHE = `fukuoka-core-${VERSION}`;
 const TILE_CACHE = 'fukuoka-tiles';
 const TILE_LIMIT = 800;
@@ -11,6 +11,7 @@ const CORE_FILES = [
   './index.html',
   './data/trip.json',
   './data/info.json',
+  './data/checklist.json',
   './manifest.webmanifest',
   './vendor/leaflet/leaflet.js',
   './vendor/leaflet/leaflet.css',
@@ -52,7 +53,7 @@ self.addEventListener('fetch', (event) => {
     event.respondWith(networkFirst(request, './index.html'));
     return;
   }
-  const dataFile = ['trip.json', 'info.json'].find((name) => url.pathname.endsWith(`/data/${name}`));
+  const dataFile = ['trip.json', 'info.json', 'checklist.json'].find((name) => url.pathname.endsWith(`/data/${name}`));
   if (url.origin === self.location.origin && dataFile) {
     event.respondWith(networkFirst(request, `./data/${dataFile}`));
     return;

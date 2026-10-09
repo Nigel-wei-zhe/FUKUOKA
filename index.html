@@ -919,6 +919,55 @@
         .phrase-actions .chip-btn { flex: 1 1 40%; min-height: 52px; font-size: calc(16px * var(--fs)); }
         .phrase-actions .chip-btn.nav { flex-basis: 100%; }
 
+        /* ---------- 行前自檢表 ---------- */
+        .list-col.is-prep #cat-chips,
+        .list-col.is-prep #list-count { display: none; }
+        .checklist { display: flex; flex-direction: column; gap: 16px; padding: 18px 16px 8px; }
+        .check-progress p { font-size: calc(17px * var(--fs)); line-height: 1.5; }
+        .check-progress strong { font-weight: 400; font-size: calc(22px * var(--fs)); color: var(--link); }
+        .check-bar {
+            height: 12px;
+            margin-top: 8px;
+            border: 2px solid var(--line-strong);
+            border-radius: 999px;
+            background: var(--card);
+            overflow: hidden;
+        }
+        .check-bar span { display: block; height: 100%; background: var(--c-sight); transition: width .3s ease; }
+        .check-items { margin-top: 6px; }
+        .check-items li + li { border-top: 1.5px dashed var(--line); }
+        .check-row {
+            display: flex;
+            align-items: flex-start;
+            gap: 12px;
+            width: 100%;
+            min-height: 56px;
+            padding: 12px 2px;
+            border: 0;
+            background: transparent;
+            text-align: left;
+        }
+        .check-box {
+            display: grid;
+            place-items: center;
+            flex: none;
+            width: 30px;
+            height: 30px;
+            margin-top: 1px;
+            border: 2px solid var(--ink);
+            border-radius: 8px;
+            background: var(--card);
+            color: transparent;
+            transition: background-color .15s ease, color .15s ease;
+        }
+        .check-box .ico { width: 22px; height: 22px; stroke-width: 2.6; }
+        .check-row[aria-checked="true"] .check-box { background: var(--c-sight); color: var(--on-cat); }
+        .check-row:active .check-box { transform: scale(.9); }
+        .check-text { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+        .check-title { font-size: calc(17px * var(--fs)); line-height: 1.45; color: var(--ink); overflow-wrap: anywhere; }
+        .check-note { font-size: calc(14px * var(--fs)); line-height: 1.5; color: var(--ink-soft); overflow-wrap: anywhere; }
+        .check-row[aria-checked="true"] .check-title { color: var(--ink-soft); text-decoration: line-through; text-decoration-thickness: 1.5px; }
+
         /* ---------- 篩選列（吸頂） ---------- */
         .toolbar {
             position: sticky;
@@ -1768,6 +1817,8 @@
         <symbol id="i-chat" viewBox="0 0 24 24"><path d="M4 5.5h16a1 1 0 0 1 1 1v9.5a1 1 0 0 1-1 1h-9l-4.5 3.5V17H4a1 1 0 0 1-1-1V6.5a1 1 0 0 1 1-1z"/><path d="M8 10h8M8 13h5"/></symbol>
         <symbol id="i-volume" viewBox="0 0 24 24"><path d="M4 9.5h3.5L12 5.5v13l-4.5-4H4z"/><path d="M15.5 9a4 4 0 0 1 0 6M18 6.5a7.5 7.5 0 0 1 0 11"/></symbol>
         <symbol id="i-expand" viewBox="0 0 24 24"><path d="M14 4h6v6M10 20H4v-6M20 4l-7 7M4 20l7-7"/></symbol>
+        <symbol id="i-check" viewBox="0 0 24 24"><path d="M5 12.5l4.5 4.5L19 7.5"/></symbol>
+        <symbol id="i-heart" viewBox="0 0 24 24"><path d="M12 20s-7.5-4.6-7.5-10.2A4.3 4.3 0 0 1 12 7.2a4.3 4.3 0 0 1 7.5 2.6C19.5 15.4 12 20 12 20z"/></symbol>
         <symbol id="i-share" viewBox="0 0 24 24"><path d="M12 3.5v11M8 7.5l4-4 4 4"/><path d="M8 10.5H6.5v10h11v-10H16"/></symbol>
         <symbol id="i-home-add" viewBox="0 0 24 24"><path d="M6 4h12a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2z"/><path d="M12 8.5v7M8.5 12h7"/></symbol>
         <symbol id="i-fit" viewBox="0 0 24 24"><path d="M4 9V5.5A1.5 1.5 0 0 1 5.5 4H9M15 4h3.5A1.5 1.5 0 0 1 20 5.5V9M20 15v3.5a1.5 1.5 0 0 1-1.5 1.5H15M9 20H5.5A1.5 1.5 0 0 1 4 18.5V15"/><circle cx="12" cy="12" r="2.5"/></symbol>
@@ -2085,6 +2136,7 @@
         // ✏️ 行程資料放在 data/trip.json，換一趟旅程只要換這個檔案
         const TRIP_URL = './data/trip.json';
         const INFO_URL = './data/info.json';
+        const CHECKLIST_URL = './data/checklist.json';
         const VIEWS = ['home', 'list', 'map', 'info'];
         let trip = { id: 'trip', title: '', subtitle: '', timeNote: '' };
         let weatherConf = { timezone: 'auto', default: null, climate: null };
@@ -2218,16 +2270,19 @@
         }
 
         // ---------- 狀態 ----------
-        const state = { day: 'all', cat: 'all', query: '' };
+        // day：'prep'（行前自檢表）或第幾天
+        const state = { day: 'prep', cat: 'all', query: '' };
         let currentList = [];
 
         // ---------- 篩選按鈕 ----------
         function renderFilters() {
-            const dayTabs = [`<button class="day-tab" type="button" data-day="all" aria-pressed="true"><small>${days.length} 天</small><span>全部</span></button>`]
+            const dayTabs = [`<button class="day-tab" type="button" data-day="prep" aria-pressed="false"><small id="prep-progress">自檢表</small><span>行前</span></button>`]
                 .concat(days.map((d) => d.name
                     ? `<button class="day-tab" type="button" data-day="${d.day}" aria-pressed="false"><small>${dayLabel(d.day)}</small><span>${esc(d.name)}</span></button>`
                     : `<button class="day-tab" type="button" data-day="${d.day}" aria-pressed="false"><span>${dayLabel(d.day)}</span></button>`));
             $('#day-tabs').innerHTML = dayTabs.join('');
+            syncPressed($('#day-tabs'), 'day', state.day);
+            updatePrepProgress();
 
             const chips = [`<button class="cat-chip" type="button" data-cat="all" aria-pressed="true">全部</button>`]
                 .concat(Object.entries(categoryConfig).map(([key, c]) =>
@@ -2333,9 +2388,16 @@
         }
 
         function render() {
+            const isPrep = state.day === 'prep';
+            $('.list-col').classList.toggle('is-prep', isPrep);
+            if (isPrep) {
+                renderChecklist();
+                if (desktopMQ.matches) setMapDay('all', true);
+                return;
+            }
             const q = state.query.toLowerCase();
             currentList = items.filter((item) => {
-                const matchDay = state.day === 'all' || item.day == state.day;
+                const matchDay = item.day == state.day;
                 const matchCat = state.cat === 'all' || (categoryConfig[item.category] ? item.category : '景點') === state.cat;
                 const matchQuery = !q ||
                     (item.title && item.title.toLowerCase().includes(q)) ||
@@ -2348,8 +2410,8 @@
                 list.innerHTML = `
                     <div class="empty">
                         <svg aria-hidden="true"><use href="#mascot"/></svg>
-                        <p>沒有符合的地點，換個關鍵字，或清除篩選看看。</p>
-                        <button class="chip-btn nav" type="button" data-act="reset">清除篩選</button>
+                        <p>這一天沒有這個分類的地點。</p>
+                        <button class="chip-btn nav" type="button" data-act="reset">顯示這天全部地點</button>
                     </div>`;
             } else {
                 const groups = new Map();
@@ -2377,6 +2439,96 @@
             }
         }
 
+        // ---------- 行前自檢表（內容在 data/checklist.json，勾選紀錄存在這支手機） ----------
+        let checklist = null; // { title, groups } 或 { error }
+        let checkedKey = 'trip:checklist';
+        let checked = new Set();
+        async function loadChecklist() {
+            try {
+                const res = await fetch(CHECKLIST_URL, { cache: 'no-cache' });
+                if (!res.ok) throw new TripError('讀不到自檢表', `data/checklist.json 回應 ${res.status}，請確認檔案存在。`);
+                const text = (await res.text()).replace(/^\uFEFF/, '');
+                let data;
+                try {
+                    data = JSON.parse(text);
+                } catch (e) {
+                    throw new TripError('自檢表格式有誤', describeJsonError(text));
+                }
+                const groups = (Array.isArray(data.groups) ? data.groups : [])
+                    .filter((g) => g && g.title && Array.isArray(g.items))
+                    .map((g) => ({ title: String(g.title), icon: g.icon, items: g.items.filter((it) => it && it.id && it.text) }));
+                return { title: String(data.title || '行前自檢表'), groups };
+            } catch (err) {
+                console.error(err);
+                return { error: err instanceof TripError ? err : new TripError('讀不到自檢表', '請確認網路連線後重新整理。') };
+            }
+        }
+        function checklistItems() {
+            return checklist && checklist.groups ? checklist.groups.flatMap((g) => g.items) : [];
+        }
+        function updatePrepProgress() {
+            const el = $('#prep-progress');
+            const all = checklistItems();
+            if (el) el.textContent = all.length ? `自檢 ${all.filter((it) => checked.has(it.id)).length}/${all.length}` : '自檢表';
+        }
+        function renderChecklist() {
+            const list = $('#itinerary-list');
+            if (!checklist) {
+                list.innerHTML = '<p class="loading">翻開自檢表中…</p>';
+                return;
+            }
+            if (checklist.error) {
+                list.innerHTML = `
+                    <div class="empty trip-error" role="alert">
+                        <svg aria-hidden="true"><use href="#mascot"/></svg>
+                        <h2>${esc(checklist.error.message)}</h2>
+                        <pre>${esc(checklist.error.detail || '')}</pre>
+                    </div>`;
+                return;
+            }
+            const all = checklistItems();
+            const done = all.filter((it) => checked.has(it.id)).length;
+            list.innerHTML = `
+                <section class="checklist">
+                    <div class="check-progress">
+                        <p>${done === all.length ? '全部準備好了，出發吧！' : `已完成 <strong>${done}</strong>／${all.length} 項`}</p>
+                        <div class="check-bar" role="progressbar" aria-label="自檢表完成度" aria-valuemin="0" aria-valuemax="${all.length}" aria-valuenow="${done}"><span style="width:${all.length ? (done / all.length) * 100 : 0}%"></span></div>
+                    </div>
+                    ${checklist.groups.map((g) => `
+                        <section class="info-card check-group">
+                            <h2><span class="info-ico">${icon(infoIcon(g.icon))}</span>${esc(g.title)}</h2>
+                            <ul class="check-items">
+                                ${g.items.map((it) => `
+                                    <li>
+                                        <button class="check-row" type="button" role="checkbox" aria-checked="${checked.has(it.id)}" data-act="check" data-check="${esc(it.id)}">
+                                            <span class="check-box" aria-hidden="true">${icon('check')}</span>
+                                            <span class="check-text">
+                                                <span class="check-title">${esc(it.text)}</span>
+                                                ${it.note ? `<span class="check-note">${esc(it.note)}</span>` : ''}
+                                            </span>
+                                        </button>
+                                    </li>`).join('')}
+                            </ul>
+                        </section>`).join('')}
+                </section>`;
+        }
+        function toggleCheck(id) {
+            checked.has(id) ? checked.delete(id) : checked.add(id);
+            save(checkedKey, Array.from(checked));
+            const btn = document.querySelector(`[data-check="${CSS.escape(id)}"]`);
+            if (btn) btn.setAttribute('aria-checked', String(checked.has(id)));
+            const all = checklistItems();
+            const done = all.filter((it) => checked.has(it.id)).length;
+            const progress = document.querySelector('.check-progress');
+            if (progress) {
+                progress.querySelector('p').innerHTML = done === all.length ? '全部準備好了，出發吧！' : `已完成 <strong>${done}</strong>／${all.length} 項`;
+                const bar = progress.querySelector('.check-bar');
+                bar.setAttribute('aria-valuenow', String(done));
+                bar.querySelector('span').style.width = `${all.length ? (done / all.length) * 100 : 0}%`;
+            }
+            updatePrepProgress();
+        }
+
         function updateCounts() {
             $('#total-count').textContent = items.length;
             $('#visited-count').textContent = items.filter((i) => visited.has(i.id)).length;
@@ -2384,7 +2536,7 @@
 
         function scrollToList() {
             const toolbar = $('.toolbar');
-            const top = $('#list-count').getBoundingClientRect().top + window.scrollY - toolbar.offsetHeight;
+            const top = $('#itinerary-list').getBoundingClientRect().top + window.scrollY - toolbar.offsetHeight;
             if (window.scrollY > top) window.scrollTo(0, top);
         }
 
@@ -2767,7 +2919,7 @@
         $('#day-tabs').addEventListener('click', (e) => {
             const btn = e.target.closest('.day-tab');
             if (!btn) return;
-            state.day = btn.dataset.day === 'all' ? 'all' : Number(btn.dataset.day);
+            state.day = btn.dataset.day === 'prep' ? 'prep' : Number(btn.dataset.day);
             syncPressed($('#day-tabs'), 'day', state.day);
             btn.scrollIntoView({ inline: 'nearest', block: 'nearest' });
             render();
@@ -2792,12 +2944,14 @@
             }
             const act = btn.dataset.act;
             if (act === 'reset') {
-                state.day = 'all';
                 state.cat = 'all';
                 state.query = '';
-                syncPressed($('#day-tabs'), 'day', 'all');
                 syncPressed($('#cat-chips'), 'cat', 'all');
                 render();
+                return;
+            }
+            if (act === 'check') {
+                toggleCheck(btn.dataset.check);
                 return;
             }
             const card = btn.closest('.card');
@@ -3562,6 +3716,8 @@
             // 蓋章紀錄依旅程 id 分開存，換一趟旅程不會沿用
             visitedKey = `trip:${trip.id}:visited`;
             visited = new Set(load(visitedKey, []));
+            checkedKey = `trip:${trip.id}:checklist`;
+            checked = new Set(load(checkedKey, []));
 
             document.title = trip.title;
             $('#trip-title').textContent = trip.title;
@@ -3610,19 +3766,32 @@
             }
         });
 
+        const checklistReady = loadChecklist();
         loadTrip()
             .then((data) => {
                 applyTrip(data);
-                // 旅行期間打開，首頁直接顯示今天
+                // 旅行期間打開，首頁和行程頁直接顯示今天；出發前顯示行前自檢表；回來之後顯示第 1 天
                 if (trip.startDate) {
                     const n = daysBetween(trip.startDate, todayIn(weatherConf.timezone)) + 1;
-                    if (days.some((d) => d.day === n)) currentHomeDay = n;
+                    if (days.some((d) => d.day === n)) {
+                        currentHomeDay = n;
+                        state.day = n;
+                    } else if (n > 0 && days.length) {
+                        state.day = days[0].day;
+                    }
                 }
                 renderFilters();
                 updateCounts();
                 render();
                 renderHome();
                 initRouting();
+                const pressed = $('#day-tabs [aria-pressed="true"]');
+                if (pressed) pressed.scrollIntoView({ inline: 'center', block: 'nearest' });
+                checklistReady.then((c) => {
+                    checklist = c;
+                    updatePrepProgress();
+                    if (state.day === 'prep') render();
+                });
             })
             .catch((err) => {
                 console.error(err);

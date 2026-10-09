@@ -20,6 +20,7 @@
 ## 檔案地圖
 
 - `data/trip.json`：行程資料（旅程名稱、每天標題、所有地點）。格式規格是 `data/trip.schema.json`，以 schema 為準
+- `data/checklist.json`：行程頁「行前」的自檢表；勾選紀錄存在 localStorage `trip:<旅程 id>:checklist`，靠項目 `id` 對應，不要改已有的 `id`
 - `data/info.json`：「資訊」分頁的內容（指指卡、退稅、入境規定、緊急聯絡）。指指卡的日文句子要用日本當地自然的說法。規定類的內容要附官方來源連結，並更新 `updated`
 - `index.html`：整個頁面，CSS、SVG 圖示 sprite、JS 都在裡面；啟動時用 fetch 讀 `data/trip.json`
 - `sw.js`：Service Worker。`index.html`、`trip.json`、`info.json` 網路優先，其他同網域檔案快取優先，地圖圖磚另外快取

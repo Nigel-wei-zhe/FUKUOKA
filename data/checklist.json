@@ -1,0 +1,56 @@
+{
+  "_說明": "行程頁「行前」的自檢表。groups 是分組，items 每一項有 id（不可重複，勾選紀錄靠它對應，已經有人勾過的不要改 id）、text（要做的事），可加 note（補充說明）。勾選的紀錄只存在各自的手機裡。",
+  "title": "行前自檢表",
+  "groups": [
+    {
+      "title": "證件、錢",
+      "icon": "stamp",
+      "items": [
+        { "id": "passport", "text": "護照", "note": "確認效期涵蓋整趟旅程，最好還有 6 個月以上" },
+        { "id": "ticket", "text": "電子機票、訂位代號", "note": "截圖存在手機，也印一份紙本" },
+        { "id": "hotel", "text": "飯店訂房確認信", "note": "截圖存在手機" },
+        { "id": "vjw", "text": "Visit Japan Web 填好入境資料", "note": "入境審查和海關申報的 QR Code 先截圖" },
+        { "id": "yen", "text": "日圓現金", "note": "小店、神社、公車常常只收現金" },
+        { "id": "card", "text": "信用卡開通海外刷卡" },
+        { "id": "insurance", "text": "旅遊平安險、海外醫療險" }
+      ]
+    },
+    {
+      "title": "手機、網路",
+      "icon": "phone",
+      "items": [
+        { "id": "sim", "text": "日本網卡、eSIM 或開通漫遊" },
+        { "id": "charger", "text": "充電器、充電線", "note": "日本插座和台灣一樣是兩孔扁插，手機充電器可以直接用" },
+        { "id": "powerbank", "text": "行動電源", "note": "只能放隨身行李，不能託運" },
+        { "id": "home-screen", "text": "把這個網頁加到主畫面", "note": "沒有網路也能看行程" }
+      ]
+    },
+    {
+      "title": "藥品、健康",
+      "icon": "heart",
+      "items": [
+        { "id": "rx", "text": "平常吃的藥", "note": "帶足天數再多帶幾天，放隨身行李" },
+        { "id": "meds", "text": "常備藥", "note": "感冒、腸胃、暈車、止痛" },
+        { "id": "glasses", "text": "老花眼鏡、備用眼鏡" }
+      ]
+    },
+    {
+      "title": "衣物",
+      "icon": "bag",
+      "items": [
+        { "id": "coat", "text": "保暖外套", "note": "11 月下旬福岡早晚約 11°C，穿脫方便的洋蔥式穿搭" },
+        { "id": "shoes", "text": "好走的鞋", "note": "每天都會走很多路" },
+        { "id": "umbrella", "text": "折疊傘" }
+      ]
+    },
+    {
+      "title": "出發當天",
+      "icon": "train",
+      "items": [
+        { "id": "airport", "text": "起飛前 2.5 小時到桃園機場", "note": "去程 11:55 起飛（台灣時間）" },
+        { "id": "liquid", "text": "隨身行李的液體每瓶 100ml 以下", "note": "全部裝進透明夾鏈袋" },
+        { "id": "no-meat", "text": "行李裡沒有肉類製品", "note": "日本入境也不能帶肉乾、香腸等肉製品" }
+      ]
+    }
+  ]
+}

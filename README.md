@@ -64,13 +64,18 @@ node tools/check-trip.mjs
 
 規定會變，記得更新 `updated` 日期。
 
+## 修改行前自檢表
+
+行程頁最前面的「行前」是出發前的自檢表，內容在 `data/checklist.json`。`groups` 是分組，每一項有 `id`、`text`，可以加 `note`。勾選的紀錄只存在各自的手機裡，靠 `id` 對應，已經有人勾過的項目不要改 `id`。
+
 ## 換成另一趟旅程
 
 1. 換掉 `data/trip.json`，記得改 `id`，蓋章紀錄才不會跟舊旅程混在一起
-2. 改 `manifest.webmanifest` 的 `name`、`short_name`（主畫面上的 App 名稱）
-3. 想換主畫面圖示的話，換掉 `icons/` 裡的圖
-4. 執行 `node tools/check-trip.mjs` 確認格式正確
-5. 照下一段重新產生字型
+2. 改 `data/info.json`（資訊頁）和 `data/checklist.json`（行前自檢表）的內容
+3. 改 `manifest.webmanifest` 的 `name`、`short_name`（主畫面上的 App 名稱）
+4. 想換主畫面圖示的話，換掉 `icons/` 裡的圖
+5. 執行 `node tools/check-trip.mjs` 確認格式正確
+6. 照下一段重新產生字型
 
 ## 新加的字顯示成系統字型
 
