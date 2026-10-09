@@ -924,7 +924,8 @@
             position: sticky;
             top: 0;
             z-index: 40;
-            padding: calc(env(safe-area-inset-top) + 14px) 0 10px;
+            /* Safari 頂端的毛玻璃會往下延伸一段：瀏覽器裡至少留 24px；加到主畫面時沒有毛玻璃，留瀏海高度 + 10px 就好 */
+            padding: max(24px, calc(env(safe-area-inset-top) + 10px)) 0 10px;
             background: var(--paper);
             border-bottom: 2px dashed var(--line-strong);
         }
