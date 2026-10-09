@@ -25,6 +25,9 @@
                 t = window.matchMedia && matchMedia('(prefers-color-scheme: dark)').matches ? 'night' : 'day';
             }
             document.documentElement.dataset.theme = t;
+            var fs = null;
+            try { fs = localStorage.getItem('trip:font-size'); } catch (e) {}
+            if (fs === 'l' || fs === 'xl') document.documentElement.dataset.fs = fs;
             var m = document.querySelector('meta[name="theme-color"]');
             if (m) m.content = t === 'night' ? '#1E2436' : '#FBF5E9';
         })();
@@ -74,7 +77,8 @@
 
             --r-card: 18px 24px 16px 22px / 20px 16px 22px 18px;
             --r-chip: 14px 16px 13px 15px / 15px 13px 16px 14px;
-            --tabbar-h: 62px;
+            --fs: 1; /* 字級，見下方 data-fs */
+            --tabbar-h: calc(48px + 14px * var(--fs));
             --font: 'Huninn', 'jf-openhuninn', 'Zen Maru Gothic', 'PingFang TC', 'Noto Sans TC', 'Microsoft JhengHei', system-ui, sans-serif;
         }
 
@@ -111,6 +115,10 @@
             --noise-blend: screen;
         }
 
+        /* 字的大小：標準／大／特大 */
+        :root[data-fs="l"] { --fs: 1.18; }
+        :root[data-fs="xl"] { --fs: 1.36; }
+
         /* ---------- 基礎 ---------- */
         *, *::before, *::after { box-sizing: border-box; }
         html { -webkit-text-size-adjust: 100%; text-size-adjust: 100%; }
@@ -120,7 +128,7 @@
             background: var(--paper);
             color: var(--ink);
             font-family: var(--font);
-            font-size: 15px;
+            font-size: calc(15px * var(--fs));
             line-height: 1.6;
             font-synthesis: none;
             -webkit-tap-highlight-color: transparent;
@@ -171,10 +179,35 @@
         /* ---------- 封面插畫 ---------- */
         .hero { position: relative; padding-top: env(safe-area-inset-top); }
         .hero-text { padding: 22px 76px 4px 20px; }
-        .hero h1 { min-height: 1.25em; font-size: 28px; line-height: 1.25; letter-spacing: .04em; }
-        .hero-sub { margin-top: 4px; font-size: 14px; color: var(--ink-soft); }
+        .hero h1 { min-height: 1.25em; font-size: calc(28px * var(--fs)); line-height: 1.25; letter-spacing: .04em; }
+        .hero-sub { margin-top: 4px; font-size: calc(14px * var(--fs)); color: var(--ink-soft); }
         .hero-sub-2 { margin-top: 0; }
         .hero-sub strong { font-weight: 400; color: var(--ink); }
+        .fs-control {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            gap: 6px;
+            margin-top: 10px;
+        }
+        .fs-label { flex-basis: 100%; font-size: calc(13px * var(--fs)); color: var(--ink-soft); }
+        .fs-control button {
+            display: inline-flex;
+            align-items: baseline;
+            gap: 4px;
+            min-height: 44px;
+            padding: 6px 12px;
+            border: 2px solid var(--line-strong);
+            border-radius: var(--r-chip);
+            background: var(--card);
+            font-size: 15px; /* 固定大小，切換時按鈕不會跳位 */
+        }
+        .fs-control button[aria-pressed="true"] {
+            border-color: var(--ink);
+            background: var(--accent);
+            color: var(--on-accent);
+        }
+        .fs-sample { line-height: 1; }
         .scene { display: block; width: 100%; height: auto; aspect-ratio: 390 / 150; margin-top: 2px; }
         .scene text { font-family: var(--font); }
 
@@ -190,7 +223,7 @@
             border-radius: var(--r-chip);
             background: var(--card);
             box-shadow: var(--shadow);
-            font-size: 14px;
+            font-size: calc(14px * var(--fs));
         }
 
         /* 日夜切換：固定在右上，白天是太陽，夜晚是月亮 */
@@ -244,7 +277,7 @@
             outline: 0;
             background: transparent;
             color: var(--ink);
-            font-size: 16px; /* 16px 避免 iOS 聚焦時自動放大 */
+            font-size: calc(16px * var(--fs)); /* 16px 避免 iOS 聚焦時自動放大 */
         }
         .search input::placeholder { color: var(--ink-soft); opacity: .85; }
         .search input::-webkit-search-cancel-button { display: none; }
@@ -285,8 +318,8 @@
             line-height: 1.3;
             transition: transform .15s ease;
         }
-        .day-tab small { font-size: 12px; color: var(--ink-soft); }
-        .day-tab span { font-size: 14px; white-space: nowrap; }
+        .day-tab small { font-size: calc(12px * var(--fs)); color: var(--ink-soft); }
+        .day-tab span { font-size: calc(14px * var(--fs)); white-space: nowrap; }
         .day-tab:active { transform: scale(.96); }
         .day-tab[aria-pressed="true"] {
             border-color: var(--ink);
@@ -307,7 +340,7 @@
             border: 2px solid var(--line-strong);
             border-radius: 999px;
             background: var(--card);
-            font-size: 14px;
+            font-size: calc(14px * var(--fs));
             white-space: nowrap;
         }
         .cat-chip .dot {
@@ -330,7 +363,7 @@
 
         .list-count {
             padding: 12px 20px 0;
-            font-size: 13px;
+            font-size: calc(13px * var(--fs));
             color: var(--ink-soft);
         }
 
@@ -342,14 +375,14 @@
             flex-wrap: wrap;
             gap: 4px 10px;
             margin: 0 0 16px 4px;
-            font-size: 20px;
+            font-size: calc(20px * var(--fs));
             line-height: 1.35;
         }
         .tape {
             position: relative;
             display: inline-block;
             padding: 1px 12px;
-            font-size: 15px;
+            font-size: calc(15px * var(--fs));
             color: var(--on-cat);
             transform: rotate(-3deg);
         }
@@ -362,7 +395,7 @@
             opacity: .9;
             clip-path: polygon(3% 8%, 97% 0, 100% 50%, 96% 100%, 2% 94%, 0 45%);
         }
-        .day-title small { font-size: 13px; color: var(--ink-soft); }
+        .day-title small { font-size: calc(13px * var(--fs)); color: var(--ink-soft); }
 
         /* ---------- 縫線時間軸 ---------- */
         .stops { position: relative; }
@@ -371,19 +404,19 @@
             position: absolute;
             top: 14px;
             bottom: 18px;
-            left: 63px;
+            left: calc(42px * var(--fs) + 21px);
             border-left: 2px dashed var(--line-strong);
         }
         .stop {
             display: grid;
-            grid-template-columns: 42px 32px minmax(0, 1fr);
+            grid-template-columns: calc(42px * var(--fs)) 32px minmax(0, 1fr);
             column-gap: 8px;
             align-items: start;
             margin-bottom: 14px;
         }
         .stop-time {
             padding-top: 6px;
-            font-size: 13px;
+            font-size: calc(13px * var(--fs));
             color: var(--ink-soft);
             text-align: right;
             font-variant-numeric: tabular-nums;
@@ -414,20 +447,109 @@
             overflow: hidden;
         }
         .card-head { padding-right: 58px; min-height: 48px; }
-        .card-cat { font-size: 12px; color: var(--ink-soft); }
-        .card h3 { font-size: 17px; line-height: 1.4; overflow-wrap: anywhere; }
-        .card-desc { margin-top: 4px; font-size: 14px; color: var(--ink-soft); overflow-wrap: anywhere; }
+        .card-cat { font-size: calc(12px * var(--fs)); color: var(--ink-soft); }
+        .card h3 { font-size: calc(17px * var(--fs)); line-height: 1.4; overflow-wrap: anywhere; }
+        .card-desc { margin-top: 4px; font-size: calc(14px * var(--fs)); color: var(--ink-soft); overflow-wrap: anywhere; }
         .meta {
             display: flex;
             gap: 6px;
             margin-top: 6px;
-            font-size: 13px;
+            font-size: calc(13px * var(--fs));
             line-height: 1.5;
             color: var(--ink);
             overflow-wrap: anywhere;
         }
         .meta .ico { margin-top: 1px; color: var(--ink-soft); }
         .meta-list { margin-top: 4px; }
+
+        /* ---------- 依分類換卡片樣式 ---------- */
+        /* 景點：上緣一道山丘 */
+        .card--sight { padding-top: 22px; }
+        .card--sight::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 14px;
+            background: var(--cat);
+            -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='80' height='14'%3E%3Cpath d='M0 0h80v8C68 8 62 2 48 5S28 13 16 9 6 6 0 8z'/%3E%3C/svg%3E") repeat-x 0 0 / 80px 14px;
+            mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='80' height='14'%3E%3Cpath d='M0 0h80v8C68 8 62 2 48 5S28 13 16 9 6 6 0 8z'/%3E%3C/svg%3E") repeat-x 0 0 / 80px 14px;
+        }
+
+        /* 美食：門口掛著暖簾 */
+        .card--food { padding-top: 28px; }
+        .card--food::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 14px;
+            width: min(60%, 180px);
+            height: 18px;
+            border-radius: 0 0 4px 4px;
+            background: repeating-linear-gradient(90deg, var(--cat) 0 calc(25% - 3px), transparent calc(25% - 3px) 25%);
+        }
+        .meta-booking {
+            margin-top: 8px;
+            padding: 6px 10px;
+            border-radius: 12px 14px 11px 13px;
+            background: color-mix(in srgb, var(--c-shop) 28%, var(--card));
+        }
+        .meta-booking b { font-weight: 400; color: var(--link); }
+        .menu-price {
+            display: flex;
+            align-items: baseline;
+            gap: 8px;
+            margin-top: 8px;
+            font-size: calc(14px * var(--fs));
+            color: var(--ink-soft);
+        }
+        .menu-price .leader { flex: 1; min-width: 16px; border-bottom: 2px dotted var(--line-strong); }
+        .menu-price strong { font-weight: 400; color: var(--ink); }
+
+        /* 購物：吊牌，左上角有穿繩的孔 */
+        .card--shop { background: color-mix(in srgb, var(--cat) 14%, var(--card)); }
+        .card--shop .card-head { padding-left: 24px; }
+        .card--shop::before {
+            content: "";
+            position: absolute;
+            top: 16px;
+            left: 12px;
+            width: 14px;
+            height: 14px;
+            border: 2px solid var(--line-strong);
+            border-radius: 50%;
+            background: var(--paper);
+        }
+
+        /* 交通住宿：車票，標題下方是撕線 */
+        .card--move {
+            background:
+                linear-gradient(var(--cat), var(--cat)) top / 100% 6px no-repeat,
+                var(--card);
+        }
+        .card--move .card-head {
+            position: relative;
+            margin: 0 -14px;
+            padding: 0 72px 12px 14px;
+            border-bottom: 2px dashed var(--line-strong);
+        }
+        .card--move .card-head::before,
+        .card--move .card-head::after {
+            content: "";
+            position: absolute;
+            bottom: -10px;
+            width: 18px;
+            height: 18px;
+            border: 2px solid var(--line-strong);
+            border-radius: 50%;
+            background: var(--paper);
+        }
+        .card--move .card-head::before { left: -11px; }
+        .card--move .card-head::after { right: -11px; }
+        .card--move .card-desc { margin-top: 12px; }
+        .route { display: flex; flex-wrap: wrap; align-items: center; gap: 2px 8px; }
+        .route-arrow { display: inline-grid; color: var(--ink-soft); }
 
         .card-actions {
             display: flex;
@@ -446,7 +568,7 @@
             border: 2px solid var(--line-strong);
             border-radius: var(--r-chip);
             background: transparent;
-            font-size: 14px;
+            font-size: calc(14px * var(--fs));
             text-decoration: none;
             color: var(--ink);
             transition: transform .15s ease;
@@ -470,8 +592,8 @@
             line-height: 1.1;
         }
         .stamp-btn .ico { width: 20px; height: 20px; }
-        .stamp-empty { display: grid; place-items: center; gap: 1px; font-size: 11px; }
-        .stamp-done { display: none; font-size: 15px; letter-spacing: .1em; }
+        .stamp-empty { display: grid; place-items: center; gap: 1px; font-size: calc(11px * var(--fs)); }
+        .stamp-done { display: none; font-size: calc(15px * var(--fs)); letter-spacing: .1em; }
         .stamp-btn[aria-pressed="true"] {
             border: 2.5px solid var(--stamp);
             color: var(--stamp);
@@ -498,7 +620,7 @@
         /* 載入中、找不到結果、資料有誤 */
         .loading { padding: 36px 24px; text-align: center; color: var(--ink-soft); }
         .empty { padding: 36px 24px; text-align: center; color: var(--ink-soft); }
-        .trip-error h2 { margin-bottom: 10px; font-size: 18px; color: var(--ink); }
+        .trip-error h2 { margin-bottom: 10px; font-size: calc(18px * var(--fs)); color: var(--ink); }
         .trip-error pre {
             margin: 0;
             padding: 12px 14px;
@@ -507,7 +629,7 @@
             background: var(--card);
             color: var(--ink);
             font-family: var(--font);
-            font-size: 13px;
+            font-size: calc(13px * var(--fs));
             line-height: 1.6;
             text-align: left;
             white-space: pre-wrap;
@@ -533,8 +655,8 @@
             left: 20px;
             right: 76px;
         }
-        .map-head h2 { font-size: 20px; line-height: 1.3; }
-        .map-head p { font-size: 13px; color: var(--ink-soft); }
+        .map-head h2 { font-size: calc(20px * var(--fs)); line-height: 1.3; }
+        .map-head p { font-size: calc(13px * var(--fs)); color: var(--ink-soft); }
         .map-frame {
             position: relative;
             height: 100%;
@@ -559,7 +681,7 @@
             border-radius: var(--r-chip);
             background: var(--card);
             box-shadow: var(--shadow);
-            font-size: 14px;
+            font-size: calc(14px * var(--fs));
         }
 
         .leaflet-container { font-family: var(--font); background: var(--paper-2); }
@@ -571,7 +693,7 @@
         .leaflet-bar { border: 2px solid var(--ink) !important; border-radius: 14px !important; overflow: hidden; box-shadow: var(--shadow) !important; }
         .leaflet-bar a { background: var(--card); color: var(--ink); border-bottom-color: var(--line) !important; width: 36px !important; height: 36px !important; line-height: 34px !important; }
         .leaflet-bar a:hover { background: var(--paper-2); }
-        .leaflet-control-attribution { background: color-mix(in srgb, var(--card) 85%, transparent) !important; color: var(--ink-soft) !important; font-size: 10px; }
+        .leaflet-control-attribution { background: color-mix(in srgb, var(--card) 85%, transparent) !important; color: var(--ink-soft) !important; font-size: calc(10px * var(--fs)); }
         .leaflet-control-attribution a { color: var(--ink-soft) !important; }
         .leaflet-popup-content-wrapper {
             border: 2px solid var(--ink);
@@ -581,11 +703,11 @@
             box-shadow: var(--shadow);
         }
         .leaflet-popup-tip { background: var(--card); border: 2px solid var(--ink); box-shadow: none; }
-        .leaflet-popup-content { margin: 12px 14px; font-size: 14px; line-height: 1.5; }
-        .leaflet-container a.leaflet-popup-close-button { color: var(--ink-soft); width: 28px; height: 28px; font-size: 20px; }
-        .popup-meta { font-size: 12px; color: var(--ink-soft); }
-        .popup-title { margin: 2px 0 4px; font-size: 16px; line-height: 1.35; }
-        .popup-hours { font-size: 13px; color: var(--ink-soft); }
+        .leaflet-popup-content { margin: 12px 14px; font-size: calc(14px * var(--fs)); line-height: 1.5; }
+        .leaflet-container a.leaflet-popup-close-button { color: var(--ink-soft); width: 28px; height: 28px; font-size: calc(20px * var(--fs)); }
+        .popup-meta { font-size: calc(12px * var(--fs)); color: var(--ink-soft); }
+        .popup-title { margin: 2px 0 4px; font-size: calc(16px * var(--fs)); line-height: 1.35; }
+        .popup-hours { font-size: calc(13px * var(--fs)); color: var(--ink-soft); }
         .leaflet-popup-content .chip-btn { margin-top: 8px; }
 
         .pin-wrap { background: none; border: 0; }
@@ -629,7 +751,7 @@
             border: 0;
             background: transparent;
             color: var(--ink-soft);
-            font-size: 13px;
+            font-size: calc(13px * var(--fs));
         }
         .tab-ico {
             display: grid;
@@ -657,14 +779,14 @@
             border-radius: var(--r-card);
             background: var(--card);
             box-shadow: 0 4px 0 var(--line-strong);
-            font-size: 14px;
+            font-size: calc(14px * var(--fs));
         }
         .sheet .mascot { position: absolute; left: 12px; top: 18px; width: 68px; height: 52px; }
-        .sheet h2 { margin-right: 28px; font-size: 16px; line-height: 1.4; }
+        .sheet h2 { margin-right: 28px; font-size: calc(16px * var(--fs)); line-height: 1.4; }
         .sheet ol { margin-top: 6px; padding-left: 1.3em; list-style: decimal; }
         .sheet li { margin-top: 2px; }
         .sheet .ico { color: var(--link); }
-        .sheet-note { margin-top: 8px; font-size: 13px; color: var(--ink-soft); }
+        .sheet-note { margin-top: 8px; font-size: calc(13px * var(--fs)); color: var(--ink-soft); }
         .sheet-close { position: absolute; top: 6px; right: 6px; }
 
         .toast {
@@ -680,7 +802,7 @@
             border-radius: var(--r-chip);
             background: var(--card);
             box-shadow: var(--shadow);
-            font-size: 14px;
+            font-size: calc(14px * var(--fs));
         }
 
         /* ---------- 桌機：攤開的繪本，左頁行程、右頁地圖 ---------- */
@@ -723,7 +845,7 @@
     <svg width="0" height="0" style="position:absolute" aria-hidden="true">
         <symbol id="i-torii" viewBox="0 0 24 24"><path d="M3 6.2c3.5 1.1 14.5 1.1 18 0"/><path d="M5 10.2h14"/><path d="M7.2 7.1V20.5M16.8 7.1V20.5"/><path d="M12 7.6v2.6"/></symbol>
         <symbol id="i-bowl" viewBox="0 0 24 24"><path d="M3.5 12.5h17c0 4.3-3.8 7.5-8.5 7.5s-8.5-3.2-8.5-7.5z"/><path d="M13 10.5l6.5-7M15.8 10.8l5-5"/><path d="M7.5 9.5c-.9-1.1.9-2.1 0-3.2"/></symbol>
-        <symbol id="i-dango" viewBox="0 0 24 24"><circle cx="12" cy="6" r="2.7"/><circle cx="12" cy="11.4" r="2.7"/><circle cx="12" cy="16.8" r="2.7"/><path d="M12 2v1.3M12 19.5V22.5"/></symbol>
+        <symbol id="i-arrow" viewBox="0 0 24 24"><path d="M4 12h15M14 7l5 5-5 5"/></symbol>
         <symbol id="i-bag" viewBox="0 0 24 24"><path d="M5 8.5h14l-1.2 11.5H6.2z"/><path d="M9 8.5V7a3 3 0 0 1 6 0v1.5"/></symbol>
         <symbol id="i-train" viewBox="0 0 24 24"><path d="M7 3.5h10a2 2 0 0 1 2 2v9.5a3 3 0 0 1-3 3H8a3 3 0 0 1-3-3V5.5a2 2 0 0 1 2-2z"/><path d="M7.5 7h9v4.2h-9z"/><path d="M8.6 14.6h.01M15.4 14.6h.01"/><path d="M8.3 18l-2 3M15.7 18l2 3"/></symbol>
         <symbol id="i-search" viewBox="0 0 24 24"><circle cx="10.8" cy="10.8" r="6.3"/><path d="M20 20l-4.6-4.6"/></symbol>
@@ -763,6 +885,12 @@
                     <h1 id="trip-title"></h1>
                     <p class="hero-sub"><span id="trip-subtitle"></span>共 <strong id="total-count">0</strong> 個地點</p>
                     <p class="hero-sub hero-sub-2">已經蓋章 <strong id="visited-count">0</strong> 個</p>
+                    <div class="fs-control" role="group" aria-label="字的大小">
+                        <span class="fs-label">字的大小</span>
+                        <button type="button" data-fs="m" aria-pressed="true"><span class="fs-sample" style="font-size:13px">字</span>標準</button>
+                        <button type="button" data-fs="l" aria-pressed="false"><span class="fs-sample" style="font-size:16px">字</span>大</button>
+                        <button type="button" data-fs="xl" aria-pressed="false"><span class="fs-sample" style="font-size:19px">字</span>特大</button>
+                    </div>
                 </div>
 
                 <!-- 封面插畫：白天有雲和海鷗，夜晚屋台燈籠會亮 -->
@@ -919,13 +1047,15 @@
         let visited = new Set();
         let visitedKey = 'trip:visited';
 
+        // kind 決定卡片樣式（.card--sight 等）
         const categoryConfig = {
-            '景點': { label: '景點', icon: 'torii', color: 'var(--c-sight)' },
-            '美食': { label: '美食', icon: 'bowl', color: 'var(--c-food)' },
-            '甜點': { label: '點心', icon: 'dango', color: 'var(--c-sweet)' },
-            '購物': { label: '購物', icon: 'bag', color: 'var(--c-shop)' },
-            '交通': { label: '交通住宿', icon: 'train', color: 'var(--c-move)' }
+            '景點': { label: '景點', icon: 'torii', color: 'var(--c-sight)', kind: 'sight', priceLabel: '門票' },
+            '美食': { label: '美食', icon: 'bowl', color: 'var(--c-food)', kind: 'food', priceLabel: '預算' },
+            '購物': { label: '購物', icon: 'bag', color: 'var(--c-shop)', kind: 'shop', priceLabel: '價位' },
+            '交通': { label: '交通住宿', icon: 'train', color: 'var(--c-move)', kind: 'move', priceLabel: '票價' }
         };
+        // 舊資料的分類名稱
+        const categoryAlias = { '甜點': '美食' };
         const tapeColors = ['var(--c-food)', 'var(--c-move)', 'var(--c-sight)', 'var(--c-shop)', 'var(--c-sweet)'];
 
         // 地圖底圖：OpenStreetMap，免費、不需金鑰
@@ -1017,17 +1147,30 @@
             const isVisited = visited.has(item.id);
             const meta = [];
             if (d.hours) meta.push(`<p class="meta">${icon('clock')}<span>${esc(d.hours)}</span></p>`);
-            if (d.booking) meta.push(`<p class="meta">${icon('calendar')}<span>訂位：${esc(d.booking)}</span></p>`);
-            if (item.price) meta.push(`<p class="meta">${icon('coin')}<span>${esc(item.price)}</span></p>`);
+            if (d.booking) meta.push(`<p class="meta meta-booking">${icon('calendar')}<span><b>要訂位</b>　${esc(d.booking)}</span></p>`);
+            if (item.price) {
+                meta.push(c.kind === 'food'
+                    ? `<p class="menu-price"><span>${c.priceLabel}</span><span class="leader" aria-hidden="true"></span><strong>${esc(item.price)}</strong></p>`
+                    : `<p class="meta">${icon('coin')}<span>${c.priceLabel}：${esc(item.price)}</span></p>`);
+            }
+
+            // 交通的「A ➔ B」拆成起點和終點
+            let titleHTML = `<h3>${esc(item.title)}</h3>`;
+            if (c.kind === 'move') {
+                const parts = item.title.split(/\s*(?:➔|→|->|⇒)\s*/).filter(Boolean);
+                if (parts.length >= 2) {
+                    titleHTML = `<h3 class="route">${parts.map((p) => `<span>${esc(p)}</span>`).join(`<span class="route-arrow" aria-label="到">${icon('arrow')}</span>`)}</h3>`;
+                }
+            }
 
             return `
                 <li class="stop" style="--cat:${c.color}">
                     <div class="stop-time">${item.time ? esc(item.time) : '未定'}</div>
                     <div class="stop-node">${icon(c.icon)}</div>
-                    <article class="card${isVisited ? ' is-visited' : ''}" data-id="${esc(item.id)}">
+                    <article class="card card--${c.kind}${isVisited ? ' is-visited' : ''}" data-id="${esc(item.id)}">
                         <div class="card-head">
                             <p class="card-cat">${c.label}</p>
-                            <h3>${esc(item.title)}</h3>
+                            ${titleHTML}
                         </div>
                         <button class="stamp-btn" type="button" data-act="stamp" aria-pressed="${isVisited}" aria-label="${esc(item.title)}：標記為去過">
                             <span class="stamp-empty" aria-hidden="true">${icon('stamp')}蓋章</span>
@@ -1217,6 +1360,23 @@
             if (!saved) applyTheme(e.matches ? 'night' : 'day');
         });
         applyTheme(root.dataset.theme === 'night' ? 'night' : 'day');
+
+        // ---------- 字的大小 ----------
+        const fontSizes = ['m', 'l', 'xl'];
+        function applyFontSize(size) {
+            if (!fontSizes.includes(size)) size = 'm';
+            if (size === 'm') delete root.dataset.fs;
+            else root.dataset.fs = size;
+            document.querySelectorAll('.fs-control button').forEach((b) => b.setAttribute('aria-pressed', String(b.dataset.fs === size)));
+        }
+        $('.fs-control').addEventListener('click', (e) => {
+            const btn = e.target.closest('button[data-fs]');
+            if (!btn) return;
+            try { localStorage.setItem('trip:font-size', btn.dataset.fs); } catch (err) {}
+            applyFontSize(btn.dataset.fs);
+            if (map) setTimeout(() => map.invalidateSize(), 50);
+        });
+        applyFontSize(root.dataset.fs);
 
         // ---------- 事件 ----------
         $('#day-tabs').addEventListener('click', (e) => {
@@ -1466,7 +1626,7 @@
                     day: Number(it.day) || 1,
                     time: it.time ? String(it.time) : '',
                     title: String(it.title),
-                    category: it.category || '',
+                    category: categoryAlias[it.category] || it.category || '',
                     gmap: it.gmap || '',
                     lat: Number(it.lat) || 0,
                     lng: Number(it.lng) || 0,
