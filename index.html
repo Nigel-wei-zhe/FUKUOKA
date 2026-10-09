@@ -577,7 +577,8 @@
             border-radius: 26px 28px 0 0;
             background: var(--card);
             color: var(--ink);
-            box-shadow: 0 -4px 0 var(--line-strong);
+            /* 第二層陰影：sheet 底色往下延伸，蓋住 iOS 26 Safari 半透明工具列後面的區域 */
+            box-shadow: 0 -4px 0 var(--line-strong), 0 160px 0 var(--card);
             overflow: hidden;
             overscroll-behavior: contain;
         }
@@ -1501,6 +1502,16 @@
             padding: 6px 8px env(safe-area-inset-bottom);
             background: var(--card);
             border-top: 2px solid var(--line-strong);
+        }
+        /* iOS 26 Safari 的工具列浮在網頁上、而且半透明：分頁的底色往下延伸，蓋住工具列後面，不會看到後面捲動的內容 */
+        .tabbar::after {
+            content: "";
+            position: absolute;
+            left: 0;
+            right: 0;
+            top: 100%;
+            height: 160px;
+            background: var(--card);
         }
         .tab {
             display: flex;
