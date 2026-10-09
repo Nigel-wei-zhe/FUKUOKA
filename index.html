@@ -139,10 +139,12 @@
             font-synthesis: none;
             -webkit-tap-highlight-color: transparent;
         }
-        /* 當任何 Sheet 彈窗打開時，鎖定背景頁面滾動（保持版面平穩不位移） */
+        /* Sheet 打開時把頁面固定在原位，背景不會跟著捲動（iOS Safari 只設 overflow: hidden 擋不住） */
         body.sheet-open {
+            position: fixed;
+            left: 0;
+            right: 0;
             overflow: hidden;
-            touch-action: none;
         }
         /* 紙張纖維紋理 */
         body::before {
@@ -1696,7 +1698,7 @@
                 <div class="weather-header">
                     <span class="weather-city-badge">
                         <svg class="ico"><use href="#i-pin"/></svg>
-                        <span id="weather-city-name">福岡市 (Hakata)</span>
+                        <span id="weather-city-name"></span>
                     </span>
                     <span class="weather-status-tag" id="weather-date-label">今日預報</span>
                 </div>
@@ -1706,19 +1708,19 @@
                     </div>
                     <div>
                         <div class="weather-temp-main">
-                            <span class="weather-temp-now" id="weather-temp">16°</span>
+                            <span class="weather-temp-now" id="weather-temp">--°</span>
                         </div>
-                        <div class="weather-desc-text" id="weather-desc">晴朗舒適</div>
+                        <div class="weather-desc-text" id="weather-desc">讀取天氣中…</div>
                     </div>
                     <div class="weather-range-box">
-                        <div>最高 <strong id="weather-max">18°</strong></div>
-                        <div>最低 <strong id="weather-min">11°</strong></div>
-                        <div>降雨 <strong id="weather-rain">10%</strong></div>
+                        <div>最高 <strong id="weather-max">--°</strong></div>
+                        <div>最低 <strong id="weather-min">--°</strong></div>
+                        <div>降雨 <strong id="weather-rain">--%</strong></div>
                     </div>
                 </div>
                 <div class="weather-tips">
                     <svg class="ico"><use href="#i-bowl"/></svg>
-                    <span id="weather-outfit-tip">早晚偏涼風大，建議穿薄長袖並攜帶防風保暖外套。</span>
+                    <span id="weather-outfit-tip"></span>
                 </div>
             </section>
 
@@ -1903,6 +1905,7 @@
         const INFO_URL = './data/info.json';
         const VIEWS = ['home', 'list', 'map', 'info'];
         let trip = { id: 'trip', title: '', subtitle: '', timeNote: '' };
+        let weatherConf = { timezone: 'auto', default: null, fallback: null };
         let days = [];
         let items = [];
         let visited = new Set();
@@ -2237,7 +2240,11 @@
 
         function initMap(fit = true) {
             if (map || !window.L) return;
-            map = L.map('map', { zoomControl: true }).setView([33.5902, 130.4207], 11);
+            const pts = items.filter((it) => it.lat && it.lng);
+            const center = pts.length
+                ? [(Math.min(...pts.map((p) => p.lat)) + Math.max(...pts.map((p) => p.lat))) / 2, (Math.min(...pts.map((p) => p.lng)) + Math.max(...pts.map((p) => p.lng))) / 2]
+                : [0, 0];
+            map = L.map('map', { zoomControl: true }).setView(center, pts.length ? 10 : 2);
             L.tileLayer(TILE_URL, { attribution: TILE_ATTRIBUTION, maxZoom: 19 }).addTo(map);
             markerLayer = L.layerGroup().addTo(map);
             renderMapDayTabs();
@@ -2382,21 +2389,47 @@
         });
         applyFontSize(root.dataset.fs);
 
+        // ---------- Sheet 共用：打開時鎖住背景捲動，關閉後回到原本位置 ----------
+        let lockedScrollY = 0;
+        function lockScroll() {
+            if (document.body.classList.contains('sheet-open')) return;
+            lockedScrollY = window.scrollY;
+            document.body.style.top = `-${lockedScrollY}px`;
+            document.body.classList.add('sheet-open');
+        }
+        function unlockScroll() {
+            if (!document.body.classList.contains('sheet-open')) return;
+            if (document.querySelector('dialog[open]')) return; // 還有別的 sheet 開著
+            document.body.classList.remove('sheet-open');
+            document.body.style.top = '';
+            window.scrollTo(0, lockedScrollY);
+        }
+        function openSheet(dialog) {
+            lockScroll();
+            if (dialog.showModal) dialog.showModal();
+            else dialog.setAttribute('open', '');
+        }
+        function closeSheet(dialog) {
+            if (dialog.open) dialog.close();
+            unlockScroll();
+        }
+        function bindSheet(dialog) {
+            dialog.addEventListener('click', (e) => {
+                // 點到 sheet 外面的暗色區域，或按關閉
+                if (e.target === dialog || e.target.closest('[data-close]')) closeSheet(dialog);
+            });
+            // 按 Esc 或返回鍵關閉時也要解鎖
+            dialog.addEventListener('close', unlockScroll);
+        }
+
         // ---------- 設定 sheet ----------
         const settings = $('#settings');
         function openSettings() {
-            document.body.classList.add('sheet-open');
-            if (settings.showModal) settings.showModal();
-            else settings.setAttribute('open', '');
+            openSheet(settings);
         }
         $('#menu-btn').addEventListener('click', openSettings);
         $('#settings-tab').addEventListener('click', openSettings);
-        settings.addEventListener('click', (e) => {
-            // 點到 sheet 外面的暗色區域，或按關閉
-            if (e.target === settings || e.target.closest('[data-close]')) settings.close();
-        });
-        settings.addEventListener('close', () => document.body.classList.remove('sheet-open'));
-        settings.addEventListener('cancel', () => document.body.classList.remove('sheet-open'));
+        bindSheet(settings);
 
         // ---------- 事件 ----------
         $('#day-tabs').addEventListener('click', (e) => {
@@ -2461,11 +2494,7 @@
 
         // ---------- 地點詳細彈窗邏輯 ----------
         const detailModal = $('#detail-modal');
-        detailModal.addEventListener('click', (e) => {
-            if (e.target === detailModal || e.target.closest('[data-close]')) detailModal.close();
-        });
-        detailModal.addEventListener('close', () => document.body.classList.remove('sheet-open'));
-        detailModal.addEventListener('cancel', () => document.body.classList.remove('sheet-open'));
+        bindSheet(detailModal);
 
         function showDetailModal(id) {
             const item = items.find((it) => it.id === id);
@@ -2516,7 +2545,7 @@
             if (item.lat && item.lng) {
                 mapBtn.hidden = false;
                 mapBtn.onclick = () => {
-                    detailModal.close();
+                    closeSheet(detailModal);
                     focusOnMap(id);
                 };
             } else {
@@ -2528,9 +2557,7 @@
             const navBtn = $('#detail-nav-btn');
             navBtn.href = mapLink(item);
 
-            document.body.classList.add('sheet-open');
-            if (detailModal.showModal) detailModal.showModal();
-            else detailModal.setAttribute('open', '');
+            openSheet(detailModal);
         }
 
         // ---------- 首頁當天天氣與當日行程邏輯 ----------
@@ -2548,30 +2575,25 @@
             55: { desc: '偶陣雨', icon: 'i-rain', outfit: '有短暫陣雨，備傘為宜，室內行程備案佳。' },
             61: { desc: '微弱小雨', icon: 'i-rain', outfit: '降雨機率高，出門請帶傘，注意路面濕滑。' },
             63: { desc: '陣雨綿綿', icon: 'i-rain', outfit: '雨勢明顯，鞋襪易濕，建議安排室內或地下街景點。' },
-            65: { desc: '較大雨勢', icon: 'i-rain', outfit: '雨勢偏大，建議走天神地下街或大型商場逛街。' },
+            65: { desc: '較大雨勢', icon: 'i-rain', outfit: '雨勢偏大，建議改去地下街或大型商場。' },
             80: { desc: '陣雨', icon: 'i-rain', outfit: '短暫陣雨，隨身攜帶雨具即可。' },
             81: { desc: '強陣雨', icon: 'i-rain', outfit: '陣雨偏大，建議先在室內或咖啡廳稍作停留。' }
         };
 
-        const cityCoords = {
-            '抵達福岡/博多': { name: '福岡市 (博多)', lat: 33.5902, lng: 130.4207 },
-            '天神購物': { name: '福岡市 (天神)', lat: 33.5916, lng: 130.3989 },
-            '糸島海岸': { name: '糸島市 (Itoshima)', lat: 33.5597, lng: 130.1986 },
-            '由布院溫泉': { name: '由布市 (由布院)', lat: 33.2642, lng: 131.3556 },
-            '由布院/博多': { name: '由布 / 博多', lat: 33.5902, lng: 130.4207 },
-            '小倉城/門司港': { name: '北九州市 (小倉)', lat: 33.8834, lng: 130.8752 },
-            '太宰府/竈門神社': { name: '太宰府市 (Dazaifu)', lat: 33.5215, lng: 130.5348 },
-            '柳橋市場/返台': { name: '福岡市 (博多)', lat: 33.5902, lng: 130.4207 }
-        };
-
         async function fetchWeatherForDay(dayNum) {
+            // 天氣地點在 data/trip.json：days[].weather，沒寫就用 weather.default
             const dayInfo = days.find((d) => d.day === dayNum);
-            const city = (dayInfo && cityCoords[dayInfo.name]) || { name: '福岡市 (Hakata)', lat: 33.5902, lng: 130.4207 };
+            const city = (dayInfo && dayInfo.weather) || weatherConf.default;
+            if (!city) {
+                $('#weather-card').hidden = true;
+                return;
+            }
+            $('#weather-card').hidden = false;
             $('#weather-city-name').textContent = city.name;
             $('#weather-date-label').textContent = dayInfo ? `${dayLabel(dayNum)} ${dayInfo.name}` : `${dayLabel(dayNum)} 預報`;
 
             // 檢查快取
-            const cacheKey = `fukuoka:weather:${dayNum}`;
+            const cacheKey = `trip:${trip.id}:weather:${city.lat},${city.lng}`;
             let cached = null;
             try {
                 const raw = localStorage.getItem(cacheKey);
@@ -2585,7 +2607,7 @@
             }
 
             try {
-                const url = `https://api.open-meteo.com/v1/forecast?latitude=${city.lat}&longitude=${city.lng}&current_weather=true&daily=temperature_2m_max,temperature_2m_min,precipitation_probability_max,weathercode&timezone=Asia%2FTokyo`;
+                const url = `https://api.open-meteo.com/v1/forecast?latitude=${city.lat}&longitude=${city.lng}&current_weather=true&daily=temperature_2m_max,temperature_2m_min,precipitation_probability_max,weathercode&timezone=${encodeURIComponent(weatherConf.timezone)}`;
                 const res = await fetch(url);
                 if (!res.ok) throw new Error('API 回應錯誤');
                 const data = await res.json();
@@ -2604,11 +2626,11 @@
                 } catch (e) {}
                 applyWeatherUI(payload);
             } catch (err) {
-                // 離線或讀取失敗時，若有舊快取套用舊快取，否則套用 11 月標準氣候
+                // 離線或讀取失敗時，若有舊快取套用舊快取，否則用 trip.json 的 weather.fallback（旅遊季節的平均氣候）
                 if (cached) {
                     applyWeatherUI(cached.data);
                 } else {
-                    applyWeatherUI({ temp: 16, max: 18, min: 11, rain: 10, code: 0 });
+                    applyWeatherUI(Object.assign({ temp: 0, max: 0, min: 0, rain: 0 }, weatherConf.fallback, { code: 0 }));
                 }
             }
         }
@@ -3035,6 +3057,16 @@
                 }))
                 .sort(byTime);
 
+            // 天氣設定：地點要有名稱和經緯度才用
+            const validPlace = (pl) => (pl && pl.name && Number.isFinite(Number(pl.lat)) && Number.isFinite(Number(pl.lng))
+                ? { name: String(pl.name), lat: Number(pl.lat), lng: Number(pl.lng) } : null);
+            const w = data.weather || {};
+            weatherConf = {
+                timezone: w.timezone ? String(w.timezone) : 'auto',
+                default: validPlace(w.default),
+                fallback: w.fallback && typeof w.fallback === 'object' ? w.fallback : null
+            };
+
             // 天數標題：以 days 為準，items 裡出現但沒寫標題的天數也會列出
             const named = Array.isArray(data.days) ? data.days : [];
             const dayNumbers = Array.from(new Set(items.map((i) => i.day).concat(named.map((d) => Number(d.day)))))
@@ -3042,7 +3074,7 @@
                 .sort((a, b) => a - b);
             days = dayNumbers.map((n) => {
                 const d = named.find((x) => Number(x.day) === n);
-                return { day: n, name: d && d.name ? String(d.name) : '' };
+                return { day: n, name: d && d.name ? String(d.name) : '', weather: d ? validPlace(d.weather) : null };
             });
 
             const seen = new Set();

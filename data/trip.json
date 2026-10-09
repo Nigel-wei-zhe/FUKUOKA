@@ -4,16 +4,21 @@
   "title": "福岡散步繪本",
   "subtitle": "2026/11/21–11/28 八天七夜",
   "timeNote": "時間都是日本時間，比台灣快 1 小時",
+  "weather": {
+    "timezone": "Asia/Tokyo",
+    "default": { "name": "福岡市 (博多)", "lat": 33.5902, "lng": 130.4207 },
+    "fallback": { "temp": 16, "max": 18, "min": 11, "rain": 10 }
+  },
   "_說明": "由行程規劃文件轉換。已存在於舊版 trip.json 的地點沿用原本的 id、gmap、經緯度；新地點 id 從 89 起編，沒有經緯度的不會出現在地圖上。同一時間、同一分類的地點是擇一的選項。",
   "days": [
-    { "day": 1, "name": "抵達福岡/博多" },
-    { "day": 2, "name": "天神購物" },
-    { "day": 3, "name": "糸島海岸" },
-    { "day": 4, "name": "由布院溫泉" },
-    { "day": 5, "name": "由布院/博多" },
-    { "day": 6, "name": "小倉城/門司港" },
-    { "day": 7, "name": "太宰府/竈門神社" },
-    { "day": 8, "name": "柳橋市場/返台" }
+    { "day": 1, "name": "抵達福岡/博多", "weather": { "name": "福岡市 (博多)", "lat": 33.5902, "lng": 130.4207 } },
+    { "day": 2, "name": "天神購物", "weather": { "name": "福岡市 (天神)", "lat": 33.5916, "lng": 130.3989 } },
+    { "day": 3, "name": "糸島海岸", "weather": { "name": "糸島市 (Itoshima)", "lat": 33.5597, "lng": 130.1986 } },
+    { "day": 4, "name": "由布院溫泉", "weather": { "name": "由布市 (由布院)", "lat": 33.2642, "lng": 131.3556 } },
+    { "day": 5, "name": "由布院/博多", "weather": { "name": "由布 / 博多", "lat": 33.5902, "lng": 130.4207 } },
+    { "day": 6, "name": "小倉城/門司港", "weather": { "name": "北九州市 (小倉)", "lat": 33.8834, "lng": 130.8752 } },
+    { "day": 7, "name": "太宰府/竈門神社", "weather": { "name": "太宰府市 (Dazaifu)", "lat": 33.5215, "lng": 130.5348 } },
+    { "day": 8, "name": "柳橋市場/返台", "weather": { "name": "福岡市 (博多)", "lat": 33.5902, "lng": 130.4207 } }
   ],
   "items": [
     { "id": "89", "day": 1, "time": "11:55", "tz": "台灣時間", "title": "去程 桃園機場 (TPE) → 福岡機場 (FUK)", "category": "交通", "gmap": "https://www.google.com/maps/search/?api=1&query=%E7%A6%8F%E5%B2%A1%E7%A9%BA%E6%B8%AF%20%E5%9B%BD%E9%9A%9B%E7%B7%9A%E3%82%BF%E3%83%BC%E3%83%9F%E3%83%8A%E3%83%AB", "lat": 33.5836, "lng": 130.46, "desc": "11:55 起飛（台灣時間），15:20 抵達（日本時間）", "price": "" },
