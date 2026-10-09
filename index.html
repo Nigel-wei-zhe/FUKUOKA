@@ -183,51 +183,11 @@
         .hero-sub { margin-top: 4px; font-size: calc(14px * var(--fs)); color: var(--ink-soft); }
         .hero-sub-2 { margin-top: 0; }
         .hero-sub strong { font-weight: 400; color: var(--ink); }
-        .fs-control {
-            display: flex;
-            flex-wrap: wrap;
-            align-items: center;
-            gap: 6px;
-            margin-top: 10px;
-        }
-        .fs-label { flex-basis: 100%; font-size: calc(13px * var(--fs)); color: var(--ink-soft); }
-        .fs-control button {
-            display: inline-flex;
-            align-items: baseline;
-            gap: 4px;
-            min-height: 44px;
-            padding: 6px 12px;
-            border: 2px solid var(--line-strong);
-            border-radius: var(--r-chip);
-            background: var(--card);
-            font-size: 15px; /* 固定大小，切換時按鈕不會跳位 */
-        }
-        .fs-control button[aria-pressed="true"] {
-            border-color: var(--ink);
-            background: var(--accent);
-            color: var(--on-accent);
-        }
-        .fs-sample { line-height: 1; }
         .scene { display: block; width: 100%; height: auto; aspect-ratio: 390 / 150; margin-top: 2px; }
         .scene text { font-family: var(--font); }
 
-        .install-pill {
-            position: absolute;
-            left: 20px;
-            bottom: 18px;
-            display: inline-flex;
-            align-items: center;
-            gap: 6px;
-            padding: 6px 12px;
-            border: 2px solid var(--ink);
-            border-radius: var(--r-chip);
-            background: var(--card);
-            box-shadow: var(--shadow);
-            font-size: calc(14px * var(--fs));
-        }
-
-        /* 日夜切換：固定在右上，白天是太陽，夜晚是月亮 */
-        .theme-toggle {
+        /* 右上角的設定按鈕 */
+        .menu-btn {
             position: fixed;
             z-index: 60;
             top: calc(env(safe-area-inset-top) + 14px);
@@ -243,9 +203,79 @@
             box-shadow: var(--shadow);
             transition: transform .2s ease;
         }
-        .theme-toggle:active { transform: scale(.92); }
-        .theme-toggle .ico { width: 28px; height: 28px; }
-        .theme-toggle .ico { fill: var(--lamp); }
+        .menu-btn:active { transform: scale(.92); }
+        .menu-btn .ico { width: 26px; height: 26px; }
+        /* 可以加到主畫面時，按鈕上出現小紅點 */
+        .menu-btn.has-badge::after {
+            content: "";
+            position: absolute;
+            top: 2px;
+            right: 2px;
+            width: 12px;
+            height: 12px;
+            border: 2px solid var(--card);
+            border-radius: 50%;
+            background: var(--stamp);
+        }
+
+        /* ---------- 設定（從下方拉出的 sheet） ---------- */
+        .settings-sheet {
+            position: fixed;
+            inset: auto 0 0 0;
+            width: 100%;
+            max-width: 520px;
+            max-height: 88dvh;
+            margin: 0 auto;
+            padding: 0;
+            border: 2px solid var(--ink);
+            border-bottom: 0;
+            border-radius: 26px 28px 0 0;
+            background: var(--card);
+            color: var(--ink);
+            box-shadow: 0 -4px 0 var(--line-strong);
+            overflow: auto;
+            overscroll-behavior: contain;
+        }
+        .settings-sheet[open] { animation: sheet-up .28s cubic-bezier(.2, .9, .3, 1); }
+        .settings-sheet::backdrop { background: rgba(30, 36, 54, .45); }
+        @keyframes sheet-up { from { transform: translateY(100%); } to { transform: translateY(0); } }
+        .sheet-body { padding: 10px 20px calc(24px + env(safe-area-inset-bottom)); }
+        .sheet-handle {
+            width: 44px;
+            height: 5px;
+            margin: 0 auto 8px;
+            border-radius: 3px;
+            background: var(--line-strong);
+        }
+        .sheet-head { display: flex; align-items: center; justify-content: space-between; }
+        .sheet-head h2 { font-size: calc(20px * var(--fs)); }
+        .setting { margin-top: 18px; }
+        .setting h3 { margin-bottom: 8px; font-size: calc(14px * var(--fs)); color: var(--ink-soft); }
+        .seg { display: grid; grid-auto-flow: column; grid-auto-columns: 1fr; gap: 8px; }
+        .seg button {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            min-height: 52px;
+            padding: 6px 8px;
+            border: 2px solid var(--line-strong);
+            border-radius: var(--r-chip);
+            background: var(--paper);
+            font-size: 16px; /* 固定大小，切換字級時按鈕不會跳位 */
+        }
+        .seg button[aria-pressed="true"] { border-color: var(--ink); background: var(--accent); color: var(--on-accent); }
+        .seg .ico { width: 22px; height: 22px; }
+        .fs-sample { line-height: 1; }
+        .fs-preview {
+            margin-top: 10px;
+            padding: 10px 12px;
+            border: 2px dashed var(--line);
+            border-radius: var(--r-chip);
+            font-size: calc(15px * var(--fs));
+        }
+        .setting p.setting-note { margin-top: 6px; font-size: calc(13px * var(--fs)); color: var(--ink-soft); }
+        .setting .chip-btn.nav { min-height: 48px; }
 
         /* ---------- 篩選列（吸頂） ---------- */
         .toolbar {
@@ -845,6 +875,7 @@
     <svg width="0" height="0" style="position:absolute" aria-hidden="true">
         <symbol id="i-torii" viewBox="0 0 24 24"><path d="M3 6.2c3.5 1.1 14.5 1.1 18 0"/><path d="M5 10.2h14"/><path d="M7.2 7.1V20.5M16.8 7.1V20.5"/><path d="M12 7.6v2.6"/></symbol>
         <symbol id="i-bowl" viewBox="0 0 24 24"><path d="M3.5 12.5h17c0 4.3-3.8 7.5-8.5 7.5s-8.5-3.2-8.5-7.5z"/><path d="M13 10.5l6.5-7M15.8 10.8l5-5"/><path d="M7.5 9.5c-.9-1.1.9-2.1 0-3.2"/></symbol>
+        <symbol id="i-tune" viewBox="0 0 24 24"><path d="M4 7h9.5M18.5 7H20M4 17h3.5M12.5 17H20"/><circle cx="16" cy="7" r="2.4"/><circle cx="10" cy="17" r="2.4"/></symbol>
         <symbol id="i-arrow" viewBox="0 0 24 24"><path d="M4 12h15M14 7l5 5-5 5"/></symbol>
         <symbol id="i-bag" viewBox="0 0 24 24"><path d="M5 8.5h14l-1.2 11.5H6.2z"/><path d="M9 8.5V7a3 3 0 0 1 6 0v1.5"/></symbol>
         <symbol id="i-train" viewBox="0 0 24 24"><path d="M7 3.5h10a2 2 0 0 1 2 2v9.5a3 3 0 0 1-3 3H8a3 3 0 0 1-3-3V5.5a2 2 0 0 1 2-2z"/><path d="M7.5 7h9v4.2h-9z"/><path d="M8.6 14.6h.01M15.4 14.6h.01"/><path d="M8.3 18l-2 3M15.7 18l2 3"/></symbol>
@@ -873,10 +904,44 @@
         </symbol>
     </svg>
 
-    <button id="theme-toggle" class="theme-toggle" type="button" aria-label="切換成夜晚">
-        <svg class="ico day-only"><use href="#i-sun"/></svg>
-        <svg class="ico night-only"><use href="#i-moon"/></svg>
+    <button id="menu-btn" class="menu-btn" type="button" aria-label="設定：日夜模式、字的大小" aria-haspopup="dialog">
+        <svg class="ico"><use href="#i-tune"/></svg>
     </button>
+
+    <dialog id="settings" class="settings-sheet" aria-labelledby="settings-title">
+        <div class="sheet-body">
+            <div class="sheet-handle" aria-hidden="true"></div>
+            <div class="sheet-head">
+                <h2 id="settings-title">設定</h2>
+                <button class="icon-btn" type="button" data-close aria-label="關閉設定"><svg class="ico"><use href="#i-close"/></svg></button>
+            </div>
+
+            <section class="setting">
+                <h3>日夜模式</h3>
+                <div class="seg" role="group" aria-label="日夜模式">
+                    <button type="button" data-theme-choice="day" aria-pressed="true"><svg class="ico"><use href="#i-sun"/></svg>白天</button>
+                    <button type="button" data-theme-choice="night" aria-pressed="false"><svg class="ico"><use href="#i-moon"/></svg>夜晚</button>
+                </div>
+            </section>
+
+            <section class="setting">
+                <h3>字的大小</h3>
+                <div class="seg" role="group" aria-label="字的大小">
+                    <button type="button" data-fs="m" aria-pressed="true"><span class="fs-sample" style="font-size:14px">字</span>標準</button>
+                    <button type="button" data-fs="l" aria-pressed="false"><span class="fs-sample" style="font-size:18px">字</span>大</button>
+                    <button type="button" data-fs="xl" aria-pressed="false"><span class="fs-sample" style="font-size:22px">字</span>特大</button>
+                </div>
+                <p class="fs-preview">預覽：上午 09:30 太宰府天滿宮，營業時間 06:00～19:30</p>
+            </section>
+
+            <section class="setting" id="install-setting" hidden>
+                <h3>加到主畫面</h3>
+                <button id="install-btn" class="chip-btn nav" type="button" hidden><svg class="ico"><use href="#i-home-add"/></svg>加到主畫面</button>
+                <p id="install-ios" class="setting-note" hidden>點 Safari 的分享按鈕 <svg class="ico" aria-label="分享"><use href="#i-share"/></svg>，再選「加入主畫面」。</p>
+                <p class="setting-note">加到主畫面後，沒有網路也能看行程。</p>
+            </section>
+        </div>
+    </dialog>
 
     <div class="app">
         <div class="list-col">
@@ -885,12 +950,6 @@
                     <h1 id="trip-title"></h1>
                     <p class="hero-sub"><span id="trip-subtitle"></span>共 <strong id="total-count">0</strong> 個地點</p>
                     <p class="hero-sub hero-sub-2">已經蓋章 <strong id="visited-count">0</strong> 個</p>
-                    <div class="fs-control" role="group" aria-label="字的大小">
-                        <span class="fs-label">字的大小</span>
-                        <button type="button" data-fs="m" aria-pressed="true"><span class="fs-sample" style="font-size:13px">字</span>標準</button>
-                        <button type="button" data-fs="l" aria-pressed="false"><span class="fs-sample" style="font-size:16px">字</span>大</button>
-                        <button type="button" data-fs="xl" aria-pressed="false"><span class="fs-sample" style="font-size:19px">字</span>特大</button>
-                    </div>
                 </div>
 
                 <!-- 封面插畫：白天有雲和海鷗，夜晚屋台燈籠會亮 -->
@@ -976,10 +1035,6 @@
                     </g>
                     <use href="#mascot" x="262" y="112" width="34" height="26"/>
                 </svg>
-
-                <button id="install-btn" class="install-pill" type="button" hidden>
-                    <svg class="ico"><use href="#i-home-add"/></svg>加到主畫面
-                </button>
             </header>
 
             <div class="toolbar">
@@ -1325,11 +1380,10 @@
         }
 
         // ---------- 日夜切換 ----------
-        const themeBtn = $('#theme-toggle');
         function applyTheme(theme) {
             root.dataset.theme = theme;
             document.querySelector('meta[name="theme-color"]').content = theme === 'night' ? '#1E2436' : '#FBF5E9';
-            themeBtn.setAttribute('aria-label', theme === 'night' ? '切換成白天' : '切換成夜晚');
+            document.querySelectorAll('[data-theme-choice]').forEach((b) => b.setAttribute('aria-pressed', String(b.dataset.themeChoice === theme)));
         }
         function setTheme(theme, origin) {
             const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
@@ -1347,11 +1401,14 @@
                 );
             }).catch(() => {});
         }
-        themeBtn.addEventListener('click', () => {
-            const next = root.dataset.theme === 'night' ? 'day' : 'night';
-            try { localStorage.setItem('fukuoka:theme', next); } catch (e) {}
-            const rect = themeBtn.getBoundingClientRect();
-            setTheme(next, { x: rect.left + rect.width / 2, y: rect.top + rect.height / 2 });
+        document.querySelectorAll('[data-theme-choice]').forEach((btn) => {
+            btn.addEventListener('click', () => {
+                const next = btn.dataset.themeChoice;
+                if (next === root.dataset.theme) return;
+                try { localStorage.setItem('fukuoka:theme', next); } catch (e) {}
+                const rect = btn.getBoundingClientRect();
+                setTheme(next, { x: rect.left + rect.width / 2, y: rect.top + rect.height / 2 });
+            });
         });
         // 沒手動選過時，跟著系統的深淺色
         window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', (e) => {
@@ -1367,9 +1424,9 @@
             if (!fontSizes.includes(size)) size = 'm';
             if (size === 'm') delete root.dataset.fs;
             else root.dataset.fs = size;
-            document.querySelectorAll('.fs-control button').forEach((b) => b.setAttribute('aria-pressed', String(b.dataset.fs === size)));
+            document.querySelectorAll('button[data-fs]').forEach((b) => b.setAttribute('aria-pressed', String(b.dataset.fs === size)));
         }
-        $('.fs-control').addEventListener('click', (e) => {
+        $('#settings').addEventListener('click', (e) => {
             const btn = e.target.closest('button[data-fs]');
             if (!btn) return;
             try { localStorage.setItem('trip:font-size', btn.dataset.fs); } catch (err) {}
@@ -1377,6 +1434,17 @@
             if (map) setTimeout(() => map.invalidateSize(), 50);
         });
         applyFontSize(root.dataset.fs);
+
+        // ---------- 設定 sheet ----------
+        const settings = $('#settings');
+        $('#menu-btn').addEventListener('click', () => {
+            if (settings.showModal) settings.showModal();
+            else settings.setAttribute('open', '');
+        });
+        settings.addEventListener('click', (e) => {
+            // 點到 sheet 外面的暗色區域，或按關閉
+            if (e.target === settings || e.target.closest('[data-close]')) settings.close();
+        });
 
         // ---------- 事件 ----------
         $('#day-tabs').addEventListener('click', (e) => {
@@ -1471,20 +1539,32 @@
         const isIOS = /iphone|ipad|ipod/i.test(navigator.userAgent) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
         let deferredPrompt = null;
 
-        // Android／桌機 Chrome：攔下系統的安裝提示，改用封面上的按鈕
+        // 設定裡的「加到主畫面」：Android／桌機 Chrome 顯示按鈕，iPhone 顯示做法，已安裝就不顯示
+        function updateInstallSetting() {
+            const canPrompt = !!deferredPrompt;
+            const showIOS = isIOS && !isStandalone;
+            $('#install-btn').hidden = !canPrompt;
+            $('#install-ios').hidden = !showIOS;
+            $('#install-setting').hidden = !(canPrompt || showIOS);
+            $('#menu-btn').classList.toggle('has-badge', canPrompt);
+        }
         window.addEventListener('beforeinstallprompt', (e) => {
             e.preventDefault();
             deferredPrompt = e;
-            $('#install-btn').hidden = false;
+            updateInstallSetting();
         });
         $('#install-btn').addEventListener('click', async () => {
             if (!deferredPrompt) return;
             deferredPrompt.prompt();
             await deferredPrompt.userChoice;
             deferredPrompt = null;
-            $('#install-btn').hidden = true;
+            updateInstallSetting();
         });
-        window.addEventListener('appinstalled', () => { $('#install-btn').hidden = true; });
+        window.addEventListener('appinstalled', () => {
+            deferredPrompt = null;
+            updateInstallSetting();
+        });
+        updateInstallSetting();
 
         // iPhone／iPad：Safari 不會主動提示，第一次開啟時顯示教學
         if (isIOS && !isStandalone && !load('fukuoka:ios-tip-dismissed', false)) {
