@@ -125,6 +125,14 @@
           "minLength": 1,
           "description": "地點名稱"
         },
+        "ja": {
+          "type": "string",
+          "description": "日文名稱。指指卡給司機、路人看的時候用；住宿一定要填"
+        },
+        "address": {
+          "type": "string",
+          "description": "日文地址。指指卡的「帶我回飯店」會用大字顯示；住宿一定要填"
+        },
         "category": {
           "type": "string",
           "enum": ["景點", "美食", "購物", "交通", "住宿", ""],

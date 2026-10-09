@@ -829,6 +829,82 @@
         }
         .info-links .chip-btn.nav { justify-content: center; }
 
+        /* 指指卡：一句一列，右邊「給對方看」 */
+        .phrase-list { display: flex; flex-direction: column; gap: 10px; margin-top: 12px; }
+        .phrase-row {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            width: 100%;
+            min-height: 64px;
+            padding: 10px 10px 10px 14px;
+            border: 2px solid var(--line-strong);
+            border-radius: var(--r-chip);
+            background: var(--paper);
+            text-align: left;
+            transition: transform .15s ease;
+        }
+        .phrase-row:active { transform: scale(.98); }
+        .phrase-row-text { display: flex; flex-direction: column; gap: 2px; flex: 1; min-width: 0; }
+        .phrase-row-zh { font-size: calc(17px * var(--fs)); line-height: 1.45; color: var(--ink); overflow-wrap: anywhere; }
+        .phrase-row-ja { font-size: calc(14px * var(--fs)); line-height: 1.5; color: var(--ink-soft); overflow-wrap: anywhere; }
+        .phrase-row-go {
+            display: inline-flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 2px;
+            flex-shrink: 0;
+            min-width: 64px;
+            padding: 6px 4px;
+            border: 2px solid var(--ink);
+            border-radius: 12px;
+            background: var(--accent);
+            color: var(--on-accent);
+            font-size: calc(13px * var(--fs));
+            line-height: 1.2;
+        }
+        .phrase-row-go .ico { width: 20px; height: 20px; }
+        .phrase-row-tag {
+            align-self: flex-start;
+            padding: 0 8px;
+            border-radius: 8px;
+            background: var(--stamp);
+            color: var(--card);
+            font-size: calc(13px * var(--fs));
+            line-height: 1.6;
+        }
+        .phrase-empty { margin-top: 10px; font-size: calc(15px * var(--fs)); color: var(--ink-soft); }
+
+        /* 指指卡全螢幕：日文用日本的系統字型，大到對方一眼看得清楚 */
+        .phrase-sheet .sheet-head { align-items: center; padding-bottom: 10px; border-bottom: 1.5px dashed var(--line); }
+        .phrase-zh { font-size: calc(17px * var(--fs)); line-height: 1.5; color: var(--ink-soft); }
+        .phrase-body { display: flex; flex-direction: column; justify-content: center; gap: 24px; padding: 24px 0; }
+        .phrase-ja,
+        .phrase-place {
+            font-family: 'Hiragino Sans', 'Hiragino Kaku Gothic ProN', 'Noto Sans JP', 'Yu Gothic', 'Meiryo', var(--font);
+            color: var(--ink);
+            overflow-wrap: anywhere;
+        }
+        .phrase-ja { font-size: clamp(30px, 9.5vw, 52px); line-height: 1.45; font-weight: 600; }
+        .phrase-place {
+            padding: 16px;
+            border: 2px solid var(--line-strong);
+            border-radius: var(--r-chip);
+            background: var(--paper);
+        }
+        .phrase-place-name { font-size: clamp(24px, 7vw, 40px); line-height: 1.4; font-weight: 600; }
+        .phrase-place-address { margin-top: 8px; font-size: clamp(20px, 5.6vw, 30px); line-height: 1.5; }
+        .phrase-actions {
+            flex-shrink: 0;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            padding-top: 12px;
+            border-top: 1.5px dashed var(--line);
+        }
+        .phrase-actions .chip-btn { flex: 1 1 40%; min-height: 52px; font-size: calc(16px * var(--fs)); }
+        .phrase-actions .chip-btn.nav { flex-basis: 100%; }
+
         /* ---------- 篩選列（吸頂） ---------- */
         .toolbar {
             position: sticky;
@@ -1674,6 +1750,9 @@
         <symbol id="i-stamp" viewBox="0 0 24 24"><path d="M9.5 3.5h5v4.2l3.5 2.3v3.5H6V10l3.5-2.3z"/><path d="M5 17h14M7.5 20.5h9"/></symbol>
         <symbol id="i-info" viewBox="0 0 24 24"><circle cx="12" cy="12" r="8.6"/><path d="M12 11v5.5M12 7.6v.01"/></symbol>
         <symbol id="i-phone" viewBox="0 0 24 24"><path d="M6.6 3.5h2.7l1.4 4.2-2 1.4a11 11 0 0 0 6.2 6.2l1.4-2 4.2 1.4v2.7a2 2 0 0 1-2.2 2A16.5 16.5 0 0 1 4.6 5.7a2 2 0 0 1 2-2.2z"/></symbol>
+        <symbol id="i-chat" viewBox="0 0 24 24"><path d="M4 5.5h16a1 1 0 0 1 1 1v9.5a1 1 0 0 1-1 1h-9l-4.5 3.5V17H4a1 1 0 0 1-1-1V6.5a1 1 0 0 1 1-1z"/><path d="M8 10h8M8 13h5"/></symbol>
+        <symbol id="i-volume" viewBox="0 0 24 24"><path d="M4 9.5h3.5L12 5.5v13l-4.5-4H4z"/><path d="M15.5 9a4 4 0 0 1 0 6M18 6.5a7.5 7.5 0 0 1 0 11"/></symbol>
+        <symbol id="i-expand" viewBox="0 0 24 24"><path d="M14 4h6v6M10 20H4v-6M20 4l-7 7M4 20l7-7"/></symbol>
         <symbol id="i-share" viewBox="0 0 24 24"><path d="M12 3.5v11M8 7.5l4-4 4 4"/><path d="M8 10.5H6.5v10h11v-10H16"/></symbol>
         <symbol id="i-home-add" viewBox="0 0 24 24"><path d="M6 4h12a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2z"/><path d="M12 8.5v7M8.5 12h7"/></symbol>
         <symbol id="i-fit" viewBox="0 0 24 24"><path d="M4 9V5.5A1.5 1.5 0 0 1 5.5 4H9M15 4h3.5A1.5 1.5 0 0 1 20 5.5V9M20 15v3.5a1.5 1.5 0 0 1-1.5 1.5H15M9 20H5.5A1.5 1.5 0 0 1 4 18.5V15"/><circle cx="12" cy="12" r="2.5"/></symbol>
@@ -1748,6 +1827,29 @@
                 <button id="detail-map-btn" class="chip-btn" type="button"><svg class="ico"><use href="#i-pin"/></svg>看地圖</button>
                 <button id="detail-share-btn" class="chip-btn" type="button"><svg class="ico"><use href="#i-share"/></svg>分享</button>
                 <a id="detail-nav-btn" class="chip-btn nav" href="#" target="_blank" rel="noopener"><svg class="ico"><use href="#i-nav"/></svg>導航</a>
+            </div>
+        </div>
+    </dialog>
+
+    <!-- 指指卡：大字日文給對方看（內容在 data/info.json） -->
+    <dialog id="phrase-modal" class="sheet-dialog phrase-sheet" aria-labelledby="phrase-zh">
+        <div class="sheet-body">
+            <button class="sheet-handle" type="button" aria-label="縮回原本大小" aria-expanded="true"></button>
+            <div class="sheet-head">
+                <p id="phrase-zh" class="phrase-zh"></p>
+                <button class="icon-btn" type="button" data-close aria-label="關閉"><svg class="ico"><use href="#i-close"/></svg></button>
+            </div>
+            <div class="sheet-scroll phrase-body">
+                <p id="phrase-ja" class="phrase-ja" lang="ja"></p>
+                <div id="phrase-place" class="phrase-place" lang="ja" hidden>
+                    <p id="phrase-place-name" class="phrase-place-name"></p>
+                    <p id="phrase-place-address" class="phrase-place-address"></p>
+                </div>
+            </div>
+            <div class="phrase-actions">
+                <button id="phrase-speak" class="chip-btn" type="button" hidden><svg class="ico"><use href="#i-volume"/></svg>播放日文</button>
+                <a id="phrase-nav" class="chip-btn" href="#" target="_blank" rel="noopener" hidden><svg class="ico"><use href="#i-nav"/></svg>導航</a>
+                <button class="chip-btn nav" type="button" data-close>關閉</button>
             </div>
         </div>
     </dialog>
@@ -2509,9 +2611,10 @@
             handle.setAttribute('aria-expanded', String(full));
             handle.setAttribute('aria-label', full ? '縮回原本大小' : '放大成全螢幕');
         }
-        function openSheet(dialog) {
+        function openSheet(dialog, opts = {}) {
             lockScroll();
             dialog.classList.remove('is-closing', 'is-full', 'is-dragging');
+            if (opts.full) dialog.classList.add('is-full');
             resetSheetStyle(dialog);
             dialog.style.animation = ''; // 讓打開的滑入動畫重新播放
             syncHandle(dialog);
@@ -3094,6 +3197,57 @@
             }
             return `<li><span class="info-point-title">${esc(pt)}</span></li>`;
         }
+        // 指指卡的句子先存起來，點了再用索引找
+        let infoPhrases = [];
+        // 列表上顯示 title（預設中文）和 sub（預設日文）；點了全螢幕顯示 entry
+        function phraseRowHTML(entry, opts = {}) {
+            const idx = infoPhrases.push(entry) - 1;
+            const sub = opts.sub != null ? opts.sub : entry.ja;
+            return `
+                <button class="phrase-row" type="button" data-phrase="${idx}">
+                    <span class="phrase-row-text">
+                        ${opts.tag ? `<span class="phrase-row-tag">${esc(opts.tag)}</span>` : ''}
+                        <span class="phrase-row-zh">${esc(opts.title || entry.zh)}</span>
+                        <span class="phrase-row-ja"${opts.sub != null ? '' : ' lang="ja"'}>${esc(sub)}</span>
+                    </span>
+                    <span class="phrase-row-go">${icon('expand')}給對方看</span>
+                </button>`;
+        }
+        // 每晚住哪裡：每一天用「當天或之前最後一筆住宿」，最後一天回國不算；同一間飯店合併天數
+        function hotelStays() {
+            const stays = items.filter((it) => catOf(it).kind === 'stay').sort(byTime);
+            const nights = days.slice(0, -1).map((d) => ({ day: d.day, stay: stays.filter((it) => it.day <= d.day).pop() })).filter((n) => n.stay);
+            const byHotel = new Map();
+            nights.forEach(({ day, stay }) => {
+                const key = stay.ja || stay.title;
+                if (!byHotel.has(key)) byHotel.set(key, { stay, days: [] });
+                const h = byHotel.get(key);
+                if (!h.stay.address && stay.address) h.stay = stay;
+                h.days.push(day);
+            });
+            return Array.from(byHotel.values());
+        }
+        function dayRangesLabel(list) {
+            const ranges = [];
+            list.forEach((n) => {
+                const last = ranges[ranges.length - 1];
+                if (last && n === last[1] + 1) last[1] = n;
+                else ranges.push([n, n]);
+            });
+            return '第 ' + ranges.map(([a, b]) => (a === b ? `${a}` : `${a}–${b}`)).join('、') + ' 天住這裡';
+        }
+        function hotelSectionHTML(sec) {
+            const phrase = sec.phrase || {};
+            const hotels = hotelStays();
+            const today = trip.startDate ? daysBetween(trip.startDate, todayIn(weatherConf.timezone)) + 1 : 0;
+            // 旅行中：今晚住的飯店排第一個
+            hotels.sort((a, b) => (b.days.includes(today) ? 1 : 0) - (a.days.includes(today) ? 1 : 0));
+            const rows = hotels.map((h) => phraseRowHTML(
+                { zh: `${phrase.zh || '請帶我到這間飯店'}：${h.stay.title}`, ja: phrase.ja || 'このホテルまでお願いします。', place: h.stay },
+                { title: h.stay.title, sub: dayRangesLabel(h.days), tag: h.days.includes(today) ? '今晚' : '' }
+            ));
+            return rows.length ? rows.join('') : '<p class="phrase-empty">行程裡還沒有住宿。</p>';
+        }
         function infoSectionHTML(sec) {
             const points = Array.isArray(sec.points) ? sec.points.filter(Boolean) : [];
             const links = (Array.isArray(sec.links) ? sec.links : []).filter((l) => l && l.name && safeLink(l.url));
@@ -3102,6 +3256,8 @@
                     <h2><span class="info-ico">${icon(infoIcon(sec.icon))}</span>${esc(sec.title)}</h2>
                     ${sec.lead ? `<p class="info-lead">${esc(sec.lead)}</p>` : ''}
                     ${points.length ? `<ul class="info-points">${points.map(infoPointHTML).join('')}</ul>` : ''}
+                    ${sec.type === 'hotel' ? `<div class="phrase-list">${hotelSectionHTML(sec)}</div>` : ''}
+                    ${Array.isArray(sec.phrases) ? `<div class="phrase-list">${sec.phrases.filter((ph) => ph && ph.zh && ph.ja).map((ph) => phraseRowHTML(ph)).join('')}</div>` : ''}
                     ${links.length ? `<div class="info-links">${links.map((l) => {
                         // 電話用醒目的按鈕；網頁連結開新分頁
                         const tel = /^tel:/i.test(l.url);
@@ -3118,6 +3274,7 @@
             const cat = cats.find((c) => c.id === infoCat) || cats[0];
             if (!cat) return;
             infoCat = cat.id;
+            infoPhrases = [];
             syncPressed($('#info-cats'), 'cat', infoCat);
             $('#info-list').innerHTML = cat.sections.filter((sec) => sec && sec.title).map(infoSectionHTML).join('');
         }
@@ -3151,6 +3308,10 @@
                         ${cats.map((c) => `<button class="info-cat" type="button" data-cat="${esc(c.id)}" aria-pressed="false">${icon(infoIcon(c.icon))}${esc(c.name)}</button>`).join('')}
                     </nav>
                     <div id="info-list" class="info-list" aria-live="polite"></div>`;
+                $('#info-list').addEventListener('click', (e) => {
+                    const row = e.target.closest('[data-phrase]');
+                    if (row) showPhrase(infoPhrases[Number(row.dataset.phrase)]);
+                });
                 $('#info-cats').addEventListener('click', (e) => {
                     const btn = e.target.closest('.info-cat');
                     if (!btn || btn.dataset.cat === infoCat) return;
@@ -3173,6 +3334,39 @@
                     </div>`;
             }
         }
+
+        // ---------- 指指卡全螢幕 ----------
+        const phraseModal = $('#phrase-modal');
+        bindSheet(phraseModal);
+        phraseModal.addEventListener('close', () => { if (window.speechSynthesis) speechSynthesis.cancel(); });
+        let phraseSpeech = '';
+        function showPhrase(entry) {
+            if (!entry) return;
+            const place = entry.place;
+            $('#phrase-zh').textContent = entry.zh;
+            $('#phrase-ja').textContent = entry.ja;
+            $('#phrase-place').hidden = !place;
+            $('#phrase-place-name').textContent = place ? place.ja || place.title : '';
+            $('#phrase-place-address').textContent = place ? place.address || '' : '';
+            $('#phrase-place-address').hidden = !(place && place.address);
+            const nav = $('#phrase-nav');
+            nav.hidden = !place;
+            if (place) nav.href = mapLink(place);
+            phraseSpeech = [entry.ja, place ? place.ja || '' : ''].filter(Boolean).join('　');
+            $('#phrase-speak').hidden = !('speechSynthesis' in window);
+            openSheet(phraseModal, { full: true });
+        }
+        // 長輩不會唸日文：直接放給對方聽
+        $('#phrase-speak').addEventListener('click', () => {
+            if (!window.speechSynthesis || !phraseSpeech) return;
+            speechSynthesis.cancel();
+            const u = new SpeechSynthesisUtterance(phraseSpeech);
+            u.lang = 'ja-JP';
+            u.rate = 0.9;
+            const voice = speechSynthesis.getVoices().find((v) => /^ja/i.test(v.lang));
+            if (voice) u.voice = voice;
+            speechSynthesis.speak(u);
+        });
 
         // ---------- 讀取行程 ----------
         class TripError extends Error {
@@ -3295,6 +3489,8 @@
                     day: Number(it.day) || 1,
                     time: it.time ? String(it.time) : '',
                     tz: it.tz ? String(it.tz) : '',
+                    ja: it.ja ? String(it.ja) : '',
+                    address: it.address ? String(it.address) : '',
                     title: String(it.title),
                     category: categoryAlias[it.category] || it.category || '',
                     gmap: it.gmap || '',
