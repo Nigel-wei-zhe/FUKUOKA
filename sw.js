@@ -58,7 +58,7 @@ self.addEventListener('fetch', (event) => {
   }
 
   // 地圖圖磚：看過的區域存起來，離線時還能看
-  if (url.hostname.endsWith('basemaps.cartocdn.com')) {
+  if (url.hostname === 'tile.openstreetmap.org' || url.hostname.endsWith('basemaps.cartocdn.com')) {
     event.respondWith(tileCache(request));
   }
 });
