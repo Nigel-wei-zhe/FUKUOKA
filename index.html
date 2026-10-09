@@ -146,6 +146,19 @@
             right: 0;
             overflow: hidden;
         }
+        /* iOS 26 Safari 會把網頁畫到瀏海和狀態列後面（版面範圍外），捲動的內容會被毛玻璃糊在那裡：
+           在畫面上緣外面墊一塊紙張底色蓋住 */
+        body::after {
+            content: "";
+            position: fixed;
+            z-index: 95;
+            left: 0;
+            right: 0;
+            bottom: 100%;
+            height: 160px;
+            background: var(--paper);
+            pointer-events: none;
+        }
         /* 紙張纖維紋理 */
         body::before {
             content: "";
@@ -589,10 +602,11 @@
             animation: sheet-up .4s cubic-bezier(.22, 1, .36, 1);
         }
         .sheet-dialog[open]::backdrop { animation: backdrop-in .4s ease; }
-        .sheet-dialog::backdrop { background: rgba(30, 36, 54, .45); }
+        /* 暗色背景也延伸到畫面上下緣外面（iOS 26 Safari 的狀態列、工具列後面） */
+        .sheet-dialog::backdrop { background: rgba(30, 36, 54, .45); box-shadow: 0 -160px 0 rgba(30, 36, 54, .45), 0 160px 0 rgba(30, 36, 54, .45); }
         .sheet-dialog.is-closing::backdrop { animation: backdrop-out .26s ease forwards; }
         /* 滿版：往上拉或點把手 */
-        .sheet-dialog.is-full { height: 100dvh; max-height: 100dvh; border-radius: 0; }
+        .sheet-dialog.is-full { height: 100dvh; max-height: 100dvh; border-radius: 0; box-shadow: 0 -160px 0 var(--card), 0 160px 0 var(--card); }
         .sheet-dialog.is-full .sheet-body { padding-top: env(safe-area-inset-top); }
         .sheet-dialog.is-dragging { user-select: none; }
         @keyframes sheet-up { from { transform: translateY(100%); } to { transform: translateY(0); } }
@@ -817,7 +831,7 @@
             position: sticky;
             top: 0;
             z-index: 40;
-            padding: calc(env(safe-area-inset-top) + 10px) 0 10px;
+            padding: calc(env(safe-area-inset-top) + 14px) 0 10px;
             background: var(--paper);
             border-bottom: 2px dashed var(--line-strong);
         }
