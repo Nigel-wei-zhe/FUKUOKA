@@ -1,5 +1,5 @@
 {
-  "_說明": "「資訊」分頁的內容。categories 是上方的分類按鈕（建議 4 個以內），每個分類底下有幾個 sections。sections 可以用 phrases（[{ \"zh\": 中文, \"ja\": 日文 }]，指指卡的句子），或 \"type\": \"hotel\"（自動列出行程裡的住宿，phrase 是要對司機說的話）；points 每一條可以是文字，或 { \"title\": 重點, \"text\": 說明 }；lead 是醒目的開頭說明；warn 為 true 用警告樣式；links 是區塊底下的按鈕（https:// 或 tel:）。規定會變，出發前照 links 的官方頁面再確認一次，並更新 updated。",
+  "_說明": "「資訊」分頁的內容。categories 是上方的分類按鈕（建議 4 個以內），每個分類底下有幾個 sections；分類加 \"layout\": \"tabs\" 會在上方列出各 section 的按鈕，一次只顯示一個（句子多的指指卡用）。sections 可以用 phrases（[{ \"zh\": 中文, \"ja\": 日文 }]，指指卡的句子），或 \"type\": \"hotel\"（自動列出行程裡的住宿，phrase 是要對司機說的話）；points 每一條可以是文字，或 { \"title\": 重點, \"text\": 說明 }；lead 是醒目的開頭說明；warn 為 true 用警告樣式；links 是區塊底下的按鈕（https:// 或 tel:）。規定會變，出發前照 links 的官方頁面再確認一次，並更新 updated。",
   "title": "旅遊資訊",
   "updated": "2026/10/10",
   "categories": [
@@ -9,7 +9,7 @@
       "icon": "chat",
       "sections": [
         {
-          "title": "帶我回飯店",
+          "title": "回飯店",
           "icon": "bed",
           "type": "hotel",
           "phrase": {
@@ -56,7 +56,7 @@
           ]
         },
         {
-          "title": "問路、搭車",
+          "title": "問路搭車",
           "icon": "train",
           "phrases": [
             {
@@ -116,9 +116,8 @@
           ]
         },
         {
-          "title": "身體不舒服",
+          "title": "不舒服",
           "icon": "phone",
-          "warn": true,
           "phrases": [
             {
               "zh": "我身體不舒服",
@@ -146,7 +145,8 @@
             }
           ]
         }
-      ]
+      ],
+      "layout": "tabs"
     },
     {
       "id": "tax",

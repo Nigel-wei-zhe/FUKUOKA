@@ -58,6 +58,7 @@ node tools/check-trip.mjs
 
 - `categories`：上方的分類按鈕，建議 4 個以內；每個分類有 `id`、`name`、`icon`、`sections`
 - `sections`：分類底下的區塊，有 `title`、`points`，可加 `lead`（醒目的開頭說明）、`warn: true`（警告樣式）、`links`（官方連結或 `tel:` 電話）
+- 分類加 `"layout": "tabs"` 時，上方列出各區塊的按鈕，一次只顯示一個（指指卡用）
 - 指指卡：`phrases` 寫成 `[{ "zh": "請給我這個", "ja": "これをください。" }]`，點了會用全螢幕大字顯示日文、可以播放發音；`"type": "hotel"` 的區塊會自動列出行程裡的住宿（日文名稱和地址用 trip.json 住宿的 `ja`、`address`）
 - `points`：每一條寫成 `{ "title": "重點", "text": "說明" }`，長輩比較好掃讀
 

@@ -829,12 +829,30 @@
         }
         .info-links .chip-btn.nav { justify-content: center; }
 
-        /* 指指卡：一句一列，右邊「給對方看」 */
-        .phrase-list { display: flex; flex-direction: column; gap: 10px; margin-top: 12px; }
-        .phrase-row {
+        /* 指指卡：上方情境按鈕（自動換行，不用左右滑） */
+        .info-subtabs { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; }
+        .info-subtab {
             display: flex;
+            flex-direction: column;
             align-items: center;
-            gap: 10px;
+            justify-content: center;
+            gap: 2px;
+            min-height: 60px;
+            padding: 6px 4px;
+            border: 2px solid var(--line-strong);
+            border-radius: var(--r-chip);
+            background: var(--card);
+            font-size: calc(15px * var(--fs));
+            line-height: 1.25;
+            text-align: center;
+        }
+        .info-subtab .ico { width: 22px; height: 22px; }
+        .info-subtab[aria-pressed="true"] { border-color: var(--ink); background: var(--c-sight); color: var(--on-cat); box-shadow: var(--shadow); }
+        /* 句子：一句一張卡，整張可點，右上角放大圖示（一次只顯示一個情境，所以不會太長） */
+        .phrase-list { display: grid; gap: 10px; }
+        .phrase-row {
+            position: relative;
+            display: flex;
             width: 100%;
             min-height: 64px;
             padding: 10px 10px 10px 14px;
@@ -844,28 +862,24 @@
             text-align: left;
             transition: transform .15s ease;
         }
-        .phrase-row:active { transform: scale(.98); }
-        .phrase-row-text { display: flex; flex-direction: column; gap: 2px; flex: 1; min-width: 0; }
-        .phrase-row-zh { font-size: calc(17px * var(--fs)); line-height: 1.45; color: var(--ink); overflow-wrap: anywhere; }
-        .phrase-row-ja { font-size: calc(14px * var(--fs)); line-height: 1.5; color: var(--ink-soft); overflow-wrap: anywhere; }
+        .phrase-row:active { transform: scale(.97); border-color: var(--ink); }
+        .phrase-row-text { display: block; flex: 1; min-width: 0; }
+        .phrase-row-zh { display: block; font-size: calc(17px * var(--fs)); line-height: 1.4; color: var(--ink); overflow-wrap: anywhere; }
+        .phrase-row-ja { display: block; margin-top: 3px; font-size: calc(13px * var(--fs)); line-height: 1.45; color: var(--ink-soft); overflow-wrap: anywhere; }
+        .phrase-row-tag { display: inline-block; margin-bottom: 4px; }
         .phrase-row-go {
-            display: inline-flex;
-            flex-direction: column;
-            align-items: center;
-            gap: 2px;
-            flex-shrink: 0;
-            min-width: 64px;
-            padding: 6px 4px;
-            border: 2px solid var(--ink);
-            border-radius: 12px;
+            float: right;
+            margin: 0 0 4px 6px;
+            display: grid;
+            place-items: center;
+            width: 26px;
+            height: 26px;
+            border-radius: 50%;
             background: var(--accent);
             color: var(--on-accent);
-            font-size: calc(13px * var(--fs));
-            line-height: 1.2;
         }
-        .phrase-row-go .ico { width: 20px; height: 20px; }
+        .phrase-row-go .ico { width: 15px; height: 15px; }
         .phrase-row-tag {
-            align-self: flex-start;
             padding: 0 8px;
             border-radius: 8px;
             background: var(--stamp);
@@ -3185,6 +3199,7 @@
         let infoState = 'idle'; // idle → loading → done
         let infoData = null;
         let infoCat = '';
+        const infoSub = {}; // 每個分頁模式分類目前選的情境
         function safeLink(url) {
             return /^(https?:|tel:)/i.test(url || '') ? url : '';
         }
@@ -3204,13 +3219,13 @@
             const idx = infoPhrases.push(entry) - 1;
             const sub = opts.sub != null ? opts.sub : entry.ja;
             return `
-                <button class="phrase-row" type="button" data-phrase="${idx}">
+                <button class="phrase-row" type="button" data-phrase="${idx}" aria-label="${esc(opts.title || entry.zh)}：放大給對方看">
                     <span class="phrase-row-text">
+                        <span class="phrase-row-go" aria-hidden="true">${icon('expand')}</span>
                         ${opts.tag ? `<span class="phrase-row-tag">${esc(opts.tag)}</span>` : ''}
                         <span class="phrase-row-zh">${esc(opts.title || entry.zh)}</span>
                         <span class="phrase-row-ja"${opts.sub != null ? '' : ' lang="ja"'}>${esc(sub)}</span>
                     </span>
-                    <span class="phrase-row-go">${icon('expand')}給對方看</span>
                 </button>`;
         }
         // 每晚住哪裡：每一天用「當天或之前最後一筆住宿」，最後一天回國不算；同一間飯店合併天數
@@ -3248,12 +3263,12 @@
             ));
             return rows.length ? rows.join('') : '<p class="phrase-empty">行程裡還沒有住宿。</p>';
         }
-        function infoSectionHTML(sec) {
+        function infoSectionHTML(sec, opts = {}) {
             const points = Array.isArray(sec.points) ? sec.points.filter(Boolean) : [];
             const links = (Array.isArray(sec.links) ? sec.links : []).filter((l) => l && l.name && safeLink(l.url));
             return `
-                <section class="info-card${sec.warn ? ' info-card--warn' : ''}">
-                    <h2><span class="info-ico">${icon(infoIcon(sec.icon))}</span>${esc(sec.title)}</h2>
+                <section class="info-card${sec.warn ? ' info-card--warn' : ''}"${opts.noTitle ? ` aria-label="${esc(sec.title)}"` : ''}>
+                    ${opts.noTitle ? '' : `<h2><span class="info-ico">${icon(infoIcon(sec.icon))}</span>${esc(sec.title)}</h2>`}
                     ${sec.lead ? `<p class="info-lead">${esc(sec.lead)}</p>` : ''}
                     ${points.length ? `<ul class="info-points">${points.map(infoPointHTML).join('')}</ul>` : ''}
                     ${sec.type === 'hotel' ? `<div class="phrase-list">${hotelSectionHTML(sec)}</div>` : ''}
@@ -3276,7 +3291,18 @@
             infoCat = cat.id;
             infoPhrases = [];
             syncPressed($('#info-cats'), 'cat', infoCat);
-            $('#info-list').innerHTML = cat.sections.filter((sec) => sec && sec.title).map(infoSectionHTML).join('');
+            const sections = cat.sections.filter((sec) => sec && sec.title);
+            if (cat.layout !== 'tabs') {
+                $('#info-list').innerHTML = sections.map((sec) => infoSectionHTML(sec)).join('');
+                return;
+            }
+            // 句子多的分類（指指卡）：上方按鈕選情境，一次只看一組，不用滑很久
+            const sub = Math.min(infoSub[cat.id] || 0, sections.length - 1);
+            $('#info-list').innerHTML = `
+                <div id="info-subtabs" class="info-subtabs" role="group" aria-label="${esc(cat.name)}的情境">
+                    ${sections.map((sec, i) => `<button class="info-subtab" type="button" data-sub="${i}" aria-pressed="${i === sub}">${icon(infoIcon(sec.icon))}${esc(sec.title)}</button>`).join('')}
+                </div>
+                ${infoSectionHTML(sections[sub], { noTitle: true })}`;
         }
         async function renderInfo() {
             if (infoState !== 'idle') return;
@@ -3311,6 +3337,13 @@
                 $('#info-list').addEventListener('click', (e) => {
                     const row = e.target.closest('[data-phrase]');
                     if (row) showPhrase(infoPhrases[Number(row.dataset.phrase)]);
+                    const tab = e.target.closest('[data-sub]');
+                    if (tab) {
+                        infoSub[infoCat] = Number(tab.dataset.sub);
+                        renderInfoCategory();
+                        const top = $('#info-subtabs').getBoundingClientRect().top + window.scrollY - 12;
+                        if (window.scrollY > top) window.scrollTo(0, top);
+                    }
                 });
                 $('#info-cats').addEventListener('click', (e) => {
                     const btn = e.target.closest('.info-cat');
