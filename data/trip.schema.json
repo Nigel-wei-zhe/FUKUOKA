@@ -25,6 +25,10 @@
       "type": "string",
       "description": "封面副標，後面會自動接「共 N 個地點」"
     },
+    "timeNote": {
+      "type": "string",
+      "description": "行程時間的說明，顯示在行程清單和首頁當日行程上方，例如「時間都是日本時間，比台灣快 1 小時」"
+    },
     "_說明": {
       "type": "string",
       "description": "給編輯的人看的備註，頁面不會讀取"
@@ -69,6 +73,10 @@
           "pattern": "^(|([01][0-9]|2[0-3]):[0-5][0-9])$",
           "patternErrorMessage": "時間格式是 HH:MM，例如 09:30；不確定可以留空",
           "description": "預計時間，同一天依這個排序；留空會排在最後並顯示「未定」"
+        },
+        "tz": {
+          "type": "string",
+          "description": "time 不是當地時間時填，例如從台灣起飛的班機填「台灣時間」，會標在時間下方；當地時間不用填"
         },
         "title": {
           "type": "string",

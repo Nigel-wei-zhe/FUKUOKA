@@ -3,6 +3,7 @@
   "id": "fukuoka",
   "title": "福岡散步繪本",
   "subtitle": "2026/11/21–11/28 八天七夜",
+  "timeNote": "時間都是日本時間，比台灣快 1 小時",
   "_說明": "由行程規劃文件轉換。已存在於舊版 trip.json 的地點沿用原本的 id、gmap、經緯度；新地點 id 從 89 起編，沒有經緯度的不會出現在地圖上。同一時間、同一分類的地點是擇一的選項。",
   "days": [
     { "day": 1, "name": "抵達福岡/博多" },
@@ -15,7 +16,7 @@
     { "day": 8, "name": "柳橋市場/返台" }
   ],
   "items": [
-    { "id": "89", "day": 1, "time": "11:55", "title": "去程 桃園機場 (TPE) → 福岡機場 (FUK)", "category": "交通", "gmap": "https://www.google.com/maps/search/?api=1&query=%E7%A6%8F%E5%B2%A1%E7%A9%BA%E6%B8%AF%20%E5%9B%BD%E9%9A%9B%E7%B7%9A%E3%82%BF%E3%83%BC%E3%83%9F%E3%83%8A%E3%83%AB", "lat": 33.5836, "lng": 130.46, "desc": "11:55 起飛，15:20 抵達", "price": "" },
+    { "id": "89", "day": 1, "time": "11:55", "tz": "台灣時間", "title": "去程 桃園機場 (TPE) → 福岡機場 (FUK)", "category": "交通", "gmap": "https://www.google.com/maps/search/?api=1&query=%E7%A6%8F%E5%B2%A1%E7%A9%BA%E6%B8%AF%20%E5%9B%BD%E9%9A%9B%E7%B7%9A%E3%82%BF%E3%83%BC%E3%83%9F%E3%83%8A%E3%83%AB", "lat": 33.5836, "lng": 130.46, "desc": "11:55 起飛（台灣時間），15:20 抵達（日本時間）", "price": "" },
     { "id": "87", "day": 1, "time": "15:20", "title": "福岡機場 (FUK)", "category": "交通", "gmap": "https://www.google.com/maps/search/?api=1&query=%E7%A6%8F%E5%B2%A1%E7%A9%BA%E6%B8%AF%20%E5%9B%BD%E9%9A%9B%E7%B7%9A%E3%82%BF%E3%83%BC%E3%83%9F%E3%83%8A%E3%83%AB", "lat": 33.5836, "lng": 130.46, "desc": "到博多搭計程車約 15 分，或地鐵約 30～40 分", "price": "" },
     { "id": "88", "day": 1, "time": "16:30", "title": "Hotel Forza Hakataeki Chikushi-Guchi I", "category": "住宿", "gmap": "https://maps.app.goo.gl/3PMagCjuQmaTqcLx9", "lat": 33.589, "lng": 130.421, "desc": "博多車站筑紫口。Check-in，Day 1–3、Day 5–7 住這裡", "price": "" },
     { "id": "1", "day": 1, "time": "17:00", "title": "JR 博多 City", "category": "購物", "gmap": "https://share.google/iTxZQVZ7Le0EMQLHy", "lat": 33.5901, "lng": 130.4206, "desc": "博多車站周邊逛街", "price": "" },
@@ -135,6 +136,6 @@
     { "id": "116", "day": 8, "time": "13:00", "title": "博多站內人氣定食", "category": "美食", "gmap": "https://www.google.com/maps/search/?api=1&query=%E5%8D%9A%E5%A4%9A%E9%A7%85", "lat": 33.5897, "lng": 130.4207, "desc": "", "price": "" },
     { "id": "117", "day": 8, "time": "15:30", "title": "外帶明太子法國麵包 / ミニヨン小可頌", "category": "美食", "gmap": "https://www.google.com/maps/search/?api=1&query=%E3%83%9F%E3%83%8B%E3%83%A8%E3%83%B3%20%E5%8D%9A%E5%A4%9A%E5%BA%97", "lat": 33.5898, "lng": 130.4206, "desc": "帶到機場吃", "price": "" },
     { "id": "118", "day": 8, "time": "16:00", "title": "博多 → 福岡機場", "category": "交通", "gmap": "https://www.google.com/maps/search/?api=1&query=%E7%A6%8F%E5%B2%A1%E7%A9%BA%E6%B8%AF%20%E5%9B%BD%E9%9A%9B%E7%B7%9A%E3%82%BF%E3%83%BC%E3%83%9F%E3%83%8A%E3%83%AB", "lat": 33.5836, "lng": 130.46, "desc": "計程車約 15 分，或地鐵約 30～40 分", "price": "" },
-    { "id": "119", "day": 8, "time": "19:10", "title": "回程 福岡機場 (FUK) → 桃園機場 (TPE)", "category": "交通", "gmap": "https://www.google.com/maps/search/?api=1&query=%E7%A6%8F%E5%B2%A1%E7%A9%BA%E6%B8%AF%20%E5%9B%BD%E9%9A%9B%E7%B7%9A%E3%82%BF%E3%83%BC%E3%83%9F%E3%83%8A%E3%83%AB", "lat": 33.5836, "lng": 130.46, "desc": "19:10 起飛，20:50 抵達", "price": "" }
+    { "id": "119", "day": 8, "time": "19:10", "title": "回程 福岡機場 (FUK) → 桃園機場 (TPE)", "category": "交通", "gmap": "https://www.google.com/maps/search/?api=1&query=%E7%A6%8F%E5%B2%A1%E7%A9%BA%E6%B8%AF%20%E5%9B%BD%E9%9A%9B%E7%B7%9A%E3%82%BF%E3%83%BC%E3%83%9F%E3%83%8A%E3%83%AB", "lat": 33.5836, "lng": 130.46, "desc": "19:10 起飛，20:50 抵達（台灣時間）", "price": "" }
   ]
 }

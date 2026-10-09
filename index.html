@@ -202,6 +202,11 @@
         html[data-view="list"] .map-pane { display: none; }
         html[data-view="list"] .list-col { display: block; }
 
+        html[data-view="info"] .home-pane,
+        html[data-view="info"] .list-col,
+        html[data-view="info"] .map-pane { display: none; }
+        html[data-view="info"] .info-pane { display: block; }
+
         .home-hero-wrap {
             margin: -12px -16px 14px;
         }
@@ -629,6 +634,106 @@
         }
         .setting p.setting-note { margin-top: 6px; font-size: calc(13px * var(--fs)); color: var(--ink-soft); }
         .setting .chip-btn.nav { min-height: 48px; }
+
+        /* ---------- 時區：非當地時間標在時間下方 ---------- */
+        .time-tz {
+            display: block;
+            width: fit-content;
+            margin-top: 3px;
+            padding: 0 2px;
+            border-radius: 5px;
+            background: color-mix(in srgb, var(--c-move) 55%, transparent);
+            color: var(--ink);
+            font-size: calc(10px * var(--fs));
+            font-weight: 400;
+            line-height: 1.4;
+            white-space: nowrap;
+        }
+        .stop-time .time-tz { margin-left: auto; }
+        .tz-note {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-size: calc(13px * var(--fs));
+            color: var(--ink-soft);
+        }
+        .tz-note .ico { width: 16px; height: 16px; }
+        .home-today-section .tz-note { margin: -4px 0 4px; }
+
+        /* ---------- 資訊頁 ---------- */
+        .info-pane {
+            display: none;
+            max-width: 680px;
+            margin: 0 auto;
+            padding: calc(env(safe-area-inset-top) + 20px) 16px calc(var(--tabbar-h) + env(safe-area-inset-bottom) + 24px);
+        }
+        .info-head h1 { font-size: calc(26px * var(--fs)); line-height: 1.3; letter-spacing: .04em; }
+        .info-sub { margin-top: 4px; font-size: calc(13px * var(--fs)); color: var(--ink-soft); }
+        .info-list { display: flex; flex-direction: column; gap: 14px; margin-top: 16px; }
+        .info-card {
+            padding: 16px 16px 14px;
+            border: 2px solid var(--line-strong);
+            border-radius: var(--r-card);
+            background: var(--card);
+            box-shadow: var(--shadow);
+        }
+        .info-card h2 {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: calc(17px * var(--fs));
+            line-height: 1.4;
+        }
+        .info-ico {
+            display: grid;
+            place-items: center;
+            flex: none;
+            width: 32px;
+            height: 32px;
+            border: 2px solid var(--ink);
+            border-radius: 50%;
+            background: var(--c-sight);
+            color: var(--on-cat);
+        }
+        .info-ico .ico { width: 18px; height: 18px; }
+        .info-lead {
+            margin-top: 10px;
+            padding: 8px 12px;
+            border-radius: var(--r-chip);
+            background: color-mix(in srgb, var(--c-shop) 35%, var(--card));
+            font-size: calc(14px * var(--fs));
+            line-height: 1.6;
+        }
+        .info-points { display: flex; flex-direction: column; gap: 8px; margin-top: 10px; }
+        .info-points li {
+            position: relative;
+            padding-left: 16px;
+            font-size: calc(14px * var(--fs));
+            line-height: 1.6;
+            overflow-wrap: anywhere;
+        }
+        .info-points li::before {
+            content: "";
+            position: absolute;
+            left: 2px;
+            top: .65em;
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            background: var(--line-strong);
+        }
+        .info-card--warn { border-color: var(--stamp); }
+        .info-card--warn .info-ico { background: var(--c-food); }
+        .info-card--warn .info-points li::before { background: var(--stamp); }
+        .info-links {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-top: 12px;
+            padding-top: 12px;
+            border-top: 1.5px dashed var(--line);
+        }
+        .info-links .chip-btn { font-size: calc(13px * var(--fs)); }
 
         /* ---------- 篩選列（吸頂） ---------- */
         .toolbar {
@@ -1337,7 +1442,9 @@
             align-items: center;
             justify-content: center;
             gap: 1px;
-            width: 112px;
+            flex: 1 1 0;
+            min-width: 0;
+            max-width: 112px;
             border: 0;
             background: transparent;
             color: var(--ink-soft);
@@ -1401,7 +1508,8 @@
                 display: grid;
                 grid-template-columns: minmax(400px, 480px) minmax(0, 1fr);
             }
-            .home-pane { display: none !important; }
+            .home-pane,
+            .info-pane { display: none !important; }
             .list-col {
                 display: block !important;
                 padding-bottom: 40px;
@@ -1457,6 +1565,8 @@
         <symbol id="i-calendar" viewBox="0 0 24 24"><path d="M5.5 5.5h13a1.5 1.5 0 0 1 1.5 1.5v11.5a1.5 1.5 0 0 1-1.5 1.5h-13A1.5 1.5 0 0 1 4 18.5V7a1.5 1.5 0 0 1 1.5-1.5z"/><path d="M4 10h16M8.5 3.5v3.5M15.5 3.5v3.5"/></symbol>
         <symbol id="i-coin" viewBox="0 0 24 24"><circle cx="12" cy="12" r="8.3"/><path d="M9 7.8l3 4 3-4M12 11.8v4.8M9.4 12.6h5.2M9.4 15h5.2"/></symbol>
         <symbol id="i-stamp" viewBox="0 0 24 24"><path d="M9.5 3.5h5v4.2l3.5 2.3v3.5H6V10l3.5-2.3z"/><path d="M5 17h14M7.5 20.5h9"/></symbol>
+        <symbol id="i-info" viewBox="0 0 24 24"><circle cx="12" cy="12" r="8.6"/><path d="M12 11v5.5M12 7.6v.01"/></symbol>
+        <symbol id="i-phone" viewBox="0 0 24 24"><path d="M6.6 3.5h2.7l1.4 4.2-2 1.4a11 11 0 0 0 6.2 6.2l1.4-2 4.2 1.4v2.7a2 2 0 0 1-2.2 2A16.5 16.5 0 0 1 4.6 5.7a2 2 0 0 1 2-2.2z"/></symbol>
         <symbol id="i-share" viewBox="0 0 24 24"><path d="M12 3.5v11M8 7.5l4-4 4 4"/><path d="M8 10.5H6.5v10h11v-10H16"/></symbol>
         <symbol id="i-home-add" viewBox="0 0 24 24"><path d="M6 4h12a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2z"/><path d="M12 8.5v7M8.5 12h7"/></symbol>
         <symbol id="i-fit" viewBox="0 0 24 24"><path d="M4 9V5.5A1.5 1.5 0 0 1 5.5 4H9M15 4h3.5A1.5 1.5 0 0 1 20 5.5V9M20 15v3.5a1.5 1.5 0 0 1-1.5 1.5H15M9 20H5.5A1.5 1.5 0 0 1 4 18.5V15"/><circle cx="12" cy="12" r="2.5"/></symbol>
@@ -1577,6 +1687,7 @@
                         <button class="home-day-btn" id="home-next-day-btn" type="button" aria-label="切換後一天">後一天</button>
                     </div>
                 </div>
+                <p id="home-tz-note" class="tz-note" hidden></p>
                 <div id="home-today-list" class="today-stops-wrap"></div>
                 <button class="today-view-all-btn" id="home-view-all-btn" type="button">
                     <svg class="ico"><use href="#i-book"/></svg>前往完整行程清單
@@ -1682,7 +1793,7 @@
                 <div id="cat-chips" class="scroller cats" role="group" aria-label="選擇類別"></div>
             </div>
 
-            <p id="list-count" class="list-count" aria-live="polite"></p>
+            <p id="list-count" class="list-count tz-note" hidden></p>
             <main id="itinerary-list"><p class="loading">翻開繪本中…</p></main>
         </div>
 
@@ -1703,6 +1814,11 @@
         </section>
     </div>
 
+    <!-- 資訊頁：內容在 data/info.json -->
+    <section id="info-pane" class="info-pane" aria-label="旅遊資訊">
+        <div id="info-content"><p class="loading">翻開資訊頁中…</p></div>
+    </section>
+
     <nav class="tabbar" aria-label="切換畫面">
         <button class="tab" type="button" data-view="home" aria-pressed="true">
             <span class="tab-ico"><svg class="ico"><use href="#i-home"/></svg></span>首頁
@@ -1712,6 +1828,9 @@
         </button>
         <button class="tab" type="button" data-view="map" aria-pressed="false">
             <span class="tab-ico"><svg class="ico"><use href="#i-map"/></svg></span>地圖
+        </button>
+        <button class="tab" type="button" data-view="info" aria-pressed="false">
+            <span class="tab-ico"><svg class="ico"><use href="#i-info"/></svg></span>資訊
         </button>
     </nav>
 
@@ -1734,7 +1853,9 @@
     <script>
         // ✏️ 行程資料放在 data/trip.json，換一趟旅程只要換這個檔案
         const TRIP_URL = './data/trip.json';
-        let trip = { id: 'trip', title: '', subtitle: '' };
+        const INFO_URL = './data/info.json';
+        const VIEWS = ['home', 'list', 'map', 'info'];
+        let trip = { id: 'trip', title: '', subtitle: '', timeNote: '' };
         let days = [];
         let items = [];
         let visited = new Set();
@@ -1827,6 +1948,11 @@
 
             return { text, summary, hours: hours.trim(), booking: booking.trim(), tags };
         }
+        // 時間；不是當地時間的（例如從台灣起飛）在下方標出 tz
+        function timeHTML(item) {
+            if (!item.time) return '未定';
+            return esc(item.time) + (item.tz ? `<small class="time-tz">${esc(item.tz)}</small>` : '');
+        }
         function byTime(a, b) {
             if (a.day !== b.day) return a.day - b.day;
             if (!a.time && !b.time) return 0;
@@ -1900,6 +2026,7 @@
                         <div class="card-actions">
                             ${hasDetail ? `<button class="chip-btn" type="button" data-act="detail" aria-label="查看詳細資訊" title="詳細資訊">${icon('book')}</button>` : ''}
                             ${item.lat && item.lng ? `<button class="chip-btn" type="button" data-act="map" aria-label="在地圖上查看" title="看地圖">${icon('pin')}</button>` : ''}
+                            <button class="chip-btn" type="button" data-act="share" aria-label="分享${esc(item.title)}" title="分享">${icon('share')}</button>
                             <a class="chip-btn nav" href="${esc(mapLink(item))}" target="_blank" rel="noopener" aria-label="使用 Google Maps 導航" title="導航">${icon('nav')}</a>
                         </div>
                     </article>`;
@@ -1920,7 +2047,7 @@
             const first = group[0];
             const c = catOf(first);
             const head = `
-                    <div class="stop-time">${first.time ? esc(first.time) : '未定'}</div>
+                    <div class="stop-time">${timeHTML(first)}</div>
                     <div class="stop-node">${icon(c.icon)}</div>`;
             if (group.length === 1) {
                 return `<li class="stop" style="--cat:${c.color}">${head}${cardHTML(first)}</li>`;
@@ -1960,10 +2087,6 @@
                     (item.desc && item.desc.toLowerCase().includes(q));
                 return matchDay && matchCat && matchQuery;
             });
-
-            $('#list-count').textContent = currentList.length
-                ? `顯示 ${currentList.length} 個地點`
-                : '';
 
             const list = $('#itinerary-list');
             if (!currentList.length) {
@@ -2131,9 +2254,9 @@
             }
         }
 
-        // ---------- 畫面切換（首頁／行程／地圖） ----------
+        // ---------- 畫面切換（首頁／行程／地圖／資訊） ----------
         function setView(view, opts = {}) {
-            if (!['home', 'list', 'map'].includes(view)) view = 'home';
+            if (!VIEWS.includes(view)) view = 'home';
             root.dataset.view = view;
             document.querySelectorAll('.tab').forEach((t) => t.setAttribute('aria-pressed', String(t.dataset.view === view)));
             if (opts.updateHash !== false) {
@@ -2148,6 +2271,9 @@
             }
             if (view === 'home') {
                 renderHome();
+            }
+            if (view === 'info') {
+                renderInfo();
             }
         }
 
@@ -2259,6 +2385,7 @@
             if (!id) return;
             if (act === 'map') focusOnMap(id);
             if (act === 'detail') showDetailModal(id);
+            if (act === 'share') shareItem(id);
             if (act === 'stamp') {
                 const on = !visited.has(id);
                 on ? visited.add(id) : visited.delete(id);
@@ -2455,7 +2582,7 @@
                         ${groups.map((group) => {
                             const first = group[0];
                             const c = catOf(first);
-                            const timeStr = first.time ? esc(first.time) : '未定';
+                            const timeStr = timeHTML(first);
 
                             // 只有 1 個地點：維持簡潔單列（點擊直達 Google Maps）
                             if (group.length === 1) {
@@ -2608,6 +2735,89 @@
         window.addEventListener('offline', () => toast('目前離線：行程照常可看，地圖只會顯示看過的區域', 4000));
         window.addEventListener('online', () => toast('已恢復連線', 1800));
 
+        // ---------- 分享地點 ----------
+        // 手機用系統的分享選單；不支援的瀏覽器改成複製名稱和地圖連結
+        async function shareItem(id) {
+            const item = items.find((it) => it.id === id);
+            if (!item) return;
+            const url = mapLink(item);
+            if (navigator.share) {
+                try {
+                    await navigator.share({ title: item.title, text: item.title, url });
+                    return;
+                } catch (e) {
+                    if (e && e.name === 'AbortError') return; // 使用者關掉分享選單
+                }
+            }
+            try {
+                await navigator.clipboard.writeText(`${item.title}\n${url}`);
+                toast('已複製地點名稱和地圖連結', 2000);
+            } catch (e) {
+                toast('這個瀏覽器不能分享，請按導航打開地圖再分享', 3000);
+            }
+        }
+
+        // ---------- 資訊頁 ----------
+        let infoState = 'idle'; // idle → loading → done
+        function safeLink(url) {
+            return /^(https?:|tel:)/i.test(url || '') ? url : '';
+        }
+        function infoIcon(name) {
+            return /^[a-z-]+$/.test(name || '') && document.getElementById(`i-${name}`) ? name : 'info';
+        }
+        function infoSectionHTML(sec) {
+            const points = Array.isArray(sec.points) ? sec.points : [];
+            const links = (Array.isArray(sec.links) ? sec.links : []).filter((l) => l && l.name && safeLink(l.url));
+            return `
+                <section class="info-card${sec.warn ? ' info-card--warn' : ''}">
+                    <h2><span class="info-ico">${icon(infoIcon(sec.icon))}</span>${esc(sec.title)}</h2>
+                    ${sec.lead ? `<p class="info-lead">${esc(sec.lead)}</p>` : ''}
+                    ${points.length ? `<ul class="info-points">${points.map((t) => `<li>${esc(t)}</li>`).join('')}</ul>` : ''}
+                    ${links.length ? `<div class="info-links">${links.map((l) => {
+                        const tel = /^tel:/i.test(l.url);
+                        return `<a class="chip-btn" href="${esc(l.url)}"${tel ? '' : ' target="_blank" rel="noopener"'}>${icon(tel ? 'phone' : 'arrow')}${esc(l.name)}</a>`;
+                    }).join('')}</div>` : ''}
+                </section>`;
+        }
+        async function renderInfo() {
+            if (infoState !== 'idle') return;
+            infoState = 'loading';
+            const box = $('#info-content');
+            try {
+                let res;
+                try {
+                    res = await fetch(INFO_URL, { cache: 'no-cache' });
+                } catch (e) {
+                    throw new TripError('讀不到旅遊資訊', '請確認網路連線後重新整理。');
+                }
+                if (!res.ok) throw new TripError('讀不到旅遊資訊', `data/info.json 回應 ${res.status}，請確認檔案存在。`);
+                const text = (await res.text()).replace(/^\uFEFF/, '');
+                let data;
+                try {
+                    data = JSON.parse(text);
+                } catch (e) {
+                    throw new TripError('旅遊資訊格式有誤', describeJsonError(text));
+                }
+                const sections = Array.isArray(data.sections) ? data.sections.filter((sec) => sec && sec.title) : [];
+                box.innerHTML = `
+                    <header class="info-head">
+                        <h1>${esc(data.title || '旅遊資訊')}</h1>
+                        ${data.updated ? `<p class="info-sub">整理於 ${esc(data.updated)}，規定可能會變，出發前點官方連結再確認</p>` : ''}
+                    </header>
+                    <div class="info-list">${sections.map(infoSectionHTML).join('')}</div>`;
+                infoState = 'done';
+            } catch (err) {
+                console.error(err);
+                infoState = 'idle'; // 下次切到資訊頁再試一次
+                box.innerHTML = `
+                    <div class="empty trip-error" role="alert">
+                        <svg aria-hidden="true"><use href="#mascot"/></svg>
+                        <h2>${esc(err.message)}</h2>
+                        <pre>${esc(err.detail || '')}</pre>
+                    </div>`;
+            }
+        }
+
         // ---------- 讀取行程 ----------
         class TripError extends Error {
             constructor(title, detail) {
@@ -2718,7 +2928,8 @@
             trip = {
                 id: String(data.id || 'trip'),
                 title: String(data.title || '旅行繪本'),
-                subtitle: String(data.subtitle || '')
+                subtitle: String(data.subtitle || ''),
+                timeNote: String(data.timeNote || '')
             };
             items = data.items
                 .filter((it) => it && it.title)
@@ -2726,6 +2937,7 @@
                     id: it.id != null && it.id !== '' ? String(it.id) : `auto-${i}`,
                     day: Number(it.day) || 1,
                     time: it.time ? String(it.time) : '',
+                    tz: it.tz ? String(it.tz) : '',
                     title: String(it.title),
                     category: categoryAlias[it.category] || it.category || '',
                     gmap: it.gmap || '',
@@ -2757,6 +2969,11 @@
             document.title = trip.title;
             $('#trip-title').textContent = trip.title;
             $('#trip-subtitle').textContent = trip.subtitle ? `${trip.subtitle}，` : '';
+            ['#list-count', '#home-tz-note'].forEach((sel) => {
+                const el = $(sel);
+                el.innerHTML = trip.timeNote ? `${icon('clock')}<span>${esc(trip.timeNote)}</span>` : '';
+                el.hidden = !trip.timeNote;
+            });
 
             // 將繪本封面掛載到首頁
             const homeHeroContainer = $('#home-hero-container');
@@ -2767,7 +2984,7 @@
         }
 
         function showTripError(err) {
-            $('#list-count').textContent = '';
+            $('#list-count').hidden = true;
             document.querySelectorAll('.hero-sub').forEach((el) => { el.hidden = true; });
             $('#itinerary-list').innerHTML = `
                 <div class="empty trip-error" role="alert">
@@ -2780,7 +2997,7 @@
         // ---------- 啟動 ----------
         function initRouting() {
             const hash = location.hash.replace('#', '');
-            const initialView = ['home', 'list', 'map'].includes(hash) ? hash : 'home';
+            const initialView = VIEWS.includes(hash) ? hash : 'home';
             if (desktopMQ.matches) {
                 setView('list', { updateHash: false });
                 initMap();
@@ -2791,7 +3008,7 @@
 
         window.addEventListener('hashchange', () => {
             const next = location.hash.replace('#', '');
-            if (['home', 'list', 'map'].includes(next) && next !== root.dataset.view) {
+            if (VIEWS.includes(next) && next !== root.dataset.view) {
                 setView(next, { updateHash: false });
             }
         });

@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""重新產生 fonts/huninn-subset.woff2，只收錄 index.html 和 data/trip.json 用到的字。
+"""重新產生 fonts/huninn-subset.woff2，只收錄 index.html、data/trip.json、data/info.json 用到的字。
 
 用法（在專案根目錄執行）：
     pip install fonttools brotli
@@ -30,7 +30,7 @@ def main():
         urllib.request.urlretrieve(SOURCE_URL, CACHE)
 
     text = ''
-    for name in ('index.html', 'data/trip.json', 'manifest.webmanifest'):
+    for name in ('index.html', 'data/trip.json', 'data/info.json', 'manifest.webmanifest'):
         text += (ROOT / name).read_text(encoding='utf-8')
     chars = set(text) | set(EXTRA) | {chr(c) for c in range(0x20, 0x7F)}
     chars = ''.join(sorted(c for c in chars if ord(c) >= 0x20))
