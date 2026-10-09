@@ -1202,12 +1202,12 @@
         let markerLayer = null;
         const markersById = new Map();
 
-        function initMap() {
+        function initMap(fit = true) {
             if (map || !window.L) return;
             map = L.map('map', { zoomControl: true }).setView([33.5902, 130.4207], 11);
             L.tileLayer(TILE_URL, { attribution: TILE_ATTRIBUTION, maxZoom: 19 }).addTo(map);
             markerLayer = L.layerGroup().addTo(map);
-            updateMarkers();
+            updateMarkers(fit);
         }
 
         function popupHTML(item) {
@@ -1249,22 +1249,28 @@
         function focusOnMap(id) {
             const item = items.find((i) => i.id === id);
             if (!item) return;
-            if (!desktopMQ.matches) setView('map');
-            initMap();
+            const fresh = !map;
+            if (!desktopMQ.matches) setView('map', { init: false });
+            initMap(false); // 第一次開地圖就直接定位到這個點，不先縮放到全部圖釘
             if (!map) return;
-            setTimeout(() => {
-                map.invalidateSize();
-                map.flyTo([item.lat, item.lng], 16, { duration: 0.8 });
-                const marker = markersById.get(id);
-                if (marker) setTimeout(() => marker.openPopup(), 850);
-            }, 60);
+            map.invalidateSize();
+            const marker = markersById.get(id);
+            const target = [item.lat, item.lng];
+            if (fresh) {
+                map.setView(target, 16, { animate: false });
+                if (marker) marker.openPopup();
+            } else {
+                map.closePopup();
+                map.once('moveend', () => { if (marker) marker.openPopup(); });
+                map.flyTo(target, 16, { duration: 0.8 });
+            }
         }
 
         // ---------- 行程／地圖切換（手機） ----------
-        function setView(view) {
+        function setView(view, opts = {}) {
             root.dataset.view = view;
             document.querySelectorAll('.tab').forEach((t) => t.setAttribute('aria-pressed', String(t.dataset.view === view)));
-            if (view === 'map') {
+            if (view === 'map' && opts.init !== false) {
                 initMap();
                 setTimeout(() => map && map.invalidateSize(), 50);
             }
