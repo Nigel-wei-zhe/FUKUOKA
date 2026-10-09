@@ -2,6 +2,20 @@
 
 福岡旅行行程的手機網頁（PWA）。純靜態網站，沒有建置流程，部署在 GitHub Pages 的子路徑 `https://05131041.github.io/FUKUOKA/`。給人看的說明在 `README.md`。
 
+## 分支與部署（個人 fork 的開發流程）
+
+這個 repo 是 fork，先在個人 `dev` 開發，穩定後再同步回原作者。
+
+- `origin`：個人 fork `Nigel-wei-zhe/FUKUOKA`；`upstream`：原作者 `05131041/FUKUOKA`
+- **開發都在 `dev` 分支**。`main` 是舊的單檔版本，不在上面開發
+- 個人 fork 的 GitHub Pages 來源是 `dev` 分支根目錄（Deploy from a branch，沒有 Actions workflow）。**push 到 `origin/dev` 就會自動部署**到 `https://nigel-wei-zhe.github.io/FUKUOKA/`，可當作預覽站
+- **小功能先開功能分支**：從 `dev` 開 `feat-<名稱>`（不用 `/`），push 到 `origin` 後用 raw.githack 預覽，確認沒問題再合回 `dev`，避免 `dev` 頻繁部署、也讓多個功能互不覆蓋
+  - 預覽網址（每次 push 完都要附給使用者，使用者常用手機看）：`https://raw.githack.com/Nigel-wei-zhe/FUKUOKA/<commit sha>/index.html`；用 commit sha 才不會吃到 githack 幾分鐘的快取，分支名稱的網址可當固定入口
+  - 每個網址路徑的 Service Worker 是分開的；`index.html`、`trip.json` 網路優先會馬上更新，其他檔案改了照規則把 `sw.js` 的 `VERSION` 加 1
+  - githack 只當個人預覽用，不要當正式網址分享
+- 開發到差不多後，從 `dev` 對 `upstream` 開 PR 同步回原作者；開 PR 前先確認上游最新狀態，有衝突先在 `dev` 解掉
+- README 與下方提到的網址 `05131041.github.io` 是原作者的正式站，不要改成個人 fork 的網址
+
 ## 檔案地圖
 
 - `data/trip.json`：行程資料（旅程名稱、每天標題、所有地點）。格式規格是 `data/trip.schema.json`，以 schema 為準
