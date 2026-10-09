@@ -1,249 +1,901 @@
 <!DOCTYPE html>
-<html lang="zh-TW" class="h-full bg-[#F9F7F2]">
+<html lang="zh-TW" data-theme="day">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>福岡 | FUKUOKA Travel</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+    <title>福岡散步繪本 | FUKUOKA Travel</title>
+    <meta name="description" content="福岡八天的吃喝散步路線：景點、美食、點心、購物與交通，附地圖導航，可離線瀏覽。">
+    <meta name="theme-color" content="#FBF5E9">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-title" content="福岡散步">
+    <meta name="apple-mobile-web-app-status-bar-style" content="default">
+    <link rel="manifest" href="./manifest.webmanifest">
+    <link rel="icon" type="image/png" sizes="32x32" href="./icons/favicon-32.png">
+    <link rel="apple-touch-icon" href="./icons/apple-touch-icon.png">
+    <link rel="preload" href="./fonts/huninn-subset.woff2" as="font" type="font/woff2" crossorigin>
+    <link rel="stylesheet" href="./vendor/leaflet/leaflet.css">
 
-    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- 在畫面渲染前決定日夜主題，避免閃爍 -->
     <script>
-        tailwind.config = {
-            theme: {
-                extend: {
-                    colors: {
-                        sage: {
-                            50: '#f4f6f3',
-                            100: '#e5eae1',
-                            200: '#cdd7c6',
-                            300: '#adc0a3',
-                            400: '#8ca480',
-                            500: '#738c67',
-                            600: '#5a704f',
-                            700: '#48583f',
-                            800: '#3c4835',
-                            900: '#323c2d',
-                        },
-                        beige: {
-                            50: '#fcfbf9',
-                            100: '#f7f4ed',
-                            200: '#eee8da',
-                            300: '#e0d6c2',
-                            400: '#cca88c',
-                            800: '#4e473b',
-                            900: '#363128',
-                        },
-                        clay: '#C27355',
-                        rosewood: '#BA7B88',
-                        ochre: '#B88F51',
-                        olive: '#627D75'
-                    },
-                    fontFamily: {
-                        serif: ['"Noto Serif TC"', 'serif'],
-                        sans: ['"Noto Sans TC"', 'sans-serif'],
-                    }
-                }
+        (function () {
+            var t = null;
+            try { t = localStorage.getItem('fukuoka:theme'); } catch (e) {}
+            if (t !== 'day' && t !== 'night') {
+                t = window.matchMedia && matchMedia('(prefers-color-scheme: dark)').matches ? 'night' : 'day';
             }
-        }
+            document.documentElement.dataset.theme = t;
+            var m = document.querySelector('meta[name="theme-color"]');
+            if (m) m.content = t === 'night' ? '#1E2436' : '#FBF5E9';
+        })();
     </script>
 
-    <!-- Font Awesome Icons -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-
-    <!-- Leaflet CSS & JS -->
-    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
-    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;600;700&family=Noto+Serif+TC:wght@600;700&display=swap');
-        
-        * {
-            -webkit-tap-highlight-color: transparent;
-            box-sizing: border-box;
+        @font-face {
+            font-family: 'Huninn';
+            src: url('./fonts/huninn-subset.woff2') format('woff2');
+            font-weight: 400;
+            font-style: normal;
+            font-display: swap;
         }
 
+        /* ---------- 色票：白天是紙張與明太子粉，夜晚是博多灣與屋台燈籠 ---------- */
+        :root {
+            color-scheme: light;
+            --paper: #FBF5E9;
+            --paper-2: #F3E8D3;
+            --card: #FFFDF7;
+            --ink: #4A3B33;
+            --ink-soft: #75655A;
+            --line: #EADFCB;
+            --line-strong: #CDBDA4;
+            --accent: #F29B95;
+            --on-accent: #3E302A;
+            --link: #A84A46;
+            --stamp: #C9433D;
+
+            --c-sight: #B9D3A8;
+            --c-food: #F4A9A3;
+            --c-sweet: #F2C1D3;
+            --c-shop: #F5D58A;
+            --c-move: #A9D2E0;
+            --on-cat: #3E302A;
+
+            --hill: #DCE8CB;
+            --sea: #BFDDE6;
+            --sea-line: #86B8CA;
+            --torii: #E7897B;
+            --lamp: #F5C85E;
+            --window: #FFFDF7;
+
+            --shadow: 0 3px 0 var(--line);
+            --noise-opacity: .07;
+            --noise-blend: multiply;
+
+            --r-card: 18px 24px 16px 22px / 20px 16px 22px 18px;
+            --r-chip: 14px 16px 13px 15px / 15px 13px 16px 14px;
+            --tabbar-h: 62px;
+            --font: 'Huninn', 'jf-openhuninn', 'Zen Maru Gothic', 'PingFang TC', 'Noto Sans TC', 'Microsoft JhengHei', system-ui, sans-serif;
+        }
+
+        :root[data-theme="night"] {
+            color-scheme: dark;
+            --paper: #1E2436;
+            --paper-2: #262E46;
+            --card: #283049;
+            --ink: #F1E8D8;
+            --ink-soft: #BDB3A3;
+            --line: #353E5A;
+            --line-strong: #56618A;
+            --accent: #F6CD6E;
+            --on-accent: #1E2436;
+            --link: #F6CD6E;
+            --stamp: #F08A80;
+
+            --c-sight: #A3C493;
+            --c-food: #F0938D;
+            --c-sweet: #E6A8C2;
+            --c-shop: #F3C766;
+            --c-move: #8EC1D6;
+            --on-cat: #1E2436;
+
+            --hill: #2B3552;
+            --sea: #25405F;
+            --sea-line: #4A70A0;
+            --torii: #D9786B;
+            --lamp: #FFD27A;
+            --window: #FFD98A;
+
+            --shadow: 0 3px 0 #161B2A;
+            --noise-opacity: .05;
+            --noise-blend: screen;
+        }
+
+        /* ---------- 基礎 ---------- */
+        *, *::before, *::after { box-sizing: border-box; }
+        html { -webkit-text-size-adjust: 100%; text-size-adjust: 100%; }
         body {
-            font-family: 'Noto Sans TC', system-ui, -apple-system, sans-serif;
-            user-select: none;
-            touch-action: manipulation;
-            background-color: #F9F7F2;
-            color: #363128;
+            margin: 0;
+            min-height: 100dvh;
+            background: var(--paper);
+            color: var(--ink);
+            font-family: var(--font);
+            font-size: 15px;
+            line-height: 1.6;
+            font-synthesis: none;
+            -webkit-tap-highlight-color: transparent;
+        }
+        /* 紙張纖維紋理 */
+        body::before {
+            content: "";
+            position: fixed;
+            inset: 0;
+            z-index: 100;
+            pointer-events: none;
+            opacity: var(--noise-opacity);
+            mix-blend-mode: var(--noise-blend);
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 .35 0 0 0 0 .27 0 0 0 0 .2 0 0 0 1.4 -.2'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+        }
+        h1, h2, h3, p, ol, ul { margin: 0; }
+        h1, h2, h3 { font-weight: 400; }
+        ol, ul { padding: 0; list-style: none; }
+        button, input { font: inherit; color: inherit; }
+        button { cursor: pointer; }
+        a { color: inherit; }
+        [hidden] { display: none !important; }
+        :focus-visible { outline: 2.5px solid var(--link); outline-offset: 2px; border-radius: 10px; }
+
+        .ico {
+            width: 1.25em;
+            height: 1.25em;
+            flex: none;
+            fill: none;
+            stroke: currentColor;
+            stroke-width: 1.8;
+            stroke-linecap: round;
+            stroke-linejoin: round;
+            vertical-align: -0.22em;
+        }
+        .sr-only {
+            position: absolute; width: 1px; height: 1px; margin: -1px; padding: 0;
+            overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; border: 0;
         }
 
-        /* 電腦版微型滾動條 */
-        .custom-scroll::-webkit-scrollbar {
-            height: 5px;
-        }
-        .custom-scroll::-webkit-scrollbar-track {
-            background: #EEE8DA;
-            border-radius: 10px;
-        }
-        .custom-scroll::-webkit-scrollbar-thumb {
-            background: #ADC0A3;
-            border-radius: 10px;
-        }
-        .custom-scroll::-webkit-scrollbar-thumb:hover {
-            background: #738C67;
-        }
-        .custom-scroll {
-            scrollbar-width: thin;
-            scrollbar-color: #ADC0A3 #EEE8DA;
+        [data-theme="day"] .night-only { display: none; }
+        [data-theme="night"] .day-only { display: none; }
+
+        /* ---------- 版面 ---------- */
+        .app { max-width: 1280px; margin: 0 auto; }
+        .list-col { padding-bottom: calc(var(--tabbar-h) + env(safe-area-inset-bottom) + 24px); }
+
+        /* ---------- 封面插畫 ---------- */
+        .hero { position: relative; padding-top: env(safe-area-inset-top); }
+        .hero-text { padding: 22px 76px 4px 20px; }
+        .hero h1 { font-size: 28px; line-height: 1.25; letter-spacing: .04em; }
+        .hero-sub { margin-top: 4px; font-size: 14px; color: var(--ink-soft); }
+        .hero-sub-2 { margin-top: 0; }
+        .hero-sub strong { font-weight: 400; color: var(--ink); }
+        .scene { display: block; width: 100%; height: auto; aspect-ratio: 390 / 150; margin-top: 2px; }
+        .scene text { font-family: var(--font); }
+
+        .install-pill {
+            position: absolute;
+            left: 20px;
+            bottom: 18px;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 6px 12px;
+            border: 2px solid var(--ink);
+            border-radius: var(--r-chip);
+            background: var(--card);
+            box-shadow: var(--shadow);
+            font-size: 14px;
         }
 
-        #map {
-            width: 100%;
+        /* 日夜切換：固定在右上，白天是太陽，夜晚是月亮 */
+        .theme-toggle {
+            position: fixed;
+            z-index: 60;
+            top: calc(env(safe-area-inset-top) + 14px);
+            right: max(14px, calc((100vw - 1280px) / 2 + 14px));
+            width: 48px;
+            height: 48px;
+            display: grid;
+            place-items: center;
+            border: 2px solid var(--ink);
+            border-radius: 50%;
+            background: var(--card);
+            color: var(--ink);
+            box-shadow: var(--shadow);
+            transition: transform .2s ease;
+        }
+        .theme-toggle:active { transform: scale(.92); }
+        .theme-toggle .ico { width: 28px; height: 28px; }
+        .theme-toggle .ico { fill: var(--lamp); }
+
+        /* ---------- 篩選列（吸頂） ---------- */
+        .toolbar {
+            position: sticky;
+            top: 0;
+            z-index: 40;
+            padding: calc(env(safe-area-inset-top) + 10px) 0 10px;
+            background: var(--paper);
+            border-bottom: 2px dashed var(--line-strong);
+        }
+        .search {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin: 0 76px 10px 16px;
+            padding: 0 6px 0 12px;
+            height: 44px;
+            border: 2px solid var(--line-strong);
+            border-radius: var(--r-chip);
+            background: var(--card);
+            color: var(--ink-soft);
+        }
+        .search:focus-within { border-color: var(--ink); }
+        .search input {
+            flex: 1;
+            min-width: 0;
             height: 100%;
-            z-index: 10;
-        }
-
-        .custom-div-icon {
+            border: 0;
+            outline: 0;
             background: transparent;
-            border: none;
+            color: var(--ink);
+            font-size: 16px; /* 16px 避免 iOS 聚焦時自動放大 */
+        }
+        .search input::placeholder { color: var(--ink-soft); opacity: .85; }
+        .search input::-webkit-search-cancel-button { display: none; }
+        .icon-btn {
+            display: grid;
+            place-items: center;
+            width: 36px;
+            height: 36px;
+            border: 0;
+            border-radius: 50%;
+            background: transparent;
+            color: var(--ink-soft);
         }
 
-        .pb-safe {
-            padding-bottom: env(safe-area-inset-bottom, 1rem);
+        .scroller {
+            display: flex;
+            gap: 8px;
+            overflow-x: auto;
+            padding: 2px 16px 6px;
+            scroll-snap-type: x proximity;
+            scroll-padding: 0 16px;
+            scrollbar-width: none;
+        }
+        .scroller::-webkit-scrollbar { display: none; }
+
+        .day-tab {
+            flex: none;
+            scroll-snap-align: start;
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+            min-height: 48px;
+            padding: 5px 12px 6px;
+            border: 2px solid var(--line-strong);
+            border-radius: var(--r-chip);
+            background: var(--card);
+            text-align: left;
+            line-height: 1.3;
+            transition: transform .15s ease;
+        }
+        .day-tab small { font-size: 12px; color: var(--ink-soft); }
+        .day-tab span { font-size: 14px; white-space: nowrap; }
+        .day-tab:active { transform: scale(.96); }
+        .day-tab[aria-pressed="true"] {
+            border-color: var(--ink);
+            background: var(--accent);
+            color: var(--on-accent);
+            box-shadow: var(--shadow);
+        }
+        .day-tab[aria-pressed="true"] small { color: var(--on-accent); opacity: .8; }
+
+        .cats { margin-top: 2px; }
+        .cat-chip {
+            flex: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            min-height: 36px;
+            padding: 4px 12px 4px 6px;
+            border: 2px solid var(--line-strong);
+            border-radius: 999px;
+            background: var(--card);
+            font-size: 14px;
+            white-space: nowrap;
+        }
+        .cat-chip .dot {
+            display: grid;
+            place-items: center;
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            background: var(--cat, var(--paper-2));
+            color: var(--on-cat);
+        }
+        .cat-chip .dot .ico { width: 16px; height: 16px; }
+        .cat-chip[data-cat="all"] { padding-left: 12px; }
+        .cat-chip[aria-pressed="true"] {
+            border-color: var(--ink);
+            background: var(--cat, var(--accent));
+            color: var(--on-cat);
+        }
+        .cat-chip[data-cat="all"][aria-pressed="true"] { color: var(--on-accent); }
+
+        .list-count {
+            padding: 12px 20px 0;
+            font-size: 13px;
+            color: var(--ink-soft);
         }
 
+        /* ---------- 每日章節 ---------- */
+        .day-section { padding: 18px 12px 4px; }
+        .day-title {
+            display: flex;
+            align-items: baseline;
+            flex-wrap: wrap;
+            gap: 4px 10px;
+            margin: 0 0 16px 4px;
+            font-size: 20px;
+            line-height: 1.35;
+        }
+        .tape {
+            position: relative;
+            display: inline-block;
+            padding: 1px 12px;
+            font-size: 15px;
+            color: var(--on-cat);
+            transform: rotate(-3deg);
+        }
+        .tape::before {
+            content: "";
+            position: absolute;
+            inset: 0;
+            z-index: -1;
+            background: var(--tape);
+            opacity: .9;
+            clip-path: polygon(3% 8%, 97% 0, 100% 50%, 96% 100%, 2% 94%, 0 45%);
+        }
+        .day-title small { font-size: 13px; color: var(--ink-soft); }
+
+        /* ---------- 縫線時間軸 ---------- */
+        .stops { position: relative; }
+        .stops::before {
+            content: "";
+            position: absolute;
+            top: 14px;
+            bottom: 18px;
+            left: 63px;
+            border-left: 2px dashed var(--line-strong);
+        }
+        .stop {
+            display: grid;
+            grid-template-columns: 42px 32px minmax(0, 1fr);
+            column-gap: 8px;
+            align-items: start;
+            margin-bottom: 14px;
+        }
+        .stop-time {
+            padding-top: 6px;
+            font-size: 13px;
+            color: var(--ink-soft);
+            text-align: right;
+            font-variant-numeric: tabular-nums;
+            white-space: nowrap;
+        }
+        .stop-node {
+            position: relative;
+            z-index: 1;
+            display: grid;
+            place-items: center;
+            width: 32px;
+            height: 32px;
+            margin-top: 2px;
+            border: 2px solid var(--ink);
+            border-radius: 50%;
+            background: var(--cat);
+            color: var(--on-cat);
+        }
+        .stop-node .ico { width: 18px; height: 18px; }
+
+        .card {
+            position: relative;
+            padding: 12px 14px 10px;
+            border: 2px solid var(--line-strong);
+            border-radius: var(--r-card);
+            background: var(--card);
+            box-shadow: var(--shadow);
+            overflow: hidden;
+        }
+        .card-head { padding-right: 58px; min-height: 48px; }
+        .card-cat { font-size: 12px; color: var(--ink-soft); }
+        .card h3 { font-size: 17px; line-height: 1.4; overflow-wrap: anywhere; }
+        .card-desc { margin-top: 4px; font-size: 14px; color: var(--ink-soft); overflow-wrap: anywhere; }
+        .meta {
+            display: flex;
+            gap: 6px;
+            margin-top: 6px;
+            font-size: 13px;
+            line-height: 1.5;
+            color: var(--ink);
+            overflow-wrap: anywhere;
+        }
+        .meta .ico { margin-top: 1px; color: var(--ink-soft); }
+        .meta-list { margin-top: 4px; }
+
+        .card-actions {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-top: 10px;
+            padding-top: 10px;
+            border-top: 1.5px dashed var(--line);
+        }
+        .chip-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            min-height: 36px;
+            padding: 4px 12px;
+            border: 2px solid var(--line-strong);
+            border-radius: var(--r-chip);
+            background: transparent;
+            font-size: 14px;
+            text-decoration: none;
+            color: var(--ink);
+            transition: transform .15s ease;
+        }
+        .chip-btn:active { transform: scale(.95); }
+        .chip-btn.nav { border-color: var(--ink); background: var(--accent); color: var(--on-accent); }
+        /* 蓋章：右上角的虛線圓圈，按下去變成「去過」印章 */
+        .stamp-btn {
+            position: absolute;
+            top: 8px;
+            right: 8px;
+            display: grid;
+            place-items: center;
+            width: 56px;
+            height: 56px;
+            padding: 0;
+            border: 2px dashed var(--line-strong);
+            border-radius: 50%;
+            background: transparent;
+            color: var(--ink-soft);
+            line-height: 1.1;
+        }
+        .stamp-btn .ico { width: 20px; height: 20px; }
+        .stamp-empty { display: grid; place-items: center; gap: 1px; font-size: 11px; }
+        .stamp-done { display: none; font-size: 15px; letter-spacing: .1em; }
+        .stamp-btn[aria-pressed="true"] {
+            border: 2.5px solid var(--stamp);
+            color: var(--stamp);
+            transform: rotate(-14deg);
+            mix-blend-mode: multiply;
+            opacity: .85;
+        }
+        .stamp-btn[aria-pressed="true"]::after {
+            content: "";
+            position: absolute;
+            inset: 3px;
+            border: 1px solid var(--stamp);
+            border-radius: 50%;
+        }
+        .stamp-btn[aria-pressed="true"] .stamp-empty { display: none; }
+        .stamp-btn[aria-pressed="true"] .stamp-done { display: block; }
+        [data-theme="night"] .stamp-btn[aria-pressed="true"] { mix-blend-mode: normal; }
+        .card.just-stamped .stamp-btn { animation: stamp-in .32s cubic-bezier(.3, 1.6, .5, 1); }
+        @keyframes stamp-in {
+            from { transform: rotate(-30deg) scale(1.6); opacity: 0; }
+            to { transform: rotate(-14deg) scale(1); opacity: .85; }
+        }
+
+        /* 找不到結果 */
+        .empty { padding: 36px 24px; text-align: center; color: var(--ink-soft); }
+        .empty svg { width: 96px; height: 72px; margin-bottom: 8px; }
+        .empty p { margin-bottom: 14px; }
+
+        /* ---------- 地圖 ---------- */
+        .map-pane {
+            position: fixed;
+            z-index: 50;
+            inset: 0 0 calc(var(--tabbar-h) + env(safe-area-inset-bottom)) 0;
+            display: none;
+            padding: calc(env(safe-area-inset-top) + 74px) 12px 12px;
+            background: var(--paper);
+        }
+        html[data-view="map"] .map-pane { display: block; }
+        html[data-view="map"] body { overflow: hidden; }
+        .map-head {
+            position: absolute;
+            top: calc(env(safe-area-inset-top) + 18px);
+            left: 20px;
+            right: 76px;
+        }
+        .map-head h2 { font-size: 20px; line-height: 1.3; }
+        .map-head p { font-size: 13px; color: var(--ink-soft); }
+        .map-frame {
+            position: relative;
+            height: 100%;
+            border: 2px solid var(--ink);
+            border-radius: var(--r-card);
+            overflow: hidden;
+            box-shadow: var(--shadow);
+            background: var(--paper-2);
+        }
+        #map { position: absolute; inset: 0; }
+        .map-fit {
+            position: absolute;
+            z-index: 500;
+            right: 12px;
+            bottom: 26px;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            min-height: 40px;
+            padding: 6px 14px;
+            border: 2px solid var(--ink);
+            border-radius: var(--r-chip);
+            background: var(--card);
+            box-shadow: var(--shadow);
+            font-size: 14px;
+        }
+
+        .leaflet-container { font-family: var(--font); background: var(--paper-2); }
+        [data-theme="night"] .leaflet-tile-pane {
+            filter: invert(1) hue-rotate(195deg) brightness(.92) contrast(.82) saturate(.45);
+        }
+        .leaflet-bar { border: 2px solid var(--ink) !important; border-radius: 14px !important; overflow: hidden; box-shadow: var(--shadow) !important; }
+        .leaflet-bar a { background: var(--card); color: var(--ink); border-bottom-color: var(--line) !important; width: 36px !important; height: 36px !important; line-height: 34px !important; }
+        .leaflet-bar a:hover { background: var(--paper-2); }
+        .leaflet-control-attribution { background: color-mix(in srgb, var(--card) 85%, transparent) !important; color: var(--ink-soft) !important; font-size: 10px; }
+        .leaflet-control-attribution a { color: var(--ink-soft) !important; }
         .leaflet-popup-content-wrapper {
-            border-radius: 1.25rem;
-            padding: 4px;
-            background: #FCFBF9;
-            box-shadow: 0 10px 30px -5px rgba(54, 49, 40, 0.12);
-            border: 1px solid #EEE8DA;
+            border: 2px solid var(--ink);
+            border-radius: var(--r-card);
+            background: var(--card);
+            color: var(--ink);
+            box-shadow: var(--shadow);
+        }
+        .leaflet-popup-tip { background: var(--card); border: 2px solid var(--ink); box-shadow: none; }
+        .leaflet-popup-content { margin: 12px 14px; font-size: 14px; line-height: 1.5; }
+        .leaflet-container a.leaflet-popup-close-button { color: var(--ink-soft); width: 28px; height: 28px; font-size: 20px; }
+        .popup-meta { font-size: 12px; color: var(--ink-soft); }
+        .popup-title { margin: 2px 0 4px; font-size: 16px; line-height: 1.35; }
+        .popup-hours { font-size: 13px; color: var(--ink-soft); }
+        .leaflet-popup-content .chip-btn { margin-top: 8px; }
+
+        .pin-wrap { background: none; border: 0; }
+        .pin {
+            width: 34px;
+            height: 34px;
+            display: grid;
+            place-items: center;
+            border: 2px solid var(--ink);
+            border-radius: 50% 50% 50% 4px;
+            background: var(--cat);
+            color: var(--on-cat);
+            transform: rotate(-45deg);
+            box-shadow: 0 2px 0 rgba(0, 0, 0, .18);
+        }
+        .pin .ico { width: 18px; height: 18px; transform: rotate(45deg); }
+        .pin.is-visited { box-shadow: 0 0 0 3px var(--stamp); }
+
+        /* ---------- 底部分頁 ---------- */
+        .tabbar {
+            position: fixed;
+            z-index: 70;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            display: flex;
+            justify-content: center;
+            gap: 12px;
+            height: calc(var(--tabbar-h) + env(safe-area-inset-bottom));
+            padding: 6px 16px env(safe-area-inset-bottom);
+            background: var(--card);
+            border-top: 2px solid var(--line-strong);
+        }
+        .tab {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 1px;
+            width: 112px;
+            border: 0;
+            background: transparent;
+            color: var(--ink-soft);
+            font-size: 13px;
+        }
+        .tab-ico {
+            display: grid;
+            place-items: center;
+            width: 52px;
+            height: 30px;
+            border-radius: 15px 17px 14px 16px;
+            transition: background-color .2s ease;
+        }
+        .tab-ico .ico { width: 22px; height: 22px; }
+        .tab[aria-pressed="true"] { color: var(--ink); }
+        .tab[aria-pressed="true"] .tab-ico { background: var(--accent); color: var(--on-accent); }
+
+        /* ---------- iOS 安裝提示、離線提示 ---------- */
+        .sheet {
+            position: fixed;
+            z-index: 80;
+            left: 12px;
+            right: 12px;
+            bottom: calc(var(--tabbar-h) + env(safe-area-inset-bottom) + 12px);
+            max-width: 420px;
+            margin: 0 auto;
+            padding: 16px 16px 14px 92px;
+            border: 2px solid var(--ink);
+            border-radius: var(--r-card);
+            background: var(--card);
+            box-shadow: 0 4px 0 var(--line-strong);
+            font-size: 14px;
+        }
+        .sheet .mascot { position: absolute; left: 12px; top: 18px; width: 68px; height: 52px; }
+        .sheet h2 { margin-right: 28px; font-size: 16px; line-height: 1.4; }
+        .sheet ol { margin-top: 6px; padding-left: 1.3em; list-style: decimal; }
+        .sheet li { margin-top: 2px; }
+        .sheet .ico { color: var(--link); }
+        .sheet-note { margin-top: 8px; font-size: 13px; color: var(--ink-soft); }
+        .sheet-close { position: absolute; top: 6px; right: 6px; }
+
+        .toast {
+            position: fixed;
+            z-index: 90;
+            left: 50%;
+            top: calc(env(safe-area-inset-top) + 76px);
+            transform: translateX(-50%);
+            width: max-content;
+            max-width: calc(100vw - 32px);
+            padding: 8px 14px;
+            border: 2px solid var(--ink);
+            border-radius: var(--r-chip);
+            background: var(--card);
+            box-shadow: var(--shadow);
+            font-size: 14px;
         }
 
-        .leaflet-container {
-            background-color: #f4f2eb !important;
+        /* ---------- 桌機：攤開的繪本，左頁行程、右頁地圖 ---------- */
+        @media (min-width: 960px) {
+            .app {
+                display: grid;
+                grid-template-columns: minmax(400px, 480px) minmax(0, 1fr);
+            }
+            .list-col {
+                padding-bottom: 40px;
+                border-right: 2px dashed var(--line-strong);
+            }
+            .tabbar { display: none; }
+            .hero-text { padding-right: 20px; }
+            .search { margin-right: 16px; }
+            .map-pane {
+                position: sticky;
+                top: 0;
+                z-index: 1;
+                display: block;
+                height: 100dvh;
+                padding: 90px 20px 20px;
+            }
+            .map-head { left: 28px; top: 26px; }
+            html[data-view="map"] body { overflow: auto; }
+            .sheet { bottom: 16px; }
         }
 
-        .paper-texture {
-            background-color: #F9F7F2;
-            background-image: radial-gradient(#E0D6C2 0.75px, transparent 0.75px);
-            background-size: 16px 16px;
+        @media (prefers-reduced-motion: reduce) {
+            *, *::before, *::after { animation: none !important; transition: none !important; }
         }
+
+        /* 日夜切換的圓形擴散過場 */
+        ::view-transition-old(root), ::view-transition-new(root) { animation: none; mix-blend-mode: normal; }
     </style>
 </head>
-<body class="h-full flex flex-col text-beige-900 paper-texture overflow-x-hidden">
+<body>
 
-    <!-- Top Header -->
-    <header class="bg-[#FCFBF9]/90 backdrop-blur-md border-b border-beige-200 text-beige-900 sticky top-0 z-30 shrink-0 transition-colors">
-        <div class="max-w-7xl mx-auto px-3 py-2.5 sm:px-4 sm:py-3 flex items-center justify-between">
-            <div class="flex items-center space-x-2.5">
-                <div class="bg-sage-100 text-sage-700 p-2 rounded-xl flex items-center justify-center w-9 h-9 sm:w-10 sm:h-10 border border-sage-200/60">
-                    <i class="fa-solid fa-compass text-base sm:text-lg"></i>
+    <!-- 圖示（自繪 SVG，跟著主題換色） -->
+    <svg width="0" height="0" style="position:absolute" aria-hidden="true">
+        <symbol id="i-torii" viewBox="0 0 24 24"><path d="M3 6.2c3.5 1.1 14.5 1.1 18 0"/><path d="M5 10.2h14"/><path d="M7.2 7.1V20.5M16.8 7.1V20.5"/><path d="M12 7.6v2.6"/></symbol>
+        <symbol id="i-bowl" viewBox="0 0 24 24"><path d="M3.5 12.5h17c0 4.3-3.8 7.5-8.5 7.5s-8.5-3.2-8.5-7.5z"/><path d="M13 10.5l6.5-7M15.8 10.8l5-5"/><path d="M7.5 9.5c-.9-1.1.9-2.1 0-3.2"/></symbol>
+        <symbol id="i-dango" viewBox="0 0 24 24"><circle cx="12" cy="6" r="2.7"/><circle cx="12" cy="11.4" r="2.7"/><circle cx="12" cy="16.8" r="2.7"/><path d="M12 2v1.3M12 19.5V22.5"/></symbol>
+        <symbol id="i-bag" viewBox="0 0 24 24"><path d="M5 8.5h14l-1.2 11.5H6.2z"/><path d="M9 8.5V7a3 3 0 0 1 6 0v1.5"/></symbol>
+        <symbol id="i-train" viewBox="0 0 24 24"><path d="M7 3.5h10a2 2 0 0 1 2 2v9.5a3 3 0 0 1-3 3H8a3 3 0 0 1-3-3V5.5a2 2 0 0 1 2-2z"/><path d="M7.5 7h9v4.2h-9z"/><path d="M8.6 14.6h.01M15.4 14.6h.01"/><path d="M8.3 18l-2 3M15.7 18l2 3"/></symbol>
+        <symbol id="i-search" viewBox="0 0 24 24"><circle cx="10.8" cy="10.8" r="6.3"/><path d="M20 20l-4.6-4.6"/></symbol>
+        <symbol id="i-close" viewBox="0 0 24 24"><path d="M6.5 6.5l11 11M17.5 6.5l-11 11"/></symbol>
+        <symbol id="i-sun" viewBox="0 0 24 24"><circle cx="12" cy="12" r="4.6"/><path fill="none" d="M12 2.6v2.2M12 19.2v2.2M2.6 12h2.2M19.2 12h2.2M5.4 5.4l1.5 1.5M17.1 17.1l1.5 1.5M5.4 18.6l1.5-1.5M17.1 6.9l1.5-1.5"/></symbol>
+        <symbol id="i-moon" viewBox="0 0 24 24"><path d="M19.5 14.6A7.8 7.8 0 0 1 9.4 4.5a7.8 7.8 0 1 0 10.1 10.1z"/><path fill="none" d="M17 3.5v2.4M15.8 4.7h2.4"/></symbol>
+        <symbol id="i-book" viewBox="0 0 24 24"><path d="M3 5.6c3-1.1 6-.9 9 1.1 3-2 6-2.2 9-1.1V19c-3-1.1-6-.9-9 1.1-3-2-6-2.2-9-1.1z"/><path d="M12 6.7v13.4"/></symbol>
+        <symbol id="i-map" viewBox="0 0 24 24"><path d="M3 6.3l6-2.3 6 2.3 6-2.3v13.7l-6 2.3-6-2.3-6 2.3z"/><path d="M9 4v13.7M15 6.3V20"/></symbol>
+        <symbol id="i-nav" viewBox="0 0 24 24"><path d="M4.5 11.2L19.5 4.5l-6.7 15-2-6.3z"/></symbol>
+        <symbol id="i-pin" viewBox="0 0 24 24"><path d="M12 21s-6.5-5.6-6.5-11a6.5 6.5 0 0 1 13 0c0 5.4-6.5 11-6.5 11z"/><circle cx="12" cy="10" r="2.3"/></symbol>
+        <symbol id="i-clock" viewBox="0 0 24 24"><circle cx="12" cy="12" r="8.3"/><path d="M12 7.6V12l2.9 1.9"/></symbol>
+        <symbol id="i-calendar" viewBox="0 0 24 24"><path d="M5.5 5.5h13a1.5 1.5 0 0 1 1.5 1.5v11.5a1.5 1.5 0 0 1-1.5 1.5h-13A1.5 1.5 0 0 1 4 18.5V7a1.5 1.5 0 0 1 1.5-1.5z"/><path d="M4 10h16M8.5 3.5v3.5M15.5 3.5v3.5"/></symbol>
+        <symbol id="i-coin" viewBox="0 0 24 24"><circle cx="12" cy="12" r="8.3"/><path d="M9 7.8l3 4 3-4M12 11.8v4.8M9.4 12.6h5.2M9.4 15h5.2"/></symbol>
+        <symbol id="i-stamp" viewBox="0 0 24 24"><path d="M9.5 3.5h5v4.2l3.5 2.3v3.5H6V10l3.5-2.3z"/><path d="M5 17h14M7.5 20.5h9"/></symbol>
+        <symbol id="i-share" viewBox="0 0 24 24"><path d="M12 3.5v11M8 7.5l4-4 4 4"/><path d="M8 10.5H6.5v10h11v-10H16"/></symbol>
+        <symbol id="i-home-add" viewBox="0 0 24 24"><path d="M6 4h12a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2z"/><path d="M12 8.5v7M8.5 12h7"/></symbol>
+        <symbol id="i-fit" viewBox="0 0 24 24"><path d="M4 9V5.5A1.5 1.5 0 0 1 5.5 4H9M15 4h3.5A1.5 1.5 0 0 1 20 5.5V9M20 15v3.5a1.5 1.5 0 0 1-1.5 1.5H15M9 20H5.5A1.5 1.5 0 0 1 4 18.5V15"/><circle cx="12" cy="12" r="2.5"/></symbol>
+        <symbol id="mascot" viewBox="0 0 68 52">
+            <ellipse cx="34" cy="48" rx="22" ry="3" fill="var(--line)"/>
+            <path d="M8 34c0-14 11-24 26-24s26 10 26 24c0 7-6 11-26 11S8 41 8 34z" fill="var(--c-food)" stroke="var(--ink)" stroke-width="2"/>
+            <circle cx="22" cy="22" r="1.6" fill="var(--card)" opacity=".7"/><circle cx="44" cy="19" r="1.4" fill="var(--card)" opacity=".7"/><circle cx="50" cy="27" r="1.2" fill="var(--card)" opacity=".7"/><circle cx="17" cy="30" r="1.2" fill="var(--card)" opacity=".7"/>
+            <circle cx="27" cy="30" r="2.2" fill="var(--ink)"/><circle cx="41" cy="30" r="2.2" fill="var(--ink)"/>
+            <ellipse cx="21.5" cy="35" rx="3.2" ry="1.8" fill="var(--stamp)" opacity=".35"/><ellipse cx="46.5" cy="35" rx="3.2" ry="1.8" fill="var(--stamp)" opacity=".35"/>
+            <path d="M31 35c1.5 1.6 4.5 1.6 6 0" fill="none" stroke="var(--ink)" stroke-width="1.8" stroke-linecap="round"/>
+        </symbol>
+    </svg>
+
+    <button id="theme-toggle" class="theme-toggle" type="button" aria-label="切換成夜晚">
+        <svg class="ico day-only"><use href="#i-sun"/></svg>
+        <svg class="ico night-only"><use href="#i-moon"/></svg>
+    </button>
+
+    <div class="app">
+        <div class="list-col">
+            <header class="hero">
+                <div class="hero-text">
+                    <h1>福岡散步繪本</h1>
+                    <p class="hero-sub">八天的吃喝散步路線，共 <strong id="total-count">0</strong> 個地點</p>
+                    <p class="hero-sub hero-sub-2">已經蓋章 <strong id="visited-count">0</strong> 個</p>
                 </div>
-                <div>
-                    <h1 class="text-base sm:text-lg font-serif font-bold tracking-tight text-beige-900 leading-tight">福岡 | FUKUOKA Travel</h1>
-                    <p class="text-[11px] text-beige-800/70">散步美食 · 景點與點心地圖導航</p>
-                </div>
-            </div>
-            
-            <div class="hidden sm:flex items-center space-x-2 text-xs text-sage-700 font-medium bg-sage-50 px-3 py-1.5 rounded-xl border border-sage-200">
-                <span class="inline-block w-2 h-2 rounded-full bg-sage-500 animate-pulse"></span>
-                <span>8日行程離線隨身版</span>
-            </div>
-        </div>
-    </header>
 
-    <!-- Main Content Grid -->
-    <main class="flex-1 max-w-7xl w-full mx-auto p-2 sm:p-4 flex flex-col md:flex-row gap-3 overflow-hidden relative">
+                <!-- 封面插畫：白天有雲和海鷗，夜晚屋台燈籠會亮 -->
+                <svg class="scene" viewBox="0 0 390 150" preserveAspectRatio="xMidYMax meet" aria-hidden="true">
+                    <defs>
+                        <radialGradient id="glow">
+                            <stop offset="0" stop-color="#FFD27A" stop-opacity=".6"/>
+                            <stop offset="1" stop-color="#FFD27A" stop-opacity="0"/>
+                        </radialGradient>
+                    </defs>
+                    <g class="night-only" fill="var(--lamp)">
+                        <path d="M36 26l1.4 3.6 3.6 1.4-3.6 1.4-1.4 3.6-1.4-3.6-3.6-1.4 3.6-1.4z"/>
+                        <path d="M122 12l1.1 2.9 2.9 1.1-2.9 1.1-1.1 2.9-1.1-2.9-2.9-1.1 2.9-1.1z"/>
+                        <path d="M228 30l1.3 3.2 3.2 1.3-3.2 1.3-1.3 3.2-1.3-3.2-3.2-1.3 3.2-1.3z"/>
+                        <circle cx="88" cy="20" r="1.3"/><circle cx="170" cy="14" r="1.3"/><circle cx="196" cy="44" r="1.1"/>
+                        <circle cx="262" cy="16" r="1.3"/><circle cx="20" cy="56" r="1.1"/><circle cx="150" cy="40" r="1"/>
+                    </g>
+                    <g class="day-only" fill="var(--card)" stroke="var(--ink)" stroke-width="1.8" stroke-linejoin="round">
+                        <path d="M24 44h46a10 10 0 0 0-10-10 13 13 0 0 0-25 2.5A8.5 8.5 0 0 0 24 44z"/>
+                        <path d="M186 30h36a8 8 0 0 0-8-8 10.5 10.5 0 0 0-20 2 6.5 6.5 0 0 0-8 6z"/>
+                    </g>
+                    <g class="day-only" fill="none" stroke="var(--ink)" stroke-width="1.6" stroke-linecap="round">
+                        <path d="M118 30c2-2 4-2 6 0 2-2 4-2 6 0"/>
+                        <path d="M138 22c1.6-1.6 3.2-1.6 4.8 0 1.6-1.6 3.2-1.6 4.8 0"/>
+                    </g>
 
-        <!-- Left Pane: Itinerary Controls & Cards List -->
-        <section id="list-pane" class="w-full md:w-1/2 lg:w-5/12 flex flex-col bg-[#FCFBF9] rounded-2xl shadow-xs border border-beige-200 overflow-hidden h-full">
-            
-            <!-- Sticky Filter Header -->
-            <div class="p-2.5 sm:p-3 bg-beige-50/80 backdrop-blur border-b border-beige-200/80 space-y-2 shrink-0">
-                
-                <!-- Search Box -->
-                <div class="relative">
-                    <i class="fa-solid fa-magnifying-glass absolute left-3 top-1/2 -translate-y-1/2 text-beige-400 text-xs"></i>
-                    <input type="text" id="search-input" oninput="handleSearch()" placeholder="搜尋景點、店家、備註..." 
-                        class="w-full pl-8 pr-8 py-1.5 bg-white border border-beige-200 rounded-xl text-xs outline-none focus:border-sage-500 focus:ring-1 focus:ring-sage-500 transition placeholder:text-beige-300">
-                    <button id="search-clear-btn" onclick="clearSearch()" class="hidden absolute right-2.5 top-1/2 -translate-y-1/2 text-beige-400 hover:text-beige-800">
-                        <i class="fa-solid fa-xmark text-xs"></i>
+                    <path d="M0 104C34 84 62 82 92 96C122 76 160 72 196 92C228 80 262 82 292 94C324 84 360 86 390 92V150H0Z" fill="var(--hill)" stroke="var(--ink)" stroke-width="1.8" stroke-linejoin="round"/>
+
+                    <g stroke="var(--ink)" stroke-width="1.8" stroke-linejoin="round" stroke-linecap="round">
+                        <path d="M58 114L66 32L74 114Z" fill="var(--card)"/>
+                        <rect x="60.5" y="50" width="11" height="8" rx="2" fill="var(--window)"/>
+                        <path d="M66 32V21M62.2 78h7.6M60.6 96h10.8" fill="none"/>
+                    </g>
+
+                    <g stroke="var(--ink)" stroke-width="1.8" stroke-linejoin="round" stroke-linecap="round">
+                        <rect x="154.6" y="76" width="3.8" height="20" fill="var(--torii)"/>
+                        <rect x="173.6" y="76" width="3.8" height="20" fill="var(--torii)"/>
+                        <path d="M148 71.5c7 2 29 2 36 0l-1.2 5c-7 1.2-26.6 1.2-33.6 0z" fill="var(--torii)"/>
+                        <path d="M152 82h28" fill="none"/>
+                    </g>
+                    <g fill="var(--c-sweet)" stroke="var(--ink)" stroke-width="1.2">
+                        <circle cx="198" cy="76" r="2.4"/><circle cx="202.4" cy="78.6" r="2.4"/><circle cx="200.6" cy="83.2" r="2.4"/><circle cx="195.4" cy="83.2" r="2.4"/><circle cx="193.6" cy="78.6" r="2.4"/>
+                        <circle cx="198" cy="79.8" r="1.3" fill="var(--lamp)"/>
+                        <circle cx="128" cy="88" r="1.9"/><circle cx="131.6" cy="90.2" r="1.9"/><circle cx="130" cy="94" r="1.9"/><circle cx="126" cy="94" r="1.9"/><circle cx="124.4" cy="90.2" r="1.9"/>
+                    </g>
+
+                    <g stroke="var(--ink)" stroke-width="1.8" stroke-linejoin="round">
+                        <path d="M206 112V97l9-7 9 7v15z" fill="var(--card)"/>
+                        <rect x="212.5" y="99" width="5" height="5" rx="1" fill="var(--window)"/>
+                        <path d="M226 112V89h18v23z" fill="var(--card)"/>
+                        <rect x="230" y="93" width="4" height="4" rx="1" fill="var(--window)"/>
+                        <rect x="236.5" y="93" width="4" height="4" rx="1" fill="var(--window)"/>
+                        <rect x="230" y="100" width="4" height="4" rx="1" fill="var(--window)"/>
+                        <rect x="236.5" y="100" width="4" height="4" rx="1" fill="var(--window)"/>
+                        <path d="M246 112V100l8-6 8 6v12z" fill="var(--card)"/>
+                    </g>
+
+                    <path d="M0 116c13 0 13-4 26-4s13 4 26 4 13-4 26-4 13 4 26 4 13-4 26-4 13 4 26 4 13-4 26-4 13 4 26 4 13-4 26-4 13 4 26 4 13-4 26-4 13 4 26 4 13-4 26-4 13 4 26 4 13-4 26-4 13 4 26 4V150H0Z" fill="var(--sea)" stroke="var(--ink)" stroke-width="1.8" stroke-linejoin="round"/>
+                    <g fill="none" stroke="var(--sea-line)" stroke-width="1.8" stroke-linecap="round">
+                        <path d="M22 130c4-2.4 8-2.4 12 0M60 140c4-2.4 8-2.4 12 0M150 136c4-2.4 8-2.4 12 0M196 128c4-2.4 8-2.4 12 0M230 142c4-2.4 8-2.4 12 0"/>
+                    </g>
+                    <g stroke="var(--ink)" stroke-width="1.8" stroke-linejoin="round">
+                        <path d="M98 121h28l-4.5 6.5h-19z" fill="var(--card)"/>
+                        <path d="M112 121V104l10 15z" fill="var(--accent)"/>
+                    </g>
+
+                    <path d="M262 138h128v12H262z" fill="var(--paper-2)" stroke="var(--ink)" stroke-width="1.8"/>
+                    <circle class="night-only" cx="287" cy="100" r="26" fill="url(#glow)"/>
+                    <g stroke="var(--ink)" stroke-width="1.8" stroke-linejoin="round" stroke-linecap="round">
+                        <path d="M292 89v24M366 89v24" fill="none"/>
+                        <path d="M282 89l9-14h76l9 14z" fill="var(--c-food)"/>
+                        <path d="M296 89h21v16h-21zM319 89h21v16h-21zM342 89h21v16h-21z" fill="var(--card)"/>
+                        <path d="M287 89v4" fill="none"/>
+                        <rect x="281" y="93" width="12" height="15" rx="6" fill="var(--lamp)"/>
+                        <path d="M283.5 93h7M283.5 108h7" fill="none"/>
+                        <path d="M300 113v-5h14v5" fill="var(--card)"/>
+                        <path d="M286 113h86v17h-86z" fill="var(--card)"/>
+                        <circle cx="300" cy="132" r="6" fill="var(--card)"/>
+                        <circle cx="358" cy="132" r="6" fill="var(--card)"/>
+                    </g>
+                    <g font-size="11" fill="var(--ink)" text-anchor="middle">
+                        <text x="306.5" y="101">や</text><text x="329.5" y="101">た</text><text x="352.5" y="101">い</text>
+                    </g>
+                    <use href="#mascot" x="262" y="112" width="34" height="26"/>
+                </svg>
+
+                <button id="install-btn" class="install-pill" type="button" hidden>
+                    <svg class="ico"><use href="#i-home-add"/></svg>加到主畫面
+                </button>
+            </header>
+
+            <div class="toolbar">
+                <label class="search">
+                    <svg class="ico"><use href="#i-search"/></svg>
+                    <span class="sr-only">搜尋</span>
+                    <input id="search-input" type="search" placeholder="找店名、景點或備註" autocomplete="off" enterkeyhint="search">
+                    <button id="search-clear" class="icon-btn" type="button" aria-label="清除搜尋" hidden>
+                        <svg class="ico"><use href="#i-close"/></svg>
                     </button>
-                </div>
-
-                <!-- Horizontal Scrollable Day Switcher -->
-                <div class="flex items-center space-x-1.5 overflow-x-auto custom-scroll pb-1.5 pt-0.5 text-xs font-medium snap-x scroll-smooth">
-                    <button onclick="filterDay('all')" class="day-btn snap-start px-3 py-1.5 rounded-xl bg-sage-600 text-white font-medium whitespace-nowrap shadow-xs transition active:scale-95 shrink-0" data-day="all">全部天數</button>
-                    <button onclick="filterDay(1)" class="day-btn snap-start px-3 py-1.5 rounded-xl bg-white text-beige-800 hover:bg-beige-100 border border-beige-200 whitespace-nowrap transition active:scale-95 shrink-0" data-day="1">D1 抵達福岡/博多</button>
-                    <button onclick="filterDay(2)" class="day-btn snap-start px-3 py-1.5 rounded-xl bg-white text-beige-800 hover:bg-beige-100 border border-beige-200 whitespace-nowrap transition active:scale-95 shrink-0" data-day="2">D2 天神</button>
-                    <button onclick="filterDay(3)" class="day-btn snap-start px-3 py-1.5 rounded-xl bg-white text-beige-800 hover:bg-beige-100 border border-beige-200 whitespace-nowrap transition active:scale-95 shrink-0" data-day="3">D3 糸島海岸</button>
-                    <button onclick="filterDay(4)" class="day-btn snap-start px-3 py-1.5 rounded-xl bg-white text-beige-800 hover:bg-beige-100 border border-beige-200 whitespace-nowrap transition active:scale-95 shrink-0" data-day="4">D4 由布院溫泉</button>
-                    <button onclick="filterDay(5)" class="day-btn snap-start px-3 py-1.5 rounded-xl bg-white text-beige-800 hover:bg-beige-100 border border-beige-200 whitespace-nowrap transition active:scale-95 shrink-0" data-day="5">D5 由布院/博多</button>
-                    <button onclick="filterDay(6)" class="day-btn snap-start px-3 py-1.5 rounded-xl bg-white text-beige-800 hover:bg-beige-100 border border-beige-200 whitespace-nowrap transition active:scale-95 shrink-0" data-day="6">D6 小倉城/門司港</button>
-                    <button onclick="filterDay(7)" class="day-btn snap-start px-3 py-1.5 rounded-xl bg-white text-beige-800 hover:bg-beige-100 border border-beige-200 whitespace-nowrap transition active:scale-95 shrink-0" data-day="7">D7 太宰府天滿宮</button>
-                    <button onclick="filterDay(8)" class="day-btn snap-start px-3 py-1.5 rounded-xl bg-white text-beige-800 hover:bg-beige-100 border border-beige-200 whitespace-nowrap transition active:scale-95 shrink-0" data-day="8">D8 柳橋市場/台灣QQ</button>
-                </div>
-
-                <!-- Category Filter Chips -->
-                <div class="flex items-center space-x-1 overflow-x-auto custom-scroll pb-1 text-xs scroll-smooth">
-                    <button onclick="filterCategory('all')" class="cat-btn px-2.5 py-1 rounded-lg bg-beige-900 text-beige-50 font-medium whitespace-nowrap shrink-0" data-cat="all">全部</button>
-                    <button onclick="filterCategory('景點')" class="cat-btn px-2.5 py-1 rounded-lg bg-[#EBF0E8] text-[#5A704F] border border-[#CDD7C6] whitespace-nowrap shrink-0" data-cat="景點">🌿 景點</button>
-                    <button onclick="filterCategory('美食')" class="cat-btn px-2.5 py-1 rounded-lg bg-[#F8EFEA] text-[#C27355] border border-[#F0D8CD] whitespace-nowrap shrink-0" data-cat="美食">🍜 美食</button>
-                    <button onclick="filterCategory('甜點')" class="cat-btn px-2.5 py-1 rounded-lg bg-[#F7EEF0] text-[#BA7B88] border border-[#EBD6DC] whitespace-nowrap shrink-0" data-cat="甜點">🍰 點心</button>
-                    <button onclick="filterCategory('購物')" class="cat-btn px-2.5 py-1 rounded-lg bg-[#F8F3EA] text-[#B88F51] border border-[#EFE2CD] whitespace-nowrap shrink-0" data-cat="購物">🛍️ 購物</button>
-                    <button onclick="filterCategory('交通')" class="cat-btn px-2.5 py-1 rounded-lg bg-[#EBF2F0] text-[#627D75] border border-[#CCDCD7] whitespace-nowrap shrink-0" data-cat="交通">🏨 交通/住宿</button>
-                </div>
+                </label>
+                <nav id="day-tabs" class="scroller" aria-label="選擇天數"></nav>
+                <div id="cat-chips" class="scroller cats" role="group" aria-label="選擇類別"></div>
             </div>
 
-            <!-- Scrollable Timeline Items -->
-            <div id="itinerary-list" class="flex-1 overflow-y-auto p-2.5 sm:p-3 space-y-2.5 pb-16 sm:pb-3">
-                <!-- Dynamic itinerary cards rendered here -->
-            </div>
+            <p id="list-count" class="list-count" aria-live="polite"></p>
+            <main id="itinerary-list"></main>
+        </div>
 
-            <!-- List Summary Counter Footer -->
-            <div class="px-3 py-2 bg-beige-100/70 border-t border-beige-200 text-xs text-beige-800/80 flex justify-between items-center shrink-0">
-                <span>顯示行程地點：<strong id="item-count" class="text-sage-700 font-bold">0</strong> 處</span>
-                <span class="text-[11px] text-beige-800/60"><i class="fa-regular fa-hand-pointer mr-1"></i>點擊卡片跳轉地圖</span>
+        <section id="map-pane" class="map-pane" aria-label="地圖">
+            <div class="map-head">
+                <h2 id="map-title">全部地點</h2>
+                <p>點圖釘看店家資訊，按「導航」開 Google 地圖</p>
+            </div>
+            <div class="map-frame">
+                <div id="map"></div>
+                <button id="map-fit" class="map-fit" type="button">
+                    <svg class="ico"><use href="#i-fit"/></svg>顯示全部圖釘
+                </button>
             </div>
         </section>
+    </div>
 
-        <!-- Right Pane: Interactive Map -->
-        <section id="map-pane" class="w-full md:w-1/2 lg:w-7/12 hidden md:flex flex-col bg-[#FCFBF9] rounded-2xl shadow-xs border border-beige-200 overflow-hidden relative h-full min-h-[350px]">
-            <!-- Map Top Bar Info -->
-            <div class="p-2.5 bg-beige-50/90 border-b border-beige-200 flex justify-between items-center shrink-0 text-xs">
-                <div class="flex items-center space-x-1.5 text-beige-900 font-medium">
-                    <span class="w-2 h-2 rounded-full bg-sage-500 animate-pulse"></span>
-                    <span class="font-serif">福岡動態地圖</span>
-                </div>
-                <!-- 地圖頂部分類顏色圖例 -->
-                <div class="flex items-center space-x-2 text-[11px] text-beige-800/80 overflow-x-auto custom-scroll">
-                    <span class="flex items-center whitespace-nowrap"><span class="w-2 h-2 rounded-full bg-[#738C67] mr-1"></span>景點</span>
-                    <span class="flex items-center whitespace-nowrap"><span class="w-2 h-2 rounded-full bg-[#C27355] mr-1"></span>美食</span>
-                    <span class="flex items-center whitespace-nowrap"><span class="w-2 h-2 rounded-full bg-[#BA7B88] mr-1"></span>甜點</span>
-                    <span class="flex items-center whitespace-nowrap"><span class="w-2 h-2 rounded-full bg-[#B88F51] mr-1"></span>購物</span>
-                    <span class="flex items-center whitespace-nowrap"><span class="w-2 h-2 rounded-full bg-[#627D75] mr-1"></span>交通/住宿</span>
-                </div>
-            </div>
-
-            <!-- Map Div -->
-            <div id="map" class="w-full flex-1 min-h-[300px]"></div>
-
-            <!-- Mobile View Map Center Reset Floating Button -->
-            <button onclick="resetMapView()" class="absolute bottom-4 right-4 z-20 bg-white/90 text-beige-800 p-2.5 rounded-2xl shadow-md border border-beige-200 active:scale-95 flex items-center justify-center">
-                <i class="fa-solid fa-location-crosshairs text-base text-sage-600"></i>
-            </button>
-        </section>
-
-    </main>
-
-    <!-- Mobile Bottom Navigation Dock -->
-    <nav class="md:hidden fixed bottom-0 left-0 right-0 z-40 bg-[#FCFBF9]/95 backdrop-blur-md border-t border-beige-200 px-4 py-2 pb-safe flex justify-around items-center shadow-lg">
-        <button id="nav-btn-list" onclick="switchMobileTab('list')" class="flex flex-col items-center justify-center w-24 py-1 text-sage-700 font-bold transition active:scale-95">
-            <i class="fa-solid fa-list-ul text-lg mb-0.5"></i>
-            <span class="text-[11px]">行程列表</span>
+    <nav class="tabbar" aria-label="切換畫面">
+        <button class="tab" type="button" data-view="list" aria-pressed="true">
+            <span class="tab-ico"><svg class="ico"><use href="#i-book"/></svg></span>行程
         </button>
-
-        <button id="nav-btn-map" onclick="switchMobileTab('map')" class="flex flex-col items-center justify-center w-24 py-1 text-beige-400 font-medium transition active:scale-95">
-            <i class="fa-solid fa-map-location-dot text-lg mb-0.5"></i>
-            <span class="text-[11px]">動態地圖</span>
+        <button class="tab" type="button" data-view="map" aria-pressed="false">
+            <span class="tab-ico"><svg class="ico"><use href="#i-map"/></svg></span>地圖
         </button>
     </nav>
 
+    <aside id="ios-tip" class="sheet" hidden>
+        <svg class="mascot" aria-hidden="true"><use href="#mascot"/></svg>
+        <h2>放進主畫面，沒網路也能看</h2>
+        <ol>
+            <li>點 Safari 的分享按鈕 <svg class="ico" aria-label="分享"><use href="#i-share"/></svg></li>
+            <li>選「加入主畫面」</li>
+        </ol>
+        <p class="sheet-note">主畫面版和 Safari 的「去過」紀錄是分開存的，建議先加到主畫面再開始蓋章。</p>
+        <button id="ios-tip-close" class="icon-btn sheet-close" type="button" aria-label="關閉提示">
+            <svg class="ico"><use href="#i-close"/></svg>
+        </button>
+    </aside>
+
+    <div id="toast" class="toast" role="status" hidden></div>
+
+    <script src="./vendor/leaflet/leaflet.js"></script>
     <script>
-        // 8 Days Fukuoka Itinerary Data
+        // ✏️ 行程資料：格式和原本一樣，直接在這裡新增或修改
+        // day：第幾天　time：時間（可留空）　category：景點／美食／甜點／購物／交通
+        // gmap：Google 地圖連結（留空會用經緯度導航）　lat／lng：經緯度　price：價位（可留空）
         const itineraryItems = [
 			// Day 1: 博多
             { id: '1', day: 1, time: '10:00', title: 'JR 博多 City', category: '購物', gmap: 'https://share.google/iTxZQVZ7Le0EMQLHy', lat: 33.5901, lng: 130.4206, desc: '指的是整個博多車站上方及內部的巨大共構建築與商業總稱。包含了許多不同的獨立百貨與商場區域。 營業時間:10:00–20:00', price: '' },
@@ -349,246 +1001,449 @@
             { id: '84', day: 8, time: '09:30', title: '柳橋連合市場：柳橋食堂', category: '美食', gmap: 'https://maps.app.goo.gl/YLokY5ygmEyGoSxTA', lat: 33.5833, lng: 130.4078, desc: '高 CP 值現切海鮮丼 營業時間:08:30–14:00(禮拜天休息)', price: '' }
         ];
 
-        // Global State Variables
-        let activeDay = 'all';
-        let activeCategory = 'all';
-        let searchQuery = '';
-        let map;
-        let markers = [];
+        // 每天的標題
+        const days = [
+            { day: 1, name: '抵達福岡/博多' },
+            { day: 2, name: '天神' },
+            { day: 3, name: '糸島海岸' },
+            { day: 4, name: '由布院溫泉' },
+            { day: 5, name: '由布院/博多' },
+            { day: 6, name: '小倉城/門司港' },
+            { day: 7, name: '太宰府天滿宮' },
+            { day: 8, name: '柳橋市場/台灣QQ' }
+        ];
 
-        // Category Configurations
         const categoryConfig = {
-            '景點': { bg: 'bg-[#EBF0E8]', text: 'text-[#5A704F]', border: 'border-[#CDD7C6]', icon: 'fa-leaf', color: '#738C67' },
-            '美食': { bg: 'bg-[#F8EFEA]', text: 'text-[#C27355]', border: 'border-[#F0D8CD]', icon: 'fa-utensils', color: '#C27355' },
-            '甜點': { bg: 'bg-[#F7EEF0]', text: 'text-[#BA7B88]', border: 'border-[#EBD6DC]', icon: 'fa-cookie-bite', color: '#BA7B88' },
-            '購物': { bg: 'bg-[#F8F3EA]', text: 'text-[#B88F51]', border: 'border-[#EFE2CD]', icon: 'fa-bag-shopping', color: '#B88F51' },
-            '交通': { bg: 'bg-[#EBF2F0]', text: 'text-[#627D75]', border: 'border-[#CCDCD7]', icon: 'fa-bus', color: '#627D75' }
+            '景點': { label: '景點', icon: 'torii', color: 'var(--c-sight)' },
+            '美食': { label: '美食', icon: 'bowl', color: 'var(--c-food)' },
+            '甜點': { label: '點心', icon: 'dango', color: 'var(--c-sweet)' },
+            '購物': { label: '購物', icon: 'bag', color: 'var(--c-shop)' },
+            '交通': { label: '交通住宿', icon: 'train', color: 'var(--c-move)' }
         };
+        const tapeColors = ['var(--c-food)', 'var(--c-move)', 'var(--c-sight)', 'var(--c-shop)', 'var(--c-sweet)'];
 
-        function enableWheelHorizontalScroll() {
-            const containers = document.querySelectorAll('.custom-scroll');
-            containers.forEach(container => {
-                container.addEventListener('wheel', (e) => {
-                    if (e.deltaY !== 0) {
-                        e.preventDefault();
-                        container.scrollLeft += e.deltaY;
-                    }
-                }, { passive: false });
+        // ---------- 小工具 ----------
+        const $ = (sel) => document.querySelector(sel);
+        const root = document.documentElement;
+        const desktopMQ = window.matchMedia('(min-width: 960px)');
+
+        function load(key, fallback) {
+            try {
+                const v = localStorage.getItem(key);
+                return v === null ? fallback : JSON.parse(v);
+            } catch (e) { return fallback; }
+        }
+        function save(key, value) {
+            try { localStorage.setItem(key, JSON.stringify(value)); } catch (e) {}
+        }
+        function esc(str) {
+            return String(str == null ? '' : str).replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+        }
+        function icon(name, extra) {
+            return `<svg class="ico${extra ? ' ' + extra : ''}" aria-hidden="true"><use href="#i-${name}"/></svg>`;
+        }
+        function catOf(item) {
+            return categoryConfig[item.category] || categoryConfig['景點'];
+        }
+        function mapLink(item) {
+            if (item.gmap) return item.gmap;
+            return `https://www.google.com/maps/search/?api=1&query=${item.lat},${item.lng}`;
+        }
+        // 把描述裡的「營業時間」「最早可訂位時間」拆出來，分行顯示
+        function parseDesc(desc) {
+            let text = desc || '';
+            let hours = '';
+            let booking = '';
+            const b = text.search(/最早可訂位時間\s*[:：]/);
+            if (b > -1) {
+                booking = text.slice(b).replace(/^最早可訂位時間\s*[:：]\s*/, '');
+                text = text.slice(0, b);
+            }
+            const h = text.search(/營業時間\s*[:：]/);
+            if (h > -1) {
+                hours = text.slice(h).replace(/^營業時間\s*[:：]\s*/, '');
+                text = text.slice(0, h);
+            }
+            return { text: text.trim(), hours: hours.trim(), booking: booking.trim() };
+        }
+        function byTime(a, b) {
+            if (a.day !== b.day) return a.day - b.day;
+            if (!a.time && !b.time) return 0;
+            if (!a.time) return 1;
+            if (!b.time) return -1;
+            return a.time.localeCompare(b.time);
+        }
+
+        // ---------- 狀態 ----------
+        const state = { day: 'all', cat: 'all', query: '' };
+        const visited = new Set(load('fukuoka:visited', []));
+        const items = itineraryItems.slice().sort(byTime);
+        let currentList = [];
+
+        // ---------- 篩選按鈕 ----------
+        function renderFilters() {
+            const dayTabs = [`<button class="day-tab" type="button" data-day="all" aria-pressed="true"><small>八天</small><span>全部</span></button>`]
+                .concat(days.map((d) => `<button class="day-tab" type="button" data-day="${d.day}" aria-pressed="false"><small>Day ${d.day}</small><span>${esc(d.name)}</span></button>`));
+            $('#day-tabs').innerHTML = dayTabs.join('');
+
+            const chips = [`<button class="cat-chip" type="button" data-cat="all" aria-pressed="true">全部</button>`]
+                .concat(Object.entries(categoryConfig).map(([key, c]) =>
+                    `<button class="cat-chip" type="button" data-cat="${key}" aria-pressed="false" style="--cat:${c.color}"><span class="dot">${icon(c.icon)}</span>${c.label}</button>`));
+            $('#cat-chips').innerHTML = chips.join('');
+        }
+
+        function syncPressed(container, attr, value) {
+            container.querySelectorAll('button').forEach((btn) => {
+                btn.setAttribute('aria-pressed', String(btn.dataset[attr] === String(value)));
             });
         }
 
-        function initMap() {
-            map = L.map('map', {
-                zoomControl: true,
-                scrollWheelZoom: true
-            }).setView([33.5902, 130.4207], 11);
+        // ---------- 行程列表 ----------
+        function stopHTML(item) {
+            const c = catOf(item);
+            const d = parseDesc(item.desc);
+            const isVisited = visited.has(item.id);
+            const meta = [];
+            if (d.hours) meta.push(`<p class="meta">${icon('clock')}<span>${esc(d.hours)}</span></p>`);
+            if (d.booking) meta.push(`<p class="meta">${icon('calendar')}<span>訂位：${esc(d.booking)}</span></p>`);
+            if (item.price) meta.push(`<p class="meta">${icon('coin')}<span>${esc(item.price)}</span></p>`);
 
-            L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png', {
-                attribution: '&copy; OpenStreetMap & CartoDB',
-                subdomains: 'abcd',
-                maxZoom: 19
-            }).addTo(map);
-
-            renderListAndMap();
-            enableWheelHorizontalScroll();
+            return `
+                <li class="stop" style="--cat:${c.color}">
+                    <div class="stop-time">${item.time ? esc(item.time) : '未定'}</div>
+                    <div class="stop-node">${icon(c.icon)}</div>
+                    <article class="card${isVisited ? ' is-visited' : ''}" data-id="${esc(item.id)}">
+                        <div class="card-head">
+                            <p class="card-cat">${c.label}</p>
+                            <h3>${esc(item.title)}</h3>
+                        </div>
+                        <button class="stamp-btn" type="button" data-act="stamp" aria-pressed="${isVisited}" aria-label="${esc(item.title)}：標記為去過">
+                            <span class="stamp-empty" aria-hidden="true">${icon('stamp')}蓋章</span>
+                            <span class="stamp-done" aria-hidden="true">去過</span>
+                        </button>
+                        ${d.text ? `<p class="card-desc">${esc(d.text)}</p>` : ''}
+                        ${meta.length ? `<div class="meta-list">${meta.join('')}</div>` : ''}
+                        <div class="card-actions">
+                            ${item.lat && item.lng ? `<button class="chip-btn" type="button" data-act="map">${icon('pin')}看地圖</button>` : ''}
+                            <a class="chip-btn nav" href="${esc(mapLink(item))}" target="_blank" rel="noopener">${icon('nav')}導航</a>
+                        </div>
+                    </article>
+                </li>`;
         }
 
-        function createCustomPin(color) {
-            const svgPin = `
-                <div style="filter: drop-shadow(0px 3px 5px rgba(54,49,40,0.25));">
-                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="${color}" width="30" height="30">
-                        <path fill-rule="evenodd" d="M11.54 22.351l.07.04.028.016a.76.76 0 00.723 0l.028-.015.071-.041a16.975 16.975 0 001.144-.742 19.58 19.58 0 002.683-2.282c1.944-1.99 3.963-4.98 3.963-8.827a8.25 8.25 0 00-16.5 0c0 3.846 2.02 6.837 3.963 8.827a19.58 19.58 0 002.682 2.282 16.975 16.975 0 001.145.742zM12 13.5a3 3 0 100-6 3 3 0 000 6z" clip-rule="evenodd" />
-                    </svg>
-                </div>`;
-            return L.divIcon({
-                html: svgPin,
-                className: 'custom-div-icon',
-                iconSize: [30, 30],
-                iconAnchor: [15, 30],
-                popupAnchor: [0, -28]
-            });
-        }
-
-        function renderListAndMap() {
-            const listContainer = document.getElementById('itinerary-list');
-            listContainer.innerHTML = '';
-
-            markers.forEach(m => map.removeLayer(m));
-            markers = [];
-
-            const filtered = itineraryItems.filter(item => {
-                const matchDay = (activeDay === 'all') || (item.day == activeDay);
-                const matchCat = (activeCategory === 'all') || (item.category === activeCategory);
-                const matchQuery = !searchQuery || 
-                    (item.title && item.title.toLowerCase().includes(searchQuery.toLowerCase())) ||
-                    (item.desc && item.desc.toLowerCase().includes(searchQuery.toLowerCase()));
+        function render() {
+            const q = state.query.toLowerCase();
+            currentList = items.filter((item) => {
+                const matchDay = state.day === 'all' || item.day == state.day;
+                const matchCat = state.cat === 'all' || (categoryConfig[item.category] ? item.category : '景點') === state.cat;
+                const matchQuery = !q ||
+                    (item.title && item.title.toLowerCase().includes(q)) ||
+                    (item.desc && item.desc.toLowerCase().includes(q));
                 return matchDay && matchCat && matchQuery;
             });
 
-            document.getElementById('item-count').textContent = filtered.length;
+            $('#list-count').textContent = currentList.length
+                ? `顯示 ${currentList.length} 個地點`
+                : '';
 
-            if (filtered.length === 0) {
-                listContainer.innerHTML = `
-                    <div class="text-center py-12 text-beige-400">
-                        <i class="fa-solid fa-compass text-3xl mb-2 text-beige-300"></i>
-                        <p class="text-xs">沒有找到符合條件的地點</p>
+            const list = $('#itinerary-list');
+            if (!currentList.length) {
+                list.innerHTML = `
+                    <div class="empty">
+                        <svg aria-hidden="true"><use href="#mascot"/></svg>
+                        <p>沒有符合的地點，換個關鍵字，或清除篩選看看。</p>
+                        <button class="chip-btn nav" type="button" data-act="reset">清除篩選</button>
                     </div>`;
+            } else {
+                const groups = new Map();
+                currentList.forEach((item) => {
+                    if (!groups.has(item.day)) groups.set(item.day, []);
+                    groups.get(item.day).push(item);
+                });
+                list.innerHTML = Array.from(groups.entries()).map(([day, dayItems]) => {
+                    const info = days.find((d) => d.day == day);
+                    return `
+                        <section class="day-section" id="day-${day}">
+                            <h2 class="day-title">
+                                <span class="tape" style="--tape:${tapeColors[(day - 1) % tapeColors.length]}">Day ${day}</span>
+                                ${info ? esc(info.name) : ''}
+                                <small>${dayItems.length} 個地點</small>
+                            </h2>
+                            <ol class="stops">${dayItems.map(stopHTML).join('')}</ol>
+                        </section>`;
+                }).join('');
+            }
+
+            const dayInfo = days.find((d) => d.day == state.day);
+            $('#map-title').textContent = dayInfo ? `Day ${dayInfo.day} ${dayInfo.name}` : '全部地點';
+            updateMarkers();
+        }
+
+        function updateCounts() {
+            $('#total-count').textContent = itineraryItems.length;
+            $('#visited-count').textContent = itineraryItems.filter((i) => visited.has(i.id)).length;
+        }
+
+        function scrollToList() {
+            const toolbar = $('.toolbar');
+            const top = $('#list-count').getBoundingClientRect().top + window.scrollY - toolbar.offsetHeight;
+            if (window.scrollY > top) window.scrollTo(0, top);
+        }
+
+        // ---------- 地圖 ----------
+        let map = null;
+        let markerLayer = null;
+        const markersById = new Map();
+
+        function initMap() {
+            if (map || !window.L) return;
+            map = L.map('map', { zoomControl: true }).setView([33.5902, 130.4207], 11);
+            L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png', {
+                attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> &copy; <a href="https://carto.com/attributions">CARTO</a>',
+                subdomains: 'abcd',
+                maxZoom: 19
+            }).addTo(map);
+            markerLayer = L.layerGroup().addTo(map);
+            updateMarkers();
+        }
+
+        function popupHTML(item) {
+            const c = catOf(item);
+            const d = parseDesc(item.desc);
+            return `
+                <p class="popup-meta">Day ${item.day}　${item.time ? esc(item.time) + '　' : ''}${c.label}</p>
+                <h3 class="popup-title">${esc(item.title)}</h3>
+                ${d.hours ? `<p class="popup-hours">${esc(d.hours)}</p>` : ''}
+                <a class="chip-btn nav" href="${esc(mapLink(item))}" target="_blank" rel="noopener">${icon('nav')}導航</a>`;
+        }
+
+        function updateMarkers(fit = true) {
+            if (!map) return;
+            markerLayer.clearLayers();
+            markersById.clear();
+            const bounds = [];
+            currentList.forEach((item) => {
+                if (!item.lat || !item.lng) return;
+                const c = catOf(item);
+                const marker = L.marker([item.lat, item.lng], {
+                    title: item.title,
+                    icon: L.divIcon({
+                        className: 'pin-wrap',
+                        html: `<div class="pin${visited.has(item.id) ? ' is-visited' : ''}" style="--cat:${c.color}">${icon(c.icon)}</div>`,
+                        iconSize: [34, 34],
+                        iconAnchor: [17, 40],
+                        popupAnchor: [0, -34]
+                    })
+                });
+                marker.bindPopup(popupHTML(item), { maxWidth: 260 });
+                marker.addTo(markerLayer);
+                markersById.set(item.id, marker);
+                bounds.push([item.lat, item.lng]);
+            });
+            if (fit && bounds.length) map.fitBounds(bounds, { padding: [36, 36], maxZoom: 15 });
+        }
+
+        function focusOnMap(id) {
+            const item = items.find((i) => i.id === id);
+            if (!item) return;
+            if (!desktopMQ.matches) setView('map');
+            initMap();
+            if (!map) return;
+            setTimeout(() => {
+                map.invalidateSize();
+                map.flyTo([item.lat, item.lng], 16, { duration: 0.8 });
+                const marker = markersById.get(id);
+                if (marker) setTimeout(() => marker.openPopup(), 850);
+            }, 60);
+        }
+
+        // ---------- 行程／地圖切換（手機） ----------
+        function setView(view) {
+            root.dataset.view = view;
+            document.querySelectorAll('.tab').forEach((t) => t.setAttribute('aria-pressed', String(t.dataset.view === view)));
+            if (view === 'map') {
+                initMap();
+                setTimeout(() => map && map.invalidateSize(), 50);
+            }
+        }
+
+        // ---------- 日夜切換 ----------
+        const themeBtn = $('#theme-toggle');
+        function applyTheme(theme) {
+            root.dataset.theme = theme;
+            document.querySelector('meta[name="theme-color"]').content = theme === 'night' ? '#1E2436' : '#FBF5E9';
+            themeBtn.setAttribute('aria-label', theme === 'night' ? '切換成白天' : '切換成夜晚');
+        }
+        function setTheme(theme, origin) {
+            const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+            if (!document.startViewTransition || reduce || !origin) {
+                applyTheme(theme);
                 return;
             }
+            const { x, y } = origin;
+            const r = Math.hypot(Math.max(x, innerWidth - x), Math.max(y, innerHeight - y));
+            const t = document.startViewTransition(() => applyTheme(theme));
+            t.ready.then(() => {
+                root.animate(
+                    { clipPath: [`circle(0px at ${x}px ${y}px)`, `circle(${r}px at ${x}px ${y}px)`] },
+                    { duration: 560, easing: 'cubic-bezier(.4, 0, .2, 1)', pseudoElement: '::view-transition-new(root)' }
+                );
+            }).catch(() => {});
+        }
+        themeBtn.addEventListener('click', () => {
+            const next = root.dataset.theme === 'night' ? 'day' : 'night';
+            try { localStorage.setItem('fukuoka:theme', next); } catch (e) {}
+            const rect = themeBtn.getBoundingClientRect();
+            setTheme(next, { x: rect.left + rect.width / 2, y: rect.top + rect.height / 2 });
+        });
+        // 沒手動選過時，跟著系統的深淺色
+        window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', (e) => {
+            let saved = null;
+            try { saved = localStorage.getItem('fukuoka:theme'); } catch (err) {}
+            if (!saved) applyTheme(e.matches ? 'night' : 'day');
+        });
+        applyTheme(root.dataset.theme === 'night' ? 'night' : 'day');
 
-            const bounds = [];
+        // ---------- 事件 ----------
+        $('#day-tabs').addEventListener('click', (e) => {
+            const btn = e.target.closest('.day-tab');
+            if (!btn) return;
+            state.day = btn.dataset.day === 'all' ? 'all' : Number(btn.dataset.day);
+            syncPressed($('#day-tabs'), 'day', state.day);
+            btn.scrollIntoView({ inline: 'nearest', block: 'nearest' });
+            render();
+            scrollToList();
+        });
+        $('#cat-chips').addEventListener('click', (e) => {
+            const btn = e.target.closest('.cat-chip');
+            if (!btn) return;
+            state.cat = btn.dataset.cat;
+            syncPressed($('#cat-chips'), 'cat', state.cat);
+            btn.scrollIntoView({ inline: 'nearest', block: 'nearest' });
+            render();
+            scrollToList();
+        });
 
-            filtered.forEach(item => {
-                const catInfo = categoryConfig[item.category] || categoryConfig['景點'];
+        let searchTimer;
+        $('#search-input').addEventListener('input', (e) => {
+            clearTimeout(searchTimer);
+            $('#search-clear').hidden = !e.target.value;
+            searchTimer = setTimeout(() => {
+                state.query = e.target.value.trim();
+                render();
+            }, 120);
+        });
+        $('#search-clear').addEventListener('click', () => {
+            const input = $('#search-input');
+            input.value = '';
+            $('#search-clear').hidden = true;
+            state.query = '';
+            render();
+            input.focus();
+        });
 
-                const card = document.createElement('div');
-                card.className = `p-3 rounded-2xl border ${catInfo.border} bg-white shadow-xs hover:shadow-md transition-all duration-200 active:scale-[0.99] cursor-pointer flex flex-col space-y-1.5 group`;
-                card.onclick = () => focusLocation(item.lat, item.lng, item.id);
-
-                card.innerHTML = `
-                    <div class="flex items-center justify-between">
-                        <div class="flex items-center space-x-1.5">
-                            <span class="text-[10px] px-2 py-0.5 rounded-md ${catInfo.bg} ${catInfo.text} font-medium flex items-center">
-                                <i class="fa-solid ${catInfo.icon} mr-1 text-[9px]"></i>${item.category}
-                            </span>
-                            <span class="text-[10px] font-medium text-beige-800/70 bg-beige-100 px-1.5 py-0.5 rounded-md">
-                                Day ${item.day} · ${item.time || '時間未定'}
-                            </span>
-                        </div>
-                    </div>
-
-                    <div>
-                        <h3 class="font-serif font-bold text-beige-900 text-sm group-hover:text-sage-700 transition-colors">
-                            ${item.title}
-                        </h3>
-                        ${item.desc ? `<p class="text-xs text-beige-800/70 mt-0.5 line-clamp-2 leading-relaxed">${item.desc}</p>` : ''}
-                    </div>
-
-                    <div class="flex items-center justify-between pt-1 border-t border-beige-100 text-xs">
-                        <span class="text-[11px] text-beige-800/60 font-medium">${item.price ? `<i class="fa-regular fa-money-bill-1 mr-1"></i>${item.price}` : ''}</span>
-                        <a href="${item.gmap}" target="_blank" onclick="event.stopPropagation()" class="inline-flex items-center space-x-1 text-[11px] text-sage-700 font-semibold bg-sage-50 hover:bg-sage-100 px-2.5 py-1 rounded-lg transition-colors border border-sage-200/50">
-                            <i class="fa-solid fa-location-arrow text-[10px]"></i>
-                            <span>Google 地圖導航</span>
-                        </a>
-                    </div>
-                `;
-
-                listContainer.appendChild(card);
-
-                if (item.lat && item.lng) {
-                    const markerPin = createCustomPin(catInfo.color);
-                    const marker = L.marker([item.lat, item.lng], { icon: markerPin }).addTo(map);
-
-                    // 這裡更新了彈出視窗導航按鈕的顏色與對比度
-                    const popupContent = `
-                        <div class="p-2 max-w-[220px]">
-                            <div class="flex items-center space-x-1 mb-1">
-                                <span class="text-[9px] px-1.5 py-0.5 rounded ${catInfo.bg} ${catInfo.text} font-medium">D${item.day} ${item.category}</span>
-                                <span class="text-[10px] font-medium text-beige-800/70">${item.time || ''}</span>
-                            </div>
-                            <h4 class="font-serif font-bold text-xs text-beige-900">${item.title}</h4>
-                            <p class="text-[11px] text-beige-800/70 my-1 line-clamp-2">${item.desc || ''}</p>
-                            <a href="${item.gmap}" target="_blank" class="mt-2 inline-block w-full text-center bg-sage-50 hover:bg-sage-100 text-sage-800 border border-sage-300/80 text-xs font-semibold py-1.5 px-3 rounded-xl transition shadow-xs">
-                                <i class="fa-solid fa-map-location-dot mr-1"></i>開 Google 地圖導航
-                            </a>
-                        </div>
-                    `;
-
-                    marker.bindPopup(popupContent);
-                    marker.itemId = item.id;
-                    markers.push(marker);
-                    bounds.push([item.lat, item.lng]);
+        $('#itinerary-list').addEventListener('click', (e) => {
+            const btn = e.target.closest('[data-act]');
+            if (!btn) return;
+            const act = btn.dataset.act;
+            if (act === 'reset') {
+                state.day = 'all';
+                state.cat = 'all';
+                state.query = '';
+                $('#search-input').value = '';
+                $('#search-clear').hidden = true;
+                syncPressed($('#day-tabs'), 'day', 'all');
+                syncPressed($('#cat-chips'), 'cat', 'all');
+                render();
+                return;
+            }
+            const card = btn.closest('.card');
+            const id = card && card.dataset.id;
+            if (!id) return;
+            if (act === 'map') focusOnMap(id);
+            if (act === 'stamp') {
+                const on = !visited.has(id);
+                on ? visited.add(id) : visited.delete(id);
+                save('fukuoka:visited', Array.from(visited));
+                card.classList.toggle('is-visited', on);
+                card.classList.remove('just-stamped');
+                void card.offsetWidth; // 重新觸發蓋章動畫
+                if (on) card.classList.add('just-stamped');
+                btn.setAttribute('aria-pressed', String(on));
+                const marker = markersById.get(id);
+                if (marker) {
+                    const pin = marker.getElement() && marker.getElement().querySelector('.pin');
+                    if (pin) pin.classList.toggle('is-visited', on);
                 }
+                updateCounts();
+            }
+        });
+
+        document.querySelectorAll('.tab').forEach((tab) => {
+            tab.addEventListener('click', () => setView(tab.dataset.view));
+        });
+        $('#map-fit').addEventListener('click', () => updateMarkers(true));
+
+        desktopMQ.addEventListener('change', (e) => {
+            if (e.matches) {
+                setView('list');
+                initMap();
+            }
+            setTimeout(() => map && map.invalidateSize(), 100);
+        });
+
+        // ---------- 安裝到主畫面 ----------
+        const isStandalone = window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone === true;
+        const isIOS = /iphone|ipad|ipod/i.test(navigator.userAgent) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+        let deferredPrompt = null;
+
+        // Android／桌機 Chrome：攔下系統的安裝提示，改用封面上的按鈕
+        window.addEventListener('beforeinstallprompt', (e) => {
+            e.preventDefault();
+            deferredPrompt = e;
+            $('#install-btn').hidden = false;
+        });
+        $('#install-btn').addEventListener('click', async () => {
+            if (!deferredPrompt) return;
+            deferredPrompt.prompt();
+            await deferredPrompt.userChoice;
+            deferredPrompt = null;
+            $('#install-btn').hidden = true;
+        });
+        window.addEventListener('appinstalled', () => { $('#install-btn').hidden = true; });
+
+        // iPhone／iPad：Safari 不會主動提示，第一次開啟時顯示教學
+        if (isIOS && !isStandalone && !load('fukuoka:ios-tip-dismissed', false)) {
+            setTimeout(() => { $('#ios-tip').hidden = false; }, 1200);
+        }
+        $('#ios-tip-close').addEventListener('click', () => {
+            $('#ios-tip').hidden = true;
+            save('fukuoka:ios-tip-dismissed', true);
+        });
+
+        // ---------- 離線提示 ----------
+        let toastTimer;
+        function toast(msg, ms) {
+            const el = $('#toast');
+            el.textContent = msg;
+            el.hidden = false;
+            clearTimeout(toastTimer);
+            if (ms) toastTimer = setTimeout(() => { el.hidden = true; }, ms);
+        }
+        window.addEventListener('offline', () => toast('目前離線：行程照常可看，地圖只會顯示看過的區域', 4000));
+        window.addEventListener('online', () => toast('已恢復連線', 1800));
+
+        // ---------- 啟動 ----------
+        renderFilters();
+        updateCounts();
+        render();
+        if (desktopMQ.matches) initMap();
+
+        if ('serviceWorker' in navigator && location.protocol !== 'file:') {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('./sw.js').catch(() => {});
             });
-
-            if (bounds.length > 0) {
-                map.fitBounds(bounds, { padding: [25, 25], maxZoom: 14 });
-            }
         }
-
-        function filterDay(day) {
-            activeDay = day;
-            document.querySelectorAll('.day-btn').forEach(btn => {
-                if (btn.dataset.day == day) {
-                    btn.className = 'day-btn snap-start px-3 py-1.5 rounded-xl bg-sage-600 text-white font-medium whitespace-nowrap shadow-xs transition active:scale-95 shrink-0';
-                } else {
-                    btn.className = 'day-btn snap-start px-3 py-1.5 rounded-xl bg-white text-beige-800 hover:bg-beige-100 border border-beige-200 whitespace-nowrap transition active:scale-95 shrink-0';
-                }
-            });
-            renderListAndMap();
-        }
-
-        function filterCategory(cat) {
-            activeCategory = cat;
-            document.querySelectorAll('.cat-btn').forEach(btn => {
-                if (btn.dataset.cat == cat) {
-                    btn.classList.add('ring-2', 'ring-sage-500', 'font-semibold');
-                } else {
-                    btn.classList.remove('ring-2', 'ring-sage-500', 'font-semibold');
-                }
-            });
-            renderListAndMap();
-        }
-
-        function handleSearch() {
-            searchQuery = document.getElementById('search-input').value.trim();
-            const clearBtn = document.getElementById('search-clear-btn');
-            if (searchQuery) {
-                clearBtn.classList.remove('hidden');
-            } else {
-                clearBtn.classList.add('hidden');
-            }
-            renderListAndMap();
-        }
-
-        function clearSearch() {
-            document.getElementById('search-input').value = '';
-            handleSearch();
-        }
-
-        function focusLocation(lat, lng, itemId) {
-            if (window.innerWidth < 768) {
-                switchMobileTab('map');
-            }
-            if (lat && lng) {
-                setTimeout(() => {
-                    map.flyTo([lat, lng], 15, { duration: 1 });
-                    const marker = markers.find(m => m.itemId === itemId);
-                    if (marker) {
-                        marker.openPopup();
-                    }
-                }, 100);
-            }
-        }
-
-        function resetMapView() {
-            renderListAndMap();
-        }
-
-        function switchMobileTab(tab) {
-            const listPane = document.getElementById('list-pane');
-            const mapPane = document.getElementById('map-pane');
-            const navBtnList = document.getElementById('nav-btn-list');
-            const navBtnMap = document.getElementById('nav-btn-map');
-
-            if (tab === 'list') {
-                listPane.classList.remove('hidden');
-                mapPane.classList.add('hidden');
-                navBtnList.className = 'flex flex-col items-center justify-center w-24 py-1 text-sage-700 font-bold transition active:scale-95';
-                navBtnMap.className = 'flex flex-col items-center justify-center w-24 py-1 text-beige-400 font-medium transition active:scale-95';
-            } else {
-                listPane.classList.add('hidden');
-                mapPane.classList.remove('hidden');
-                mapPane.classList.add('flex');
-                navBtnList.className = 'flex flex-col items-center justify-center w-24 py-1 text-beige-400 font-medium transition active:scale-95';
-                navBtnMap.className = 'flex flex-col items-center justify-center w-24 py-1 text-sage-700 font-bold transition active:scale-95';
-                setTimeout(() => map.invalidateSize(), 200);
-            }
-        }
-
-        window.onload = function () {
-            initMap();
-        };
     </script>
 </body>
 </html>
