@@ -121,7 +121,11 @@
 
         /* ---------- 基礎 ---------- */
         *, *::before, *::after { box-sizing: border-box; }
-        html { -webkit-text-size-adjust: 100%; text-size-adjust: 100%; }
+        html {
+            -webkit-text-size-adjust: 100%;
+            text-size-adjust: 100%;
+            scrollbar-gutter: stable;
+        }
         body {
             margin: 0;
             min-height: 100dvh;
@@ -132,6 +136,11 @@
             line-height: 1.6;
             font-synthesis: none;
             -webkit-tap-highlight-color: transparent;
+        }
+        /* 當任何 Sheet 彈窗打開時，鎖定背景頁面滾動（保持版面平穩不位移） */
+        body.sheet-open {
+            overflow: hidden;
+            touch-action: none;
         }
         /* 紙張纖維紋理 */
         body::before {
@@ -218,8 +227,8 @@
             background: var(--stamp);
         }
 
-        /* ---------- 設定（從下方拉出的 sheet） ---------- */
-        .settings-sheet {
+        /* ---------- 下方彈出的 Sheet（設定、地點詳細） ---------- */
+        .sheet-dialog {
             position: fixed;
             inset: auto 0 0 0;
             width: 100%;
@@ -236,8 +245,8 @@
             overflow: auto;
             overscroll-behavior: contain;
         }
-        .settings-sheet[open] { animation: sheet-up .28s cubic-bezier(.2, .9, .3, 1); }
-        .settings-sheet::backdrop { background: rgba(30, 36, 54, .45); }
+        .sheet-dialog[open] { animation: sheet-up .28s cubic-bezier(.2, .9, .3, 1); }
+        .sheet-dialog::backdrop { background: rgba(30, 36, 54, .45); }
         @keyframes sheet-up { from { transform: translateY(100%); } to { transform: translateY(0); } }
         .sheet-body { padding: 10px 20px calc(24px + env(safe-area-inset-bottom)); }
         .sheet-handle {
@@ -247,8 +256,8 @@
             border-radius: 3px;
             background: var(--line-strong);
         }
-        .sheet-head { display: flex; align-items: center; justify-content: space-between; }
-        .sheet-head h2 { font-size: calc(20px * var(--fs)); }
+        .sheet-head { display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; }
+        .sheet-head h2 { font-size: calc(20px * var(--fs)); line-height: 1.35; overflow-wrap: anywhere; }
         .setting { margin-top: 18px; }
         .setting h3 { margin-bottom: 8px; font-size: calc(14px * var(--fs)); color: var(--ink-soft); }
         .seg { display: grid; grid-auto-flow: column; grid-auto-columns: 1fr; gap: 8px; }
@@ -467,9 +476,14 @@
         }
         .stop-node .ico { width: 18px; height: 18px; }
 
+        /* 四種卡片共用同樣的上緣裝飾帶（--card-top）和最小高度，按鈕列固定在底部，並排時才不會高高低低 */
         .card {
+            --card-top: 24px;
             position: relative;
-            padding: 12px 14px 10px;
+            display: flex;
+            flex-direction: column;
+            min-height: calc(115px + 90px * var(--fs));
+            padding: var(--card-top) 14px 10px;
             border: 2px solid var(--line-strong);
             border-radius: var(--r-card);
             background: var(--card);
@@ -479,7 +493,43 @@
         .card-head { padding-right: 58px; min-height: 48px; }
         .card-cat { font-size: calc(12px * var(--fs)); color: var(--ink-soft); }
         .card h3 { font-size: calc(17px * var(--fs)); line-height: 1.4; overflow-wrap: anywhere; }
-        .card-desc { margin-top: 4px; font-size: calc(14px * var(--fs)); color: var(--ink-soft); overflow-wrap: anywhere; }
+        
+        /* 關鍵提示小標籤（需預約、公休注意、排隊名店） */
+        .card-tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 4px;
+            margin-top: 6px;
+        }
+        .tag-pill {
+            display: inline-flex;
+            align-items: center;
+            gap: 3px;
+            padding: 2px 7px;
+            border-radius: 999px;
+            font-size: calc(11px * var(--fs));
+            line-height: 1.25;
+            font-weight: 500;
+            white-space: nowrap;
+        }
+        .tag--booking {
+            background: color-mix(in srgb, var(--stamp) 18%, var(--card));
+            color: var(--stamp);
+            border: 1px solid color-mix(in srgb, var(--stamp) 40%, transparent);
+        }
+        .tag--closed {
+            background: color-mix(in srgb, var(--c-shop) 32%, var(--card));
+            color: var(--ink);
+            border: 1px solid var(--line-strong);
+        }
+        .tag--queue {
+            background: color-mix(in srgb, var(--c-food) 24%, var(--card));
+            color: var(--ink);
+            border: 1px solid var(--line-strong);
+        }
+        .tag-pill .ico { width: 12px; height: 12px; }
+
+        .card-desc { margin-top: 6px; font-size: calc(14px * var(--fs)); color: var(--ink-soft); overflow-wrap: anywhere; }
         .meta {
             display: flex;
             gap: 6px;
@@ -491,6 +541,89 @@
         }
         .meta .ico { margin-top: 1px; color: var(--ink-soft); }
         .meta-list { margin-top: 4px; }
+
+        /* ---------- 地點詳細彈窗 (Detail Sheet) ---------- */
+        dialog:not([open]) {
+            display: none !important;
+        }
+        .detail-sheet {
+            height: 72dvh;
+            max-height: 72dvh;
+        }
+        .detail-sheet[open] {
+            display: flex;
+            flex-direction: column;
+        }
+        .detail-sheet-body {
+            display: flex;
+            flex-direction: column;
+            height: 100%;
+            padding: 10px 20px calc(16px + env(safe-area-inset-bottom));
+            overflow: hidden;
+        }
+        .detail-head {
+            flex-shrink: 0;
+            padding-bottom: 8px;
+            border-bottom: 1.5px dashed var(--line);
+        }
+        .detail-scroll-area {
+            flex: 1 1 auto;
+            min-height: 0;
+            overflow-y: auto;
+            overscroll-behavior: contain;
+            padding-right: 4px;
+            margin-top: 8px;
+            margin-bottom: 8px;
+        }
+        .detail-scroll-area::-webkit-scrollbar {
+            width: 4px;
+        }
+        .detail-scroll-area::-webkit-scrollbar-thumb {
+            background: var(--line-strong);
+            border-radius: 4px;
+        }
+        .detail-desc-box {
+            font-size: calc(15px * var(--fs));
+            line-height: 1.6;
+            color: var(--ink);
+        }
+        .detail-meta-group {
+            margin-top: 12px;
+            padding: 12px;
+            border-radius: var(--r-chip);
+            background: var(--paper);
+            border: 1.5px solid var(--line);
+        }
+        .detail-meta-item {
+            display: flex;
+            align-items: flex-start;
+            gap: 8px;
+            font-size: calc(14px * var(--fs));
+            line-height: 1.5;
+            color: var(--ink);
+        }
+        .detail-meta-item + .detail-meta-item {
+            margin-top: 8px;
+            padding-top: 8px;
+            border-top: 1px dashed var(--line-strong);
+        }
+        .detail-meta-item .ico { margin-top: 2px; width: 18px; height: 18px; color: var(--ink-soft); flex-shrink: 0; }
+        .detail-meta-item b { font-weight: 500; }
+        .detail-actions {
+            flex-shrink: 0;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            padding-top: 12px;
+            border-top: 1.5px dashed var(--line);
+        }
+        .detail-actions .chip-btn {
+            justify-content: center;
+            min-height: 44px;
+            font-size: calc(15px * var(--fs));
+            width: auto;
+            border-radius: var(--r-chip);
+        }
 
         /* ---------- 擇一的選項：左右滑動 ---------- */
         .choices { min-width: 0; }
@@ -517,76 +650,60 @@
         .choices-track::-webkit-scrollbar { display: none; }
         .choices-track > .card { flex: 0 0 88%; scroll-snap-align: start; }
 
-        /* ---------- 依分類換卡片樣式 ---------- */
-        /* 景點：上緣一道山丘 */
-        .card--sight { padding-top: 22px; }
+        /* ---------- 依分類換卡片樣式（統一底色，僅以頂部繪本飾條區分） ---------- */
+        /* 景點：溫和的山丘波浪邊 */
         .card--sight::before {
             content: "";
             position: absolute;
             top: 0;
             left: 0;
             right: 0;
-            height: 14px;
+            height: 8px;
             background: var(--cat);
-            -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='80' height='14'%3E%3Cpath d='M0 0h80v8C68 8 62 2 48 5S28 13 16 9 6 6 0 8z'/%3E%3C/svg%3E") repeat-x 0 0 / 80px 14px;
-            mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='80' height='14'%3E%3Cpath d='M0 0h80v8C68 8 62 2 48 5S28 13 16 9 6 6 0 8z'/%3E%3C/svg%3E") repeat-x 0 0 / 80px 14px;
+            -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='80' height='8'%3E%3Cpath d='M0 0h80v4C68 4 62 1 48 3S28 8 16 5 6 3 0 5z'/%3E%3C/svg%3E") repeat-x 0 0 / 80px 8px;
+            mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='80' height='8'%3E%3Cpath d='M0 0h80v4C68 4 62 1 48 3S28 8 16 5 6 3 0 5z'/%3E%3C/svg%3E") repeat-x 0 0 / 80px 8px;
         }
 
-        /* 美食：門口掛著暖簾 */
-        .card--food { padding-top: 28px; }
+        /* 美食：優雅的咖啡館遮陽棚圓弧簷邊（Scallop Awning） */
         .card--food::before {
             content: "";
             position: absolute;
             top: 0;
-            left: 14px;
-            width: min(60%, 180px);
-            height: 18px;
-            border-radius: 0 0 4px 4px;
-            background: repeating-linear-gradient(90deg, var(--cat) 0 calc(25% - 3px), transparent calc(25% - 3px) 25%);
+            left: 0;
+            right: 0;
+            height: 8px;
+            background: var(--cat);
+            -webkit-mask: radial-gradient(circle 5px at 10px 0, var(--cat) 99%, transparent 100%) repeat-x 0 0 / 20px 8px;
+            mask: radial-gradient(circle 5px at 10px 0, var(--cat) 99%, transparent 100%) repeat-x 0 0 / 20px 8px;
         }
-        .meta-booking {
-            margin-top: 8px;
-            padding: 6px 10px;
-            border-radius: 12px 14px 11px 13px;
-            background: color-mix(in srgb, var(--c-shop) 28%, var(--card));
-        }
-        .meta-booking b { font-weight: 400; color: var(--link); }
-        .menu-price {
-            display: flex;
-            align-items: baseline;
-            gap: 8px;
-            margin-top: 8px;
-            font-size: calc(14px * var(--fs));
-            color: var(--ink-soft);
-        }
-        .menu-price .leader { flex: 1; min-width: 16px; border-bottom: 2px dotted var(--line-strong); }
-        .menu-price strong { font-weight: 400; color: var(--ink); }
 
-        /* 購物：吊牌，左上角有穿繩的孔 */
-        .card--shop { background: color-mix(in srgb, var(--cat) 14%, var(--card)); }
-        .card--shop .card-head { padding-left: 24px; }
+        /* 購物：俐落的禮品包裝紙鋸齒飾條（底色保持與一般卡片一致） */
         .card--shop::before {
             content: "";
             position: absolute;
-            top: 16px;
-            left: 12px;
-            width: 14px;
-            height: 14px;
-            border: 2px solid var(--line-strong);
-            border-radius: 50%;
-            background: var(--paper);
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 7px;
+            background: var(--cat);
+            -webkit-mask: repeating-linear-gradient(135deg, var(--cat) 0 5px, transparent 5px 6px, var(--cat) 6px 11px) top / 100% 7px;
+            mask: repeating-linear-gradient(135deg, var(--cat) 0 5px, transparent 5px 6px, var(--cat) 6px 11px) top / 100% 7px;
         }
 
-        /* 交通住宿：車票，標題下方是撕線 */
-        .card--move {
-            background:
-                linear-gradient(var(--cat), var(--cat)) top / 100% 6px no-repeat,
-                var(--card);
+        /* 交通住宿：車票質感頂邊 */
+        .card--move::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 6px;
+            background: var(--cat);
         }
         .card--move .card-head {
             position: relative;
             margin: 0 -14px;
-            padding: 0 72px 12px 14px;
+            padding: 0 72px 8px 14px;
             border-bottom: 2px dashed var(--line-strong);
         }
         .card--move .card-head::before,
@@ -602,14 +719,16 @@
         }
         .card--move .card-head::before { left: -11px; }
         .card--move .card-head::after { right: -11px; }
-        .card--move .card-desc { margin-top: 12px; }
+        .card--move .card-desc { margin-top: 8px; }
         .route { display: flex; flex-wrap: wrap; align-items: center; gap: 2px 8px; }
         .route-arrow { display: inline-grid; color: var(--ink-soft); }
 
+        /* 內容撐開剩下的高度，按鈕列才會固定在卡片底部 */
+        .card-body { flex: 1 0 auto; }
         .card-actions {
             display: flex;
-            flex-wrap: wrap;
-            gap: 8px;
+            align-items: center;
+            gap: 10px;
             margin-top: 10px;
             padding-top: 10px;
             border-top: 1.5px dashed var(--line);
@@ -617,6 +736,7 @@
         .chip-btn {
             display: inline-flex;
             align-items: center;
+            justify-content: center;
             gap: 5px;
             min-height: 36px;
             padding: 4px 12px;
@@ -626,9 +746,20 @@
             font-size: calc(14px * var(--fs));
             text-decoration: none;
             color: var(--ink);
-            transition: transform .15s ease;
+            transition: transform .15s ease, background-color .15s ease;
         }
-        .chip-btn:active { transform: scale(.95); }
+        .card-actions .chip-btn {
+            width: 38px;
+            height: 38px;
+            min-height: 38px;
+            padding: 0;
+            border-radius: 50%;
+        }
+        .card-actions .chip-btn .ico {
+            width: 19px;
+            height: 19px;
+        }
+        .chip-btn:active { transform: scale(.92); }
         .chip-btn.nav { border-color: var(--ink); background: var(--accent); color: var(--on-accent); }
         /* 蓋章：右上角的虛線圓圈，按下去變成「去過」印章 */
         .stamp-btn {
@@ -933,7 +1064,7 @@
         <svg class="ico"><use href="#i-tune"/></svg>
     </button>
 
-    <dialog id="settings" class="settings-sheet" aria-labelledby="settings-title">
+    <dialog id="settings" class="sheet-dialog settings-sheet" aria-labelledby="settings-title">
         <div class="sheet-body">
             <div class="sheet-handle" aria-hidden="true"></div>
             <div class="sheet-head">
@@ -965,6 +1096,29 @@
                 <p id="install-ios" class="setting-note" hidden>點 Safari 的分享按鈕 <svg class="ico" aria-label="分享"><use href="#i-share"/></svg>，再選「加入主畫面」。</p>
                 <p class="setting-note">加到主畫面後，沒有網路也能看行程。</p>
             </section>
+        </div>
+    </dialog>
+
+    <!-- 地點詳細資訊彈窗 -->
+    <dialog id="detail-modal" class="sheet-dialog detail-sheet" aria-labelledby="detail-title">
+        <div class="sheet-body detail-sheet-body">
+            <div class="sheet-handle" aria-hidden="true"></div>
+            <div class="sheet-head detail-head">
+                <div>
+                    <p id="detail-cat" class="card-cat" style="font-size:calc(13px * var(--fs))"></p>
+                    <h2 id="detail-title"></h2>
+                    <div id="detail-tags" class="card-tags" style="margin-top:6px"></div>
+                </div>
+                <button class="icon-btn" type="button" data-close aria-label="關閉詳細資訊"><svg class="ico"><use href="#i-close"/></svg></button>
+            </div>
+            <div class="detail-scroll-area">
+                <div id="detail-desc" class="detail-desc-box"></div>
+                <div id="detail-meta-list" class="detail-meta-group" hidden></div>
+            </div>
+            <div class="detail-actions">
+                <button id="detail-map-btn" class="chip-btn" type="button"><svg class="ico"><use href="#i-pin"/></svg>看地圖</button>
+                <a id="detail-nav-btn" class="chip-btn nav" href="#" target="_blank" rel="noopener"><svg class="ico"><use href="#i-nav"/></svg>導航</a>
+            </div>
         </div>
     </dialog>
 
@@ -1171,7 +1325,7 @@
             const query = item.lat && item.lng ? `${item.lat},${item.lng}` : encodeURIComponent(item.title);
             return `https://www.google.com/maps/search/?api=1&query=${query}`;
         }
-        // 把描述裡的「營業時間」「最早可訂位時間」拆出來，分行顯示
+        // 把描述裡的「營業時間」「最早可訂位時間」拆出來，並自動提取關鍵提示標籤（需預約、公休、排隊）
         function parseDesc(desc) {
             let text = desc || '';
             let hours = '';
@@ -1186,7 +1340,29 @@
                 hours = text.slice(h).replace(/^營業時間\s*[:：]\s*/, '');
                 text = text.slice(0, h);
             }
-            return { text: text.trim(), hours: hours.trim(), booking: booking.trim() };
+            text = text.trim();
+
+            const tags = [];
+            if (/需預約|要預約|建議預約/.test(text) || booking) {
+                tags.push({ type: 'booking', text: '需預約', icon: 'calendar' });
+            }
+            const closedMatch = text.match(/(週[一二三四五六日]|禮拜[一二三四五六日天]|星期[一二三四五六日])(?:[、及與和]?(?:週|禮拜|星期)?[一二三四五六日天])*(?:只到[0-9:：]+)?(?:公休|休息|注意)/);
+            if (closedMatch) {
+                tags.push({ type: 'closed', text: closedMatch[0], icon: 'clock' });
+            }
+            if (/排隊/.test(text)) {
+                tags.push({ type: 'queue', text: '排隊名店', icon: 'bowl' });
+            }
+
+            // 清理標籤重複字眼後的一句話摘要
+            let summary = text
+                .replace(/[(（]?(?:需預約|要預約|建議預約)[)）]?/g, '')
+                .replace(/[(（]?(?:週[一二三四五六日]|禮拜[一二三四五六日天]|星期[一二三四五六日])(?:[、及與和]?(?:週|禮拜|星期)?[一二三四五六日天])*(?:只到[0-9:：]+)?(?:公休|休息|注意)[)）]?/g, '')
+                .replace(/[(（]?(?:要排隊|排隊名店)[)）]?/g, '')
+                .replace(/^[、，,\s]+|[、，,\s]+$/g, '')
+                .trim();
+
+            return { text, summary, hours: hours.trim(), booking: booking.trim(), tags };
         }
         function byTime(a, b) {
             if (a.day !== b.day) return a.day - b.day;
@@ -1225,16 +1401,13 @@
             const c = catOf(item);
             const d = parseDesc(item.desc);
             const isVisited = visited.has(item.id);
-            const meta = [];
-            if (d.hours) meta.push(`<p class="meta">${icon('clock')}<span>${esc(d.hours)}</span></p>`);
-            if (d.booking) meta.push(`<p class="meta meta-booking">${icon('calendar')}<span><b>要訂位</b>　${esc(d.booking)}</span></p>`);
-            if (item.price) {
-                meta.push(c.kind === 'food'
-                    ? `<p class="menu-price"><span>${c.priceLabel}</span><span class="leader" aria-hidden="true"></span><strong>${esc(item.price)}</strong></p>`
-                    : `<p class="meta">${icon('coin')}<span>${c.priceLabel}：${esc(item.price)}</span></p>`);
-            }
 
-            // 交通的「A ➔ B」拆成起點和終點
+            // 標籤徽章
+            const tagsHTML = d.tags && d.tags.length
+                ? `<div class="card-tags">${d.tags.map((t) => `<span class="tag-pill tag--${t.type}">${icon(t.icon)}${esc(t.text)}</span>`).join('')}</div>`
+                : '';
+
+            // 交通的「A → B」拆成起點和終點
             let titleHTML = `<h3>${esc(item.title)}</h3>`;
             if (c.kind === 'move') {
                 const parts = item.title.split(/\s*(?:➔|→|->|⇒)\s*/).filter(Boolean);
@@ -1243,21 +1416,27 @@
                 }
             }
 
+            // 是否有足夠資訊需要顯示詳細彈窗（有更詳細的文字、營業時間、訂位或價位）
+            const hasDetail = Boolean(d.text && (d.text.length > 25 || d.hours || d.booking || item.price || (d.tags && d.tags.length)));
+
             return `
                     <article class="card card--${c.kind}${isVisited ? ' is-visited' : ''}" data-id="${esc(item.id)}">
-                        <div class="card-head">
-                            <p class="card-cat">${c.label}</p>
-                            ${titleHTML}
+                        <div class="card-body">
+                            <div class="card-head">
+                                <p class="card-cat">${c.label}</p>
+                                ${titleHTML}
+                                ${tagsHTML}
+                            </div>
+                            ${d.summary ? `<p class="card-desc">${esc(d.summary)}</p>` : (d.text ? `<p class="card-desc">${esc(d.text)}</p>` : '')}
                         </div>
                         <button class="stamp-btn" type="button" data-act="stamp" aria-pressed="${isVisited}" aria-label="${esc(item.title)}：標記為去過">
                             <span class="stamp-empty" aria-hidden="true">${icon('stamp')}蓋章</span>
                             <span class="stamp-done" aria-hidden="true">去過</span>
                         </button>
-                        ${d.text ? `<p class="card-desc">${esc(d.text)}</p>` : ''}
-                        ${meta.length ? `<div class="meta-list">${meta.join('')}</div>` : ''}
                         <div class="card-actions">
-                            ${item.lat && item.lng ? `<button class="chip-btn" type="button" data-act="map">${icon('pin')}看地圖</button>` : ''}
-                            <a class="chip-btn nav" href="${esc(mapLink(item))}" target="_blank" rel="noopener">${icon('nav')}導航</a>
+                            ${hasDetail ? `<button class="chip-btn" type="button" data-act="detail" aria-label="查看詳細資訊" title="詳細資訊">${icon('book')}</button>` : ''}
+                            ${item.lat && item.lng ? `<button class="chip-btn" type="button" data-act="map" aria-label="在地圖上查看" title="看地圖">${icon('pin')}</button>` : ''}
+                            <a class="chip-btn nav" href="${esc(mapLink(item))}" target="_blank" rel="noopener" aria-label="使用 Google Maps 導航" title="導航">${icon('nav')}</a>
                         </div>
                     </article>`;
         }
@@ -1505,6 +1684,7 @@
         // ---------- 設定 sheet ----------
         const settings = $('#settings');
         $('#menu-btn').addEventListener('click', () => {
+            document.body.classList.add('sheet-open');
             if (settings.showModal) settings.showModal();
             else settings.setAttribute('open', '');
         });
@@ -1512,6 +1692,8 @@
             // 點到 sheet 外面的暗色區域，或按關閉
             if (e.target === settings || e.target.closest('[data-close]')) settings.close();
         });
+        settings.addEventListener('close', () => document.body.classList.remove('sheet-open'));
+        settings.addEventListener('cancel', () => document.body.classList.remove('sheet-open'));
 
         // ---------- 事件 ----------
         $('#day-tabs').addEventListener('click', (e) => {
@@ -1570,6 +1752,7 @@
             const id = card && card.dataset.id;
             if (!id) return;
             if (act === 'map') focusOnMap(id);
+            if (act === 'detail') showDetailModal(id);
             if (act === 'stamp') {
                 const on = !visited.has(id);
                 on ? visited.add(id) : visited.delete(id);
@@ -1587,6 +1770,77 @@
                 updateCounts();
             }
         });
+
+        // ---------- 地點詳細彈窗邏輯 ----------
+        const detailModal = $('#detail-modal');
+        detailModal.addEventListener('click', (e) => {
+            if (e.target === detailModal || e.target.closest('[data-close]')) detailModal.close();
+        });
+        detailModal.addEventListener('close', () => document.body.classList.remove('sheet-open'));
+        detailModal.addEventListener('cancel', () => document.body.classList.remove('sheet-open'));
+
+        function showDetailModal(id) {
+            const item = items.find((it) => it.id === id);
+            if (!item) return;
+            const c = catOf(item);
+            const d = parseDesc(item.desc);
+
+            $('#detail-cat').textContent = c.label;
+            $('#detail-title').textContent = item.title;
+
+            // 標籤
+            const tagsBox = $('#detail-tags');
+            if (d.tags && d.tags.length) {
+                tagsBox.innerHTML = d.tags.map((t) => `<span class="tag-pill tag--${t.type}">${icon(t.icon)}${esc(t.text)}</span>`).join('');
+                tagsBox.hidden = false;
+            } else {
+                tagsBox.innerHTML = '';
+                tagsBox.hidden = true;
+            }
+
+            // 說明全文
+            const descBox = $('#detail-desc');
+            descBox.textContent = d.text || '暫無額外備註。';
+
+            // 營業時間、訂位、價位中繼資訊
+            const metaList = $('#detail-meta-list');
+            const metaItems = [];
+            if (d.hours) {
+                metaItems.push(`<div class="detail-meta-item">${icon('clock')}<div><b>營業時間</b><br>${esc(d.hours)}</div></div>`);
+            }
+            if (d.booking) {
+                metaItems.push(`<div class="detail-meta-item">${icon('calendar')}<div><b>訂位方式</b><br>${esc(d.booking)}</div></div>`);
+            }
+            if (item.price) {
+                metaItems.push(`<div class="detail-meta-item">${icon('coin')}<div><b>${esc(c.priceLabel)}</b><br>${esc(item.price)}</div></div>`);
+            }
+            if (metaItems.length) {
+                metaList.innerHTML = metaItems.join('');
+                metaList.hidden = false;
+            } else {
+                metaList.innerHTML = '';
+                metaList.hidden = true;
+            }
+
+            // 底部操作按鈕
+            const mapBtn = $('#detail-map-btn');
+            if (item.lat && item.lng) {
+                mapBtn.hidden = false;
+                mapBtn.onclick = () => {
+                    detailModal.close();
+                    focusOnMap(id);
+                };
+            } else {
+                mapBtn.hidden = true;
+            }
+
+            const navBtn = $('#detail-nav-btn');
+            navBtn.href = mapLink(item);
+
+            document.body.classList.add('sheet-open');
+            if (detailModal.showModal) detailModal.showModal();
+            else detailModal.setAttribute('open', '');
+        }
 
         document.querySelectorAll('.tab').forEach((tab) => {
             tab.addEventListener('click', () => setView(tab.dataset.view));
