@@ -1,7 +1,7 @@
 // 福岡散步繪本 Service Worker
-// 只改 index.html 的行程資料時不用動這裡（頁面本身是「網路優先」，連得上就會拿到新版）。
+// 只改 data/trip.json 或 index.html 時不用動這裡（這兩個是「網路優先」，連得上就會拿到新版）。
 // 換了字型、圖示、Leaflet 等其他檔案時，把 VERSION 加 1，手機才會重新下載。
-const VERSION = 'v1';
+const VERSION = 'v2';
 const CORE_CACHE = `fukuoka-core-${VERSION}`;
 const TILE_CACHE = 'fukuoka-tiles';
 const TILE_LIMIT = 800;
@@ -9,6 +9,7 @@ const TILE_LIMIT = 800;
 const CORE_FILES = [
   './',
   './index.html',
+  './data/trip.json',
   './manifest.webmanifest',
   './vendor/leaflet/leaflet.js',
   './vendor/leaflet/leaflet.css',
@@ -45,9 +46,13 @@ self.addEventListener('fetch', (event) => {
   if (request.method !== 'GET') return;
   const url = new URL(request.url);
 
-  // 頁面：網路優先（最多等 4 秒），失敗就用快取，出國網路不穩也打得開
+  // 頁面和行程資料：網路優先（最多等 4 秒），失敗就用快取，出國網路不穩也打得開
   if (request.mode === 'navigate') {
-    event.respondWith(networkFirst(request));
+    event.respondWith(networkFirst(request, './index.html'));
+    return;
+  }
+  if (url.origin === self.location.origin && url.pathname.endsWith('/data/trip.json')) {
+    event.respondWith(networkFirst(request, './data/trip.json'));
     return;
   }
 
@@ -63,16 +68,17 @@ self.addEventListener('fetch', (event) => {
   }
 });
 
-async function networkFirst(request) {
+async function networkFirst(request, cacheKey) {
   const cache = await caches.open(CORE_CACHE);
   const network = fetch(request).then((response) => {
-    if (response.ok) cache.put('./index.html', response.clone());
+    if (response.ok) cache.put(cacheKey, response.clone());
     return response;
   });
+  network.catch(() => {}); // 離線時改用快取，不需要報錯
   try {
     return await withTimeout(network, 4000);
   } catch (err) {
-    const cached = (await cache.match('./index.html')) || (await cache.match('./'));
+    const cached = (await cache.match(cacheKey)) || (cacheKey === './index.html' && (await cache.match('./')));
     // 沒有快取時就繼續等網路
     return cached || network;
   }

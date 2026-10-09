@@ -6,11 +6,45 @@
 
 ## 修改行程
 
-打開 `index.html`，行程資料在 `itineraryItems`（格式和原本一樣），每天的標題在下方的 `days`。存檔推上去就好，已經加到主畫面的手機下次連上網路打開時會自動拿到新版。
+行程都在 `data/trip.json`，頁面本身不用動。改完推上去就好，已經加到主畫面的手機下次連上網路打開時會自動拿到新版。
 
-## 新增行程後出現沒收錄的字
+```json
+{
+  "id": "fukuoka",
+  "title": "福岡散步繪本",
+  "subtitle": "八天的吃喝散步路線",
+  "days": [
+    { "day": 1, "name": "抵達福岡/博多" }
+  ],
+  "items": [
+    { "id": "1", "day": 1, "time": "10:00", "title": "JR 博多 City", "category": "購物", "gmap": "https://...", "lat": 33.5901, "lng": 130.4206, "desc": "營業時間:10:00–20:00", "price": "" }
+  ]
+}
+```
 
-`fonts/huninn-subset.woff2` 只收錄目前頁面用到的字（約 1000 字、185 KB），這樣才能整份存進手機離線使用。新加的字如果不在裡面，會自動改用手機的系統字型顯示，不會缺字。想讓新字也用粉圓體，在專案根目錄執行：
+| 欄位 | 說明 |
+|---|---|
+| `id` | 這趟旅程的代號。「去過」的蓋章紀錄會依這個代號分開存 |
+| `title`、`subtitle` | 封面的標題和副標 |
+| `days` | 每天的標題；沒寫到的天數只會顯示 Day N |
+| `items[].id` | 地點代號，不可重複 |
+| `items[].category` | `景點`、`美食`、`甜點`、`購物`、`交通` |
+| `items[].time` | 例如 `09:30`，可留空 |
+| `items[].gmap` | Google 地圖連結；留空時會用經緯度導航 |
+| `items[].desc` | 描述；裡面的「營業時間:」「最早可訂位時間：」會自動拆成獨立一行 |
+
+JSON 的規則比較嚴格：要用雙引號，最後一筆後面不能有逗號。寫錯時頁面會直接顯示是第幾行出錯。
+
+## 換成另一趟旅程
+
+1. 換掉 `data/trip.json`，記得改 `id`，蓋章紀錄才不會跟舊旅程混在一起
+2. 改 `manifest.webmanifest` 的 `name`、`short_name`（主畫面上的 App 名稱）
+3. 想換主畫面圖示的話，換掉 `icons/` 裡的圖
+4. 照下一段重新產生字型
+
+## 新加的字顯示成系統字型
+
+`fonts/huninn-subset.woff2` 只收錄目前用到的字（約 1000 字、189 KB），這樣才能整份存進手機離線使用。新加的字如果不在裡面，會自動改用手機的系統字型顯示，不會缺字。想讓新字也用粉圓體，在專案根目錄執行：
 
 ```sh
 pip install fonttools brotli
@@ -19,11 +53,22 @@ python3 tools/subset-font.py
 
 再把 `sw.js` 裡的 `VERSION` 加 1。
 
+## 在自己電腦上預覽
+
+頁面會用 `fetch` 讀取 `data/trip.json`，直接雙擊打開 `index.html` 會讀不到資料，要用本機伺服器開：
+
+```sh
+python3 -m http.server 8000
+```
+
+然後打開 http://localhost:8000/
+
 ## 檔案
 
 | 檔案 | 用途 |
 |---|---|
-| `index.html` | 頁面與行程資料 |
+| `data/trip.json` | 行程資料 |
+| `index.html` | 頁面 |
 | `sw.js` | 離線快取（Service Worker）；改了字型、圖示等檔案時要把 `VERSION` 加 1 |
 | `manifest.webmanifest` | 加到主畫面的名稱、圖示、顏色 |
 | `icons/` | 主畫面圖示 |
