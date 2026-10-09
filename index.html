@@ -494,15 +494,15 @@
 
         /* ---------- 擇一的選項：左右滑動 ---------- */
         .choices { min-width: 0; }
-        .choices-head {
-            display: flex;
-            justify-content: space-between;
-            gap: 8px;
-            margin: 4px 2px 6px;
-            font-size: calc(13px * var(--fs));
-            color: var(--ink-soft);
+        .choices-dots { display: flex; justify-content: center; gap: 6px; padding-top: 6px; }
+        .choices-dots span {
+            width: 7px;
+            height: 7px;
+            border-radius: 50%;
+            background: var(--line-strong);
+            transition: width .2s ease, background-color .2s ease;
         }
-        .choices-count { font-variant-numeric: tabular-nums; }
+        .choices-dots span.on { width: 18px; border-radius: 4px; background: var(--cat); }
         .choices-track {
             display: flex;
             align-items: stretch;
@@ -1285,24 +1285,24 @@
             return `
                 <li class="stop" style="--cat:${c.color}">${head}
                     <div class="choices">
-                        <p class="choices-head"><span>${group.length} ${c.kind === 'food' ? '間' : '個'}擇一，左右滑動看看</span><span class="choices-count" aria-hidden="true">1 / ${group.length}</span></p>
-                        <div class="choices-track" tabindex="0" role="region" aria-label="${esc(first.time)} 的 ${group.length} 個選項">
+                        <div class="choices-track" tabindex="0" role="region" aria-label="${esc(first.time)} 有 ${group.length} 個選項，可左右滑動">
                             ${group.map(cardHTML).join('')}
                         </div>
+                        <div class="choices-dots" aria-hidden="true">${group.map((_, i) => `<span${i ? '' : ' class="on"'}></span>`).join('')}</div>
                     </div>
                 </li>`;
         }
 
-        // 滑動時更新「1 / 3」
+        // 滑動時更新下方的圓點
         function bindChoices(container) {
             container.querySelectorAll('.choices-track').forEach((track) => {
-                const count = track.parentElement.querySelector('.choices-count');
+                const dots = Array.from(track.parentElement.querySelectorAll('.choices-dots span'));
                 const cards = Array.from(track.children);
                 track.addEventListener('scroll', () => {
                     const left = track.scrollLeft;
                     let idx = 0;
                     cards.forEach((card, i) => { if (Math.abs(card.offsetLeft - track.offsetLeft - left) < Math.abs(cards[idx].offsetLeft - track.offsetLeft - left)) idx = i; });
-                    count.textContent = `${idx + 1} / ${cards.length}`;
+                    dots.forEach((dot, i) => dot.classList.toggle('on', i === idx));
                 }, { passive: true });
             });
         }
