@@ -660,7 +660,7 @@
         .tz-note .ico { width: 16px; height: 16px; }
         .home-today-section .tz-note { margin: -4px 0 4px; }
 
-        /* ---------- 資訊頁 ---------- */
+        /* ---------- 資訊頁：上方分類按鈕，一次只看一類 ---------- */
         .info-pane {
             display: none;
             max-width: 680px;
@@ -668,10 +668,38 @@
             padding: calc(env(safe-area-inset-top) + 20px) 16px calc(var(--tabbar-h) + env(safe-area-inset-bottom) + 24px);
         }
         .info-head h1 { font-size: calc(26px * var(--fs)); line-height: 1.3; letter-spacing: .04em; }
-        .info-sub { margin-top: 4px; font-size: calc(13px * var(--fs)); color: var(--ink-soft); }
-        .info-list { display: flex; flex-direction: column; gap: 14px; margin-top: 16px; }
+        .info-sub { margin-top: 4px; font-size: calc(14px * var(--fs)); line-height: 1.6; color: var(--ink-soft); }
+        .info-cats {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            margin-top: 16px;
+        }
+        .info-cat {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            min-height: 56px;
+            padding: 8px 10px;
+            border: 2px solid var(--line-strong);
+            border-radius: var(--r-chip);
+            background: var(--card);
+            font-size: calc(17px * var(--fs));
+            line-height: 1.3;
+            transition: transform .15s ease;
+        }
+        .info-cat .ico { width: 24px; height: 24px; }
+        .info-cat:active { transform: scale(.96); }
+        .info-cat[aria-pressed="true"] {
+            border-color: var(--ink);
+            background: var(--accent);
+            color: var(--on-accent);
+            box-shadow: var(--shadow);
+        }
+        .info-list { display: flex; flex-direction: column; gap: 16px; margin-top: 18px; }
         .info-card {
-            padding: 16px 16px 14px;
+            padding: 18px 16px 16px;
             border: 2px solid var(--line-strong);
             border-radius: var(--r-card);
             background: var(--card);
@@ -681,59 +709,72 @@
             display: flex;
             align-items: center;
             gap: 10px;
-            font-size: calc(17px * var(--fs));
+            font-size: calc(19px * var(--fs));
             line-height: 1.4;
         }
         .info-ico {
             display: grid;
             place-items: center;
             flex: none;
-            width: 32px;
-            height: 32px;
+            width: 36px;
+            height: 36px;
             border: 2px solid var(--ink);
             border-radius: 50%;
             background: var(--c-sight);
             color: var(--on-cat);
         }
-        .info-ico .ico { width: 18px; height: 18px; }
+        .info-ico .ico { width: 20px; height: 20px; }
         .info-lead {
-            margin-top: 10px;
-            padding: 8px 12px;
+            margin-top: 12px;
+            padding: 10px 12px;
             border-radius: var(--r-chip);
             background: color-mix(in srgb, var(--c-shop) 35%, var(--card));
-            font-size: calc(14px * var(--fs));
-            line-height: 1.6;
+            font-size: calc(16px * var(--fs));
+            line-height: 1.7;
         }
-        .info-points { display: flex; flex-direction: column; gap: 8px; margin-top: 10px; }
+        .info-points { margin-top: 6px; }
         .info-points li {
-            position: relative;
-            padding-left: 16px;
-            font-size: calc(14px * var(--fs));
-            line-height: 1.6;
+            padding: 12px 0;
+            font-size: calc(16px * var(--fs));
+            line-height: 1.7;
             overflow-wrap: anywhere;
         }
-        .info-points li::before {
-            content: "";
-            position: absolute;
-            left: 2px;
-            top: .65em;
-            width: 6px;
-            height: 6px;
-            border-radius: 50%;
-            background: var(--line-strong);
+        .info-points li + li { border-top: 1.5px dashed var(--line); }
+        .info-point-title {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: calc(17px * var(--fs));
+            color: var(--ink);
         }
+        .info-point-title::before {
+            content: "";
+            flex: none;
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: var(--c-sight);
+            box-shadow: 0 0 0 1.5px var(--ink);
+        }
+        .info-point-text { display: block; margin-top: 2px; padding-left: 16px; }
         .info-card--warn { border-color: var(--stamp); }
         .info-card--warn .info-ico { background: var(--c-food); }
-        .info-card--warn .info-points li::before { background: var(--stamp); }
+        .info-card--warn .info-point-title::before { background: var(--stamp); }
         .info-links {
             display: flex;
-            flex-wrap: wrap;
-            gap: 8px;
-            margin-top: 12px;
-            padding-top: 12px;
+            flex-direction: column;
+            gap: 10px;
+            margin-top: 8px;
+            padding-top: 14px;
             border-top: 1.5px dashed var(--line);
         }
-        .info-links .chip-btn { font-size: calc(13px * var(--fs)); }
+        .info-links .chip-btn {
+            justify-content: flex-start;
+            min-height: 48px;
+            padding: 8px 14px;
+            font-size: calc(16px * var(--fs));
+        }
+        .info-links .chip-btn.nav { justify-content: center; }
 
         /* ---------- 篩選列（吸頂） ---------- */
         .toolbar {
@@ -2758,26 +2799,48 @@
         }
 
         // ---------- 資訊頁 ----------
+        // 內容在 data/info.json；上方分類按鈕一次只顯示一類，避免整頁太長
         let infoState = 'idle'; // idle → loading → done
+        let infoData = null;
+        let infoCat = '';
         function safeLink(url) {
             return /^(https?:|tel:)/i.test(url || '') ? url : '';
         }
         function infoIcon(name) {
             return /^[a-z-]+$/.test(name || '') && document.getElementById(`i-${name}`) ? name : 'info';
         }
+        function infoPointHTML(pt) {
+            if (pt && typeof pt === 'object') {
+                return `<li>${pt.title ? `<span class="info-point-title">${esc(pt.title)}</span>` : ''}${pt.text ? `<span class="info-point-text">${esc(pt.text)}</span>` : ''}</li>`;
+            }
+            return `<li><span class="info-point-title">${esc(pt)}</span></li>`;
+        }
         function infoSectionHTML(sec) {
-            const points = Array.isArray(sec.points) ? sec.points : [];
+            const points = Array.isArray(sec.points) ? sec.points.filter(Boolean) : [];
             const links = (Array.isArray(sec.links) ? sec.links : []).filter((l) => l && l.name && safeLink(l.url));
             return `
                 <section class="info-card${sec.warn ? ' info-card--warn' : ''}">
                     <h2><span class="info-ico">${icon(infoIcon(sec.icon))}</span>${esc(sec.title)}</h2>
                     ${sec.lead ? `<p class="info-lead">${esc(sec.lead)}</p>` : ''}
-                    ${points.length ? `<ul class="info-points">${points.map((t) => `<li>${esc(t)}</li>`).join('')}</ul>` : ''}
+                    ${points.length ? `<ul class="info-points">${points.map(infoPointHTML).join('')}</ul>` : ''}
                     ${links.length ? `<div class="info-links">${links.map((l) => {
+                        // 電話用醒目的按鈕；網頁連結開新分頁
                         const tel = /^tel:/i.test(l.url);
-                        return `<a class="chip-btn" href="${esc(l.url)}"${tel ? '' : ' target="_blank" rel="noopener"'}>${icon(tel ? 'phone' : 'arrow')}${esc(l.name)}</a>`;
+                        return `<a class="chip-btn${tel ? ' nav' : ''}" href="${esc(l.url)}"${tel ? '' : ' target="_blank" rel="noopener"'}>${icon(tel ? 'phone' : 'arrow')}${esc(l.name)}</a>`;
                     }).join('')}</div>` : ''}
                 </section>`;
+        }
+        function infoCategories() {
+            const cats = Array.isArray(infoData && infoData.categories) ? infoData.categories : [];
+            return cats.filter((c) => c && c.name && Array.isArray(c.sections));
+        }
+        function renderInfoCategory() {
+            const cats = infoCategories();
+            const cat = cats.find((c) => c.id === infoCat) || cats[0];
+            if (!cat) return;
+            infoCat = cat.id;
+            syncPressed($('#info-cats'), 'cat', infoCat);
+            $('#info-list').innerHTML = cat.sections.filter((sec) => sec && sec.title).map(infoSectionHTML).join('');
         }
         async function renderInfo() {
             if (infoState !== 'idle') return;
@@ -2792,19 +2855,33 @@
                 }
                 if (!res.ok) throw new TripError('讀不到旅遊資訊', `data/info.json 回應 ${res.status}，請確認檔案存在。`);
                 const text = (await res.text()).replace(/^\uFEFF/, '');
-                let data;
                 try {
-                    data = JSON.parse(text);
+                    infoData = JSON.parse(text);
                 } catch (e) {
                     throw new TripError('旅遊資訊格式有誤', describeJsonError(text));
                 }
-                const sections = Array.isArray(data.sections) ? data.sections.filter((sec) => sec && sec.title) : [];
+                const cats = infoCategories();
+                if (!cats.length) throw new TripError('旅遊資訊格式有誤', 'data/info.json 裡找不到 "categories" 陣列。');
+                cats.forEach((c, i) => { if (!c.id) c.id = `cat-${i}`; });
                 box.innerHTML = `
                     <header class="info-head">
-                        <h1>${esc(data.title || '旅遊資訊')}</h1>
-                        ${data.updated ? `<p class="info-sub">整理於 ${esc(data.updated)}，規定可能會變，出發前點官方連結再確認</p>` : ''}
+                        <h1>${esc(infoData.title || '旅遊資訊')}</h1>
+                        ${infoData.updated ? `<p class="info-sub">${esc(infoData.updated)} 整理。規定可能會變，出發前點官方連結再確認。</p>` : ''}
                     </header>
-                    <div class="info-list">${sections.map(infoSectionHTML).join('')}</div>`;
+                    <nav id="info-cats" class="info-cats" aria-label="資訊分類">
+                        ${cats.map((c) => `<button class="info-cat" type="button" data-cat="${esc(c.id)}" aria-pressed="false">${icon(infoIcon(c.icon))}${esc(c.name)}</button>`).join('')}
+                    </nav>
+                    <div id="info-list" class="info-list" aria-live="polite"></div>`;
+                $('#info-cats').addEventListener('click', (e) => {
+                    const btn = e.target.closest('.info-cat');
+                    if (!btn || btn.dataset.cat === infoCat) return;
+                    infoCat = btn.dataset.cat;
+                    renderInfoCategory();
+                    // 換分類時回到分類按鈕的位置，從第一段開始讀
+                    const top = $('#info-cats').getBoundingClientRect().top + window.scrollY - 12;
+                    if (window.scrollY > top) window.scrollTo(0, top);
+                });
+                renderInfoCategory();
                 infoState = 'done';
             } catch (err) {
                 console.error(err);

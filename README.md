@@ -50,7 +50,13 @@ node tools/check-trip.mjs
 
 ## 修改旅遊資訊
 
-下方「資訊」分頁的內容（時差、退稅、不能帶回台灣的食物等）在 `data/info.json`，跟行程一樣改完推上去就好。每個區塊有 `title`、`points`（條列文字），可加 `lead`（醒目的說明）、`warn: true`（警告樣式）、`links`（官方連結或 `tel:` 電話）。規定會變，記得更新 `updated` 日期。
+下方「資訊」分頁的內容（退稅、帶回台灣、緊急聯絡、時差）在 `data/info.json`，跟行程一樣改完推上去就好。
+
+- `categories`：上方的分類按鈕，建議 4 個以內；每個分類有 `id`、`name`、`icon`、`sections`
+- `sections`：分類底下的區塊，有 `title`、`points`，可加 `lead`（醒目的開頭說明）、`warn: true`（警告樣式）、`links`（官方連結或 `tel:` 電話）
+- `points`：每一條寫成 `{ "title": "重點", "text": "說明" }`，長輩比較好掃讀
+
+規定會變，記得更新 `updated` 日期。
 
 ## 換成另一趟旅程
 
