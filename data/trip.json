@@ -3,11 +3,12 @@
   "id": "fukuoka",
   "title": "福岡散步繪本",
   "subtitle": "2026/11/21–11/28 八天七夜",
+  "startDate": "2026-11-21",
   "timeNote": "時間都是日本時間，比台灣快 1 小時",
   "weather": {
     "timezone": "Asia/Tokyo",
     "default": { "name": "福岡市 (博多)", "lat": 33.5902, "lng": 130.4207 },
-    "fallback": { "temp": 16, "max": 18, "min": 11, "rain": 10 }
+    "climate": { "max": 18, "min": 11, "rain": 10 }
   },
   "_說明": "由行程規劃文件轉換。已存在於舊版 trip.json 的地點沿用原本的 id、gmap、經緯度；新地點 id 從 89 起編，沒有經緯度的不會出現在地圖上。同一時間、同一分類的地點是擇一的選項。",
   "days": [

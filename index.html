@@ -295,6 +295,7 @@
             align-items: center;
             gap: 6px;
         }
+        .weather-temp-note { margin-left: 6px; font-size: calc(13px * var(--fs)); color: var(--ink-soft); }
         .weather-tips .ico { width: 16px; height: 16px; flex-shrink: 0; color: var(--link); }
 
         /* 首頁今日行程區塊 */
@@ -567,6 +568,7 @@
             inset: auto 0 0 0;
             width: 100%;
             max-width: 520px;
+            height: auto;
             max-height: 88dvh;
             margin: 0 auto;
             padding: 0;
@@ -576,21 +578,69 @@
             background: var(--card);
             color: var(--ink);
             box-shadow: 0 -4px 0 var(--line-strong);
-            overflow: auto;
+            overflow: hidden;
             overscroll-behavior: contain;
         }
-        .sheet-dialog[open] { animation: sheet-up .28s cubic-bezier(.2, .9, .3, 1); }
+        /* 高度跟著內容，內容多才捲動；把手和標題固定在上方 */
+        .sheet-dialog[open] {
+            display: flex;
+            flex-direction: column;
+            animation: sheet-up .4s cubic-bezier(.22, 1, .36, 1);
+        }
+        .sheet-dialog[open]::backdrop { animation: backdrop-in .4s ease; }
         .sheet-dialog::backdrop { background: rgba(30, 36, 54, .45); }
+        .sheet-dialog.is-closing::backdrop { animation: backdrop-out .26s ease forwards; }
+        /* 滿版：往上拉或點把手 */
+        .sheet-dialog.is-full { height: 100dvh; max-height: 100dvh; border-radius: 0; }
+        .sheet-dialog.is-full .sheet-body { padding-top: env(safe-area-inset-top); }
+        .sheet-dialog.is-dragging { user-select: none; }
         @keyframes sheet-up { from { transform: translateY(100%); } to { transform: translateY(0); } }
-        .sheet-body { padding: 10px 20px calc(24px + env(safe-area-inset-bottom)); }
+        @keyframes backdrop-in { from { opacity: 0; } }
+        @keyframes backdrop-out { to { opacity: 0; } }
+        .sheet-body {
+            display: flex;
+            flex-direction: column;
+            flex: 1 1 auto;
+            min-height: 0;
+            padding: 0 20px calc(16px + env(safe-area-inset-bottom));
+        }
+        .sheet-scroll {
+            flex: 1 1 auto;
+            min-height: 0;
+            overflow-y: auto;
+            overscroll-behavior: contain;
+            padding-bottom: 4px;
+        }
+        /* 把手：往下拉收起、往上拉滿版，點一下切換滿版；整條都是可以拉的範圍 */
         .sheet-handle {
-            width: 44px;
+            flex-shrink: 0;
+            display: grid;
+            place-items: center;
+            width: calc(100% + 40px);
+            height: 30px;
+            margin: 0 -20px;
+            padding: 0;
+            border: 0;
+            border-radius: 0;
+            background: transparent;
+            cursor: grab;
+            touch-action: none;
+        }
+        .sheet-handle::before {
+            content: "";
+            width: 48px;
             height: 5px;
-            margin: 0 auto 8px;
             border-radius: 3px;
             background: var(--line-strong);
+            transition: width .2s ease, background-color .2s ease;
         }
-        .sheet-head { display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; }
+        .sheet-handle:active::before,
+        .is-dragging .sheet-handle::before { width: 60px; background: var(--ink-soft); }
+        /* 鍵盤移到把手時：不畫整條外框，改成把手變長變色 */
+        .sheet-handle:focus-visible { outline: none; }
+        .sheet-handle:focus-visible::before { width: 64px; background: var(--link); }
+        .sheet-head { touch-action: none; }
+        .sheet-head { display: flex; flex-shrink: 0; align-items: flex-start; justify-content: space-between; gap: 12px; }
         .sheet-head h2 { font-size: calc(20px * var(--fs)); line-height: 1.35; overflow-wrap: anywhere; }
         .setting { margin-top: 18px; }
         .setting h3 { margin-bottom: 8px; font-size: calc(14px * var(--fs)); color: var(--ink-soft); }
@@ -1000,21 +1050,6 @@
         /* ---------- 地點詳細彈窗 (Detail Sheet) ---------- */
         dialog:not([open]) {
             display: none !important;
-        }
-        .detail-sheet {
-            height: 72dvh;
-            max-height: 72dvh;
-        }
-        .detail-sheet[open] {
-            display: flex;
-            flex-direction: column;
-        }
-        .detail-sheet-body {
-            display: flex;
-            flex-direction: column;
-            height: 100%;
-            padding: 10px 20px calc(16px + env(safe-area-inset-bottom));
-            overflow: hidden;
         }
         .detail-head {
             flex-shrink: 0;
@@ -1630,43 +1665,44 @@
 
     <dialog id="settings" class="sheet-dialog settings-sheet" aria-labelledby="settings-title">
         <div class="sheet-body">
-            <div class="sheet-handle" aria-hidden="true"></div>
+            <button class="sheet-handle" type="button" aria-label="放大成全螢幕" aria-expanded="false"></button>
             <div class="sheet-head">
                 <h2 id="settings-title">設定</h2>
                 <button class="icon-btn" type="button" data-close aria-label="關閉設定"><svg class="ico"><use href="#i-close"/></svg></button>
             </div>
+            <div class="sheet-scroll">
+                <section class="setting">
+                    <h3>日夜模式</h3>
+                    <div class="seg" role="group" aria-label="日夜模式">
+                        <button type="button" data-theme-choice="day" aria-pressed="true"><svg class="ico"><use href="#i-sun"/></svg>白天</button>
+                        <button type="button" data-theme-choice="night" aria-pressed="false"><svg class="ico"><use href="#i-moon"/></svg>夜晚</button>
+                    </div>
+                </section>
 
-            <section class="setting">
-                <h3>日夜模式</h3>
-                <div class="seg" role="group" aria-label="日夜模式">
-                    <button type="button" data-theme-choice="day" aria-pressed="true"><svg class="ico"><use href="#i-sun"/></svg>白天</button>
-                    <button type="button" data-theme-choice="night" aria-pressed="false"><svg class="ico"><use href="#i-moon"/></svg>夜晚</button>
-                </div>
-            </section>
+                <section class="setting">
+                    <h3>字的大小</h3>
+                    <div class="seg" role="group" aria-label="字的大小">
+                        <button type="button" data-fs="m" aria-pressed="true"><span class="fs-sample" style="font-size:14px">字</span>標準</button>
+                        <button type="button" data-fs="l" aria-pressed="false"><span class="fs-sample" style="font-size:18px">字</span>大</button>
+                        <button type="button" data-fs="xl" aria-pressed="false"><span class="fs-sample" style="font-size:22px">字</span>特大</button>
+                    </div>
+                    <p class="fs-preview">預覽：上午 09:30 太宰府天滿宮，營業時間 06:00～19:30</p>
+                </section>
 
-            <section class="setting">
-                <h3>字的大小</h3>
-                <div class="seg" role="group" aria-label="字的大小">
-                    <button type="button" data-fs="m" aria-pressed="true"><span class="fs-sample" style="font-size:14px">字</span>標準</button>
-                    <button type="button" data-fs="l" aria-pressed="false"><span class="fs-sample" style="font-size:18px">字</span>大</button>
-                    <button type="button" data-fs="xl" aria-pressed="false"><span class="fs-sample" style="font-size:22px">字</span>特大</button>
-                </div>
-                <p class="fs-preview">預覽：上午 09:30 太宰府天滿宮，營業時間 06:00～19:30</p>
-            </section>
-
-            <section class="setting" id="install-setting" hidden>
-                <h3>加到主畫面</h3>
-                <button id="install-btn" class="chip-btn nav" type="button" hidden><svg class="ico"><use href="#i-home-add"/></svg>加到主畫面</button>
-                <p id="install-ios" class="setting-note" hidden>點 Safari 的分享按鈕 <svg class="ico" aria-label="分享"><use href="#i-share"/></svg>，再選「加入主畫面」。</p>
-                <p class="setting-note">加到主畫面後，沒有網路也能看行程。</p>
-            </section>
+                <section class="setting" id="install-setting" hidden>
+                    <h3>加到主畫面</h3>
+                    <button id="install-btn" class="chip-btn nav" type="button" hidden><svg class="ico"><use href="#i-home-add"/></svg>加到主畫面</button>
+                    <p id="install-ios" class="setting-note" hidden>點 Safari 的分享按鈕 <svg class="ico" aria-label="分享"><use href="#i-share"/></svg>，再選「加入主畫面」。</p>
+                    <p class="setting-note">加到主畫面後，沒有網路也能看行程。</p>
+                </section>
+            </div>
         </div>
     </dialog>
 
     <!-- 地點詳細資訊彈窗 -->
     <dialog id="detail-modal" class="sheet-dialog detail-sheet" aria-labelledby="detail-title">
         <div class="sheet-body detail-sheet-body">
-            <div class="sheet-handle" aria-hidden="true"></div>
+            <button class="sheet-handle" type="button" aria-label="放大成全螢幕" aria-expanded="false"></button>
             <div class="sheet-head detail-head">
                 <div>
                     <p id="detail-cat" class="card-cat" style="font-size:calc(13px * var(--fs))"></p>
@@ -1707,18 +1743,19 @@
                         <svg class="ico"><use id="weather-icon-use" href="#i-sun"/></svg>
                     </div>
                     <div>
-                        <div class="weather-temp-main">
+                        <div class="weather-temp-main" id="weather-temp-row">
                             <span class="weather-temp-now" id="weather-temp">--°</span>
+                            <span class="weather-temp-note" id="weather-temp-note"></span>
                         </div>
                         <div class="weather-desc-text" id="weather-desc">讀取天氣中…</div>
                     </div>
-                    <div class="weather-range-box">
+                    <div class="weather-range-box" id="weather-range">
                         <div>最高 <strong id="weather-max">--°</strong></div>
                         <div>最低 <strong id="weather-min">--°</strong></div>
                         <div>降雨 <strong id="weather-rain">--%</strong></div>
                     </div>
                 </div>
-                <div class="weather-tips">
+                <div class="weather-tips" id="weather-tip-row">
                     <svg class="ico"><use href="#i-bowl"/></svg>
                     <span id="weather-outfit-tip"></span>
                 </div>
@@ -1905,7 +1942,7 @@
         const INFO_URL = './data/info.json';
         const VIEWS = ['home', 'list', 'map', 'info'];
         let trip = { id: 'trip', title: '', subtitle: '', timeNote: '' };
-        let weatherConf = { timezone: 'auto', default: null, fallback: null };
+        let weatherConf = { timezone: 'auto', default: null, climate: null };
         let days = [];
         let items = [];
         let visited = new Set();
@@ -2002,6 +2039,27 @@
         function timeHTML(item) {
             if (!item.time) return '未定';
             return esc(item.time) + (item.tz ? `<small class="time-tz">${esc(item.tz)}</small>` : '');
+        }
+        // 日期一律用 YYYY-MM-DD 字串，以 UTC 計算避免時區差一天
+        function todayIn(tz) {
+            try {
+                return new Intl.DateTimeFormat('en-CA', { timeZone: tz && tz !== 'auto' ? tz : undefined, year: 'numeric', month: '2-digit', day: '2-digit' }).format(new Date());
+            } catch (e) {
+                const d = new Date();
+                return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+            }
+        }
+        function dateOfDay(n) {
+            if (!trip.startDate) return '';
+            const [y, m, d] = trip.startDate.split('-').map(Number);
+            return new Date(Date.UTC(y, m - 1, d + n - 1)).toISOString().slice(0, 10);
+        }
+        function daysBetween(from, to) {
+            return Math.round((Date.parse(to) - Date.parse(from)) / 86400000);
+        }
+        function dateLabel(ymd) {
+            const d = new Date(Date.parse(ymd));
+            return `${d.getUTCMonth() + 1}/${d.getUTCDate()}（${'日一二三四五六'[d.getUTCDay()]}）`;
         }
         function dayLabel(n) {
             return `第 ${n} 天`;
@@ -2404,22 +2462,150 @@
             document.body.style.top = '';
             window.scrollTo(0, lockedScrollY);
         }
+        // 打開從下方滑上來；收起從目前位置滑下去（拖曳到一半放手也一樣順）
+        const SHEET_EASE = 'cubic-bezier(.22, 1, .36, 1)';
+        const SHEET_CLOSE_MS = 260;
+        const SHEET_SNAP_MS = 320;
+        const reduceMotion = () => window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+        function resetSheetStyle(dialog) {
+            dialog.style.transform = '';
+            dialog.style.transition = '';
+            dialog.style.height = '';
+            dialog.style.maxHeight = '';
+        }
+        function syncHandle(dialog) {
+            const full = dialog.classList.contains('is-full');
+            const handle = dialog.querySelector('.sheet-handle');
+            if (!handle) return;
+            handle.setAttribute('aria-expanded', String(full));
+            handle.setAttribute('aria-label', full ? '縮回原本大小' : '放大成全螢幕');
+        }
         function openSheet(dialog) {
             lockScroll();
+            dialog.classList.remove('is-closing', 'is-full', 'is-dragging');
+            resetSheetStyle(dialog);
+            dialog.style.animation = ''; // 讓打開的滑入動畫重新播放
+            syncHandle(dialog);
             if (dialog.showModal) dialog.showModal();
             else dialog.setAttribute('open', '');
         }
         function closeSheet(dialog) {
-            if (dialog.open) dialog.close();
-            unlockScroll();
+            if (!dialog.open || dialog.classList.contains('is-closing')) return;
+            let timer = null;
+            const finish = () => {
+                clearTimeout(timer);
+                dialog.removeEventListener('transitionend', onEnd);
+                dialog.classList.remove('is-closing', 'is-full', 'is-dragging');
+                resetSheetStyle(dialog);
+                if (dialog.open) dialog.close();
+                unlockScroll();
+            };
+            const onEnd = (e) => { if (e.target === dialog && e.propertyName === 'transform') finish(); };
+            if (reduceMotion()) { finish(); return; }
+            dialog.classList.add('is-closing');
+            dialog.style.animation = 'none'; // 停掉還沒播完的滑入動畫，從目前位置往下滑
+            dialog.style.transition = `transform ${SHEET_CLOSE_MS}ms cubic-bezier(.4, 0, .9, .5)`;
+            void dialog.offsetHeight;
+            dialog.style.transform = 'translateY(105%)';
+            dialog.addEventListener('transitionend', onEnd);
+            timer = setTimeout(finish, SHEET_CLOSE_MS + 80);
         }
+        // 切換滿版：高度用動畫過渡，同時把拖曳的位移歸零
+        function setSheetFull(dialog, on) {
+            const from = dialog.getBoundingClientRect().height;
+            dialog.classList.toggle('is-full', on);
+            syncHandle(dialog);
+            if (reduceMotion()) { resetSheetStyle(dialog); return; }
+            const to = dialog.getBoundingClientRect().height;
+            dialog.style.animation = 'none';
+            dialog.style.transition = 'none';
+            dialog.style.height = `${from}px`;
+            dialog.style.maxHeight = 'none';
+            void dialog.offsetHeight;
+            dialog.style.transition = `height ${SHEET_SNAP_MS}ms ${SHEET_EASE}, transform ${SHEET_SNAP_MS}ms ${SHEET_EASE}`;
+            dialog.style.height = `${to}px`;
+            dialog.style.transform = '';
+            setTimeout(() => { if (!dialog.classList.contains('is-closing')) resetSheetStyle(dialog); }, SHEET_SNAP_MS + 30);
+        }
+        function snapSheetBack(dialog) {
+            dialog.style.transition = `transform ${SHEET_SNAP_MS}ms ${SHEET_EASE}`;
+            dialog.style.transform = '';
+            setTimeout(() => { if (!dialog.classList.contains('is-closing')) resetSheetStyle(dialog); }, SHEET_SNAP_MS + 30);
+        }
+
         function bindSheet(dialog) {
             dialog.addEventListener('click', (e) => {
                 // 點到 sheet 外面的暗色區域，或按關閉
                 if (e.target === dialog || e.target.closest('[data-close]')) closeSheet(dialog);
             });
-            // 按 Esc 或返回鍵關閉時也要解鎖
+            // Esc 或返回鍵：一樣用滑下去的動畫收起
+            dialog.addEventListener('cancel', (e) => {
+                e.preventDefault();
+                closeSheet(dialog);
+            });
             dialog.addEventListener('close', unlockScroll);
+
+            // 拖曳：把手和標題列都可以拉。往下拉收起（滿版時先縮回），往上拉變滿版
+            const handle = dialog.querySelector('.sheet-handle');
+            const zones = [handle, dialog.querySelector('.sheet-head')].filter(Boolean);
+            let drag = null;
+            let skipClick = false;
+            zones.forEach((zone) => {
+                zone.addEventListener('pointerdown', (e) => {
+                    if (e.button !== 0 || !dialog.open || dialog.classList.contains('is-closing')) return;
+                    if (zone !== handle && e.target.closest('button, a')) return;
+                    drag = { id: e.pointerId, startY: e.clientY, dy: 0, lastY: e.clientY, lastT: e.timeStamp, v: 0, moved: false };
+                    try { zone.setPointerCapture(e.pointerId); } catch (err) {}
+                });
+                zone.addEventListener('pointermove', (e) => {
+                    if (!drag || e.pointerId !== drag.id) return;
+                    const dy = e.clientY - drag.startY;
+                    if (!drag.moved) {
+                        if (Math.abs(dy) < 6) return;
+                        drag.moved = true;
+                        dialog.classList.add('is-dragging');
+                        dialog.style.animation = 'none';
+                        dialog.style.transition = 'none';
+                    }
+                    const dt = Math.max(1, e.timeStamp - drag.lastT);
+                    drag.v = (e.clientY - drag.lastY) / dt;
+                    drag.lastY = e.clientY;
+                    drag.lastT = e.timeStamp;
+                    drag.dy = dy;
+                    // 往上拉有阻力（已經滿版就更緊），往下拉跟著手指
+                    const full = dialog.classList.contains('is-full');
+                    const offset = dy > 0 ? dy : dy * (full ? 0.08 : 0.3);
+                    dialog.style.transform = `translateY(${offset}px)`;
+                });
+                const end = (e) => {
+                    if (!drag || e.pointerId !== drag.id) return;
+                    const d = drag;
+                    drag = null;
+                    dialog.classList.remove('is-dragging');
+                    if (!d.moved) return; // 沒有拖動：當成點一下，交給 click 處理
+                    skipClick = true;
+                    setTimeout(() => { skipClick = false; }, 0);
+                    const h = dialog.getBoundingClientRect().height;
+                    const full = dialog.classList.contains('is-full');
+                    if (d.dy > 0 && (d.dy > h * 0.25 || d.v > 0.5)) {
+                        // 滿版時輕輕往下拉先縮回原本大小，拉很多或很快才直接收起
+                        if (full && d.dy < h * 0.6 && d.v < 2.5) setSheetFull(dialog, false);
+                        else closeSheet(dialog);
+                    } else if (d.dy < 0 && !full && (d.dy < -50 || d.v < -0.4)) {
+                        setSheetFull(dialog, true);
+                    } else {
+                        snapSheetBack(dialog);
+                    }
+                };
+                zone.addEventListener('pointerup', end);
+                zone.addEventListener('pointercancel', end);
+            });
+            // 點一下把手（或用鍵盤按）切換滿版，不會拖曳的人也能用
+            if (handle) handle.addEventListener('click', () => {
+                if (skipClick) return;
+                setSheetFull(dialog, !dialog.classList.contains('is-full'));
+            });
         }
 
         // ---------- 設定 sheet ----------
@@ -2580,6 +2766,15 @@
             81: { desc: '強陣雨', icon: 'i-rain', outfit: '陣雨偏大，建議先在室內或咖啡廳稍作停留。' }
         };
 
+        const FORECAST_DAYS = 16; // Open-Meteo 最多預報到 16 天後
+
+        // 往年平均氣候（trip.json 的 weather.climate），還沒有預報或讀不到時用文字提示
+        function climateText() {
+            const c = weatherConf.climate;
+            if (!c || c.max == null || c.min == null) return '';
+            return `往年這時候大約 ${c.min}～${c.max}°C${c.rain != null ? `，降雨機率約 ${c.rain}%` : ''}。`;
+        }
+
         async function fetchWeatherForDay(dayNum) {
             // 天氣地點在 data/trip.json：days[].weather，沒寫就用 weather.default
             const dayInfo = days.find((d) => d.day === dayNum);
@@ -2590,60 +2785,84 @@
             }
             $('#weather-card').hidden = false;
             $('#weather-city-name').textContent = city.name;
-            $('#weather-date-label').textContent = dayInfo ? `${dayLabel(dayNum)} ${dayInfo.name}` : `${dayLabel(dayNum)} 預報`;
 
-            // 檢查快取
-            const cacheKey = `trip:${trip.id}:weather:${city.lat},${city.lng}`;
+            // 有出發日期就看那一天的預報；沒有就看今天
+            const today = todayIn(weatherConf.timezone);
+            const date = dateOfDay(dayNum);
+            const ahead = date ? daysBetween(today, date) : 0;
+            $('#weather-date-label').textContent = date ? `${dayLabel(dayNum)}・${dateLabel(date)}` : `${dayLabel(dayNum)} 預報`;
+
+            if (ahead >= FORECAST_DAYS) {
+                applyWeatherUI({ state: 'later', ahead });
+                return;
+            }
+
+            const cacheKey = `trip:${trip.id}:weather:${date || 'today'}:${city.lat},${city.lng}`;
             let cached = null;
             try {
                 const raw = localStorage.getItem(cacheKey);
                 if (raw) cached = JSON.parse(raw);
             } catch (e) {}
-
-            // 快取如果小於 2 小時直接套用
-            if (cached && (Date.now() - cached.time < 7200000)) {
+            // 快取小於 2 小時直接套用
+            if (cached && Date.now() - cached.time < 7200000) {
                 applyWeatherUI(cached.data);
                 return;
             }
 
+            applyWeatherUI({ state: 'loading' });
             try {
-                const url = `https://api.open-meteo.com/v1/forecast?latitude=${city.lat}&longitude=${city.lng}&current_weather=true&daily=temperature_2m_max,temperature_2m_min,precipitation_probability_max,weathercode&timezone=${encodeURIComponent(weatherConf.timezone)}`;
+                const range = date ? `&start_date=${date}&end_date=${date}` : '&forecast_days=1';
+                const url = `https://api.open-meteo.com/v1/forecast?latitude=${city.lat}&longitude=${city.lng}&current_weather=true&daily=temperature_2m_max,temperature_2m_min,precipitation_probability_max,weathercode&timezone=${encodeURIComponent(weatherConf.timezone)}${range}`;
                 const res = await fetch(url);
                 if (!res.ok) throw new Error('API 回應錯誤');
                 const data = await res.json();
                 const cur = data.current_weather || {};
                 const daily = data.daily || {};
-                const wCode = cur.weathercode != null ? cur.weathercode : (daily.weathercode && daily.weathercode[0]);
+                const first = (key) => (daily[key] && daily[key][0] != null ? Math.round(daily[key][0]) : null);
+                const isToday = ahead === 0;
                 const payload = {
-                    temp: Math.round(cur.temperature != null ? cur.temperature : 16),
-                    max: Math.round(daily.temperature_2m_max ? daily.temperature_2m_max[0] : 18),
-                    min: Math.round(daily.temperature_2m_min ? daily.temperature_2m_min[0] : 11),
-                    rain: Math.round(daily.precipitation_probability_max ? daily.precipitation_probability_max[0] : 10),
-                    code: wCode || 0
+                    state: isToday ? 'today' : ahead > 0 ? 'forecast' : 'past',
+                    temp: isToday && cur.temperature != null ? Math.round(cur.temperature) : first('temperature_2m_max'),
+                    max: first('temperature_2m_max'),
+                    min: first('temperature_2m_min'),
+                    rain: first('precipitation_probability_max'),
+                    code: isToday && cur.weathercode != null ? cur.weathercode : (daily.weathercode ? daily.weathercode[0] : null)
                 };
+                if (payload.max == null) throw new Error('沒有這一天的資料');
                 try {
                     localStorage.setItem(cacheKey, JSON.stringify({ time: Date.now(), data: payload }));
                 } catch (e) {}
-                applyWeatherUI(payload);
+                if (dayNum === currentHomeDay) applyWeatherUI(payload);
             } catch (err) {
-                // 離線或讀取失敗時，若有舊快取套用舊快取，否則用 trip.json 的 weather.fallback（旅遊季節的平均氣候）
-                if (cached) {
-                    applyWeatherUI(cached.data);
-                } else {
-                    applyWeatherUI(Object.assign({ temp: 0, max: 0, min: 0, rain: 0 }, weatherConf.fallback, { code: 0 }));
-                }
+                // 離線或讀取失敗：有舊資料就用舊的，沒有就說讀不到，不顯示假數字
+                if (dayNum === currentHomeDay) applyWeatherUI(cached ? cached.data : { state: 'error' });
             }
         }
 
         function applyWeatherUI(w) {
-            const info = weatherCodes[w.code] || weatherCodes[0];
-            $('#weather-temp').textContent = `${w.temp}°`;
-            $('#weather-max').textContent = `${w.max}°`;
-            $('#weather-min').textContent = `${w.min}°`;
-            $('#weather-rain').textContent = `${w.rain}%`;
-            $('#weather-desc').textContent = info.desc;
-            $('#weather-icon-use').setAttribute('href', `#${info.icon}`);
-            $('#weather-outfit-tip').textContent = info.outfit;
+            const blank = (v, unit) => (v == null ? `--${unit}` : `${v}${unit}`);
+            const hasData = ['today', 'forecast', 'past'].includes(w.state);
+            const info = hasData ? weatherCodes[w.code] || weatherCodes[0] : null;
+            $('#weather-temp').textContent = blank(hasData ? w.temp : null, '°');
+            $('#weather-max').textContent = blank(hasData ? w.max : null, '°');
+            $('#weather-min').textContent = blank(hasData ? w.min : null, '°');
+            $('#weather-rain').textContent = blank(hasData ? w.rain : null, '%');
+            $('#weather-temp-note').textContent = { today: '現在', forecast: '預報最高', past: '當天最高' }[w.state] || '';
+            $('#weather-desc').textContent = info ? info.desc : {
+                later: '還沒有預報',
+                loading: '讀取天氣中…',
+                error: '暫時讀不到天氣'
+            }[w.state];
+            $('#weather-icon-use').setAttribute('href', `#${info ? info.icon : 'i-calendar'}`);
+            $('#weather-outfit-tip').textContent = info ? info.outfit : {
+                later: `出發前 ${FORECAST_DAYS} 天內會顯示這天的預報。${climateText()}`,
+                loading: '',
+                error: `請確認網路連線。${climateText()}`
+            }[w.state];
+            $('#weather-tip-row').hidden = !$('#weather-outfit-tip').textContent;
+            // 沒有數字時不顯示「--°」，只留文字說明
+            $('#weather-temp-row').hidden = !hasData;
+            $('#weather-range').hidden = !hasData;
         }
 
         function renderHome() {
@@ -3038,7 +3257,8 @@
                 id: String(data.id || 'trip'),
                 title: String(data.title || '旅行繪本'),
                 subtitle: String(data.subtitle || ''),
-                timeNote: String(data.timeNote || '')
+                timeNote: String(data.timeNote || ''),
+                startDate: /^\d{4}-\d{2}-\d{2}$/.test(data.startDate || '') ? data.startDate : ''
             };
             items = data.items
                 .filter((it) => it && it.title)
@@ -3064,7 +3284,7 @@
             weatherConf = {
                 timezone: w.timezone ? String(w.timezone) : 'auto',
                 default: validPlace(w.default),
-                fallback: w.fallback && typeof w.fallback === 'object' ? w.fallback : null
+                climate: w.climate && typeof w.climate === 'object' ? w.climate : null
             };
 
             // 天數標題：以 days 為準，items 裡出現但沒寫標題的天數也會列出
@@ -3135,6 +3355,11 @@
         loadTrip()
             .then((data) => {
                 applyTrip(data);
+                // 旅行期間打開，首頁直接顯示今天
+                if (trip.startDate) {
+                    const n = daysBetween(trip.startDate, todayIn(weatherConf.timezone)) + 1;
+                    if (days.some((d) => d.day === n)) currentHomeDay = n;
+                }
                 renderFilters();
                 updateCounts();
                 render();
