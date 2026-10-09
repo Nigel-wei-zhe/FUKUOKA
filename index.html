@@ -606,8 +606,11 @@
         .sheet-dialog::backdrop { background: rgba(30, 36, 54, .45); box-shadow: 0 -160px 0 rgba(30, 36, 54, .45), 0 160px 0 rgba(30, 36, 54, .45); }
         .sheet-dialog.is-closing::backdrop { animation: backdrop-out .26s ease forwards; }
         /* 滿版：往上拉或點把手 */
-        .sheet-dialog.is-full { height: 100dvh; max-height: 100dvh; border-radius: 0; box-shadow: 0 -160px 0 var(--card), 0 160px 0 var(--card); }
-        .sheet-dialog.is-full .sheet-body { padding-top: env(safe-area-inset-top); }
+        /* 滿版也保留圓角：上方留一點縫露出暗色背景，像 iOS 原生的 sheet */
+        .sheet-dialog.is-full {
+            height: calc(100dvh - env(safe-area-inset-top) - 12px);
+            max-height: calc(100dvh - env(safe-area-inset-top) - 12px);
+        }
         .sheet-dialog.is-dragging { user-select: none; }
         @keyframes sheet-up { from { transform: translateY(100%); } to { transform: translateY(0); } }
         @keyframes backdrop-in { from { opacity: 0; } }
