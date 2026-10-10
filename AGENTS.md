@@ -42,6 +42,7 @@ python3 tools/subset-font.py       # trip.json 或介面文字加了新字時執
 - **路徑一律用相對路徑**（`./data/trip.json`），不要用 `/` 開頭；網站在 `/FUKUOKA/` 子路徑底下
 - **不要引用 CDN**。要離線可用，所有 JS、CSS、字型都放在 repo 裡；新增的檔案要加進 `sw.js` 的 `CORE_FILES`
 - **改了 `index.html`、`trip.json` 以外的檔案**（字型、圖示、Leaflet、manifest），要把 `sw.js` 的 `VERSION` 加 1，否則已安裝的手機不會更新
+- **每一頁最上方的留白一律用 `var(--top-gap)`**，不要各自寫 `env(safe-area-inset-top) + Npx`。iOS 26 Safari 會把網頁畫到狀態列後面，頂端的毛玻璃還會往下延伸一段；`--top-gap` 已經處理好瀏覽器和加到主畫面兩種情況。新增頁面或吸頂元件時，第一個元素的上方留白就用它，再到 iPhone Safari 上確認首頁、行程、地圖、資訊各頁是否對齊
 - **顏色只用 CSS 變數**，而且 `:root` 和 `:root[data-theme="night"]` 兩套都要定義；不要寫死顏色
 - **設定都放在同一個 sheet**（`<dialog id="settings">`：日夜模式、字的大小、加到主畫面），手機從下方分頁的「設定」打開，桌機從右上角按鈕打開。新的設定項目加在這裡，不要在頁面上另外放按鈕
 - **字的大小可調**（標準／大／特大，`--fs` 為 1／1.18／1.36）。新的 `font-size` 一律寫成 `calc(14px * var(--fs))`，跟文字並排的固定寬度也要乘上 `--fs`
