@@ -414,8 +414,62 @@
             box-shadow: 0 2px 0 var(--line);
             color: var(--ink);
         }
+        /* 去過：整列淡淡反灰，右邊蓋一個「去過」印章（導航按鈕照樣可以按） */
+        .timeline-item, .timeline-sub-item, .timeline-group { position: relative; }
         .timeline-item.is-visited,
-        .timeline-sub-item.is-visited { background: var(--paper-2); }
+        .timeline-sub-item.is-visited,
+        .timeline-group.is-visited { background: var(--paper-2); box-shadow: none; }
+        .is-visited > .timeline-open,
+        .timeline-group.is-visited > .timeline-summary > :not(.visit-stamp) { opacity: .55; filter: grayscale(.8); }
+        .is-visited > .timeline-nav { opacity: .75; }
+        /* 右邊留出印章的位置，印章不壓到地點名稱 */
+        .timeline-item.is-visited > .timeline-open,
+        .timeline-sub-item.is-visited > .timeline-open { padding-right: 52px; }
+        .timeline-group.is-visited .timeline-left { padding-right: 50px; }
+        .visit-stamp {
+            position: absolute;
+            z-index: 1;
+            top: 50%;
+            right: 68px;
+            display: grid;
+            place-items: center;
+            width: 46px;
+            height: 46px;
+            margin-top: -23px;
+            border: 2.5px solid var(--stamp);
+            border-radius: 50%;
+            color: var(--stamp);
+            font-size: 14px;
+            letter-spacing: .08em;
+            transform: rotate(-14deg);
+            opacity: .85;
+            mix-blend-mode: multiply;
+            pointer-events: none;
+        }
+        .visit-stamp::after { content: ""; position: absolute; inset: 3px; border: 1px solid var(--stamp); border-radius: 50%; }
+        [data-theme="night"] .visit-stamp { mix-blend-mode: normal; }
+        .timeline-group.is-visited .visit-stamp { top: 30px; right: 62px; }
+        /* 現在的行程：呼吸般的光暈＋時間下方「現在」（不只靠動畫表示） */
+        .home-timeline > .is-now {
+            border-color: var(--ink);
+            box-shadow: 0 2px 0 var(--line), 0 0 0 3px color-mix(in srgb, var(--accent) 55%, transparent);
+            animation: breathe 2.8s ease-in-out infinite;
+        }
+        @keyframes breathe {
+            0%, 100% { box-shadow: 0 2px 0 var(--line), 0 0 0 3px color-mix(in srgb, var(--accent) 55%, transparent); }
+            50% { box-shadow: 0 2px 0 var(--line), 0 0 0 8px color-mix(in srgb, var(--accent) 18%, transparent); }
+        }
+        .time-now {
+            display: block;
+            width: fit-content;
+            margin-top: 3px;
+            padding: 0 6px;
+            border-radius: 5px;
+            background: var(--accent);
+            color: var(--on-accent);
+            font-size: calc(12px * var(--fs));
+            line-height: 1.5;
+        }
         /* 點左邊打開詳細資訊（不直接跳到地圖 App） */
         .timeline-open {
             display: flex;
@@ -466,14 +520,6 @@
             line-height: 1.4;
             color: var(--ink);
             overflow-wrap: anywhere;
-        }
-        .timeline-stamp-pill {
-            font-size: calc(13px * var(--fs));
-            line-height: 1.5;
-            color: var(--stamp);
-            padding: 0 6px;
-            border: 1.5px solid var(--stamp);
-            border-radius: 8px;
         }
         .timeline-nav {
             display: inline-flex;
@@ -800,6 +846,7 @@
         }
         .setting p.setting-note { margin-top: 6px; font-size: calc(13px * var(--fs)); color: var(--ink-soft); }
         .setting .chip-btn.nav { min-height: 48px; }
+        .app-version { margin-top: 22px; font-size: calc(13px * var(--fs)); color: var(--ink-soft); text-align: center; font-variant-numeric: tabular-nums; }
 
         /* ---------- 時區：非當地時間標在時間下方 ---------- */
         .time-tz {
@@ -2094,6 +2141,7 @@
                     <p id="install-ios" class="setting-note" hidden>點 Safari 的分享按鈕 <svg class="ico" aria-label="分享"><use href="#i-share"/></svg>，再選「加入主畫面」。</p>
                     <p class="setting-note">加到主畫面後，沒有網路也能看行程。</p>
                 </section>
+                <p id="app-version" class="app-version"></p>
             </div>
         </div>
     </dialog>
@@ -2376,6 +2424,8 @@
     <script src="./vendor/leaflet/leaflet.js"></script>
     <script>
         // ✏️ 行程資料放在 data/trip.json，換一趟旅程只要換這個檔案
+        // 版本號：每次合回 dev 時更新（日期.當天第幾次），設定最下方顯示，回報問題時用來確認是哪一版
+        const APP_VERSION = '2026.10.10.1';
         const TRIP_URL = './data/trip.json';
         const INFO_URL = './data/info.json';
         const CHECKLIST_URL = './data/checklist.json';
@@ -3252,6 +3302,15 @@
 
         // ---------- 設定 sheet ----------
         const settings = $('#settings');
+        // 版本：網頁版本＋離線快取版本（從 sw.js 讀，讀不到就只顯示網頁版本）
+        $('#app-version').textContent = `版本 ${APP_VERSION}`;
+        fetch('./sw.js', { cache: 'no-cache' })
+            .then((res) => (res.ok ? res.text() : ''))
+            .then((text) => {
+                const m = /const VERSION = '([^']+)'/.exec(text);
+                if (m) $('#app-version').textContent = `版本 ${APP_VERSION}・離線快取 ${m[1]}`;
+            })
+            .catch(() => {});
         function openSettings() {
             openSheet(settings);
         }
@@ -3584,13 +3643,13 @@
                     const c = catOf(item);
                     const isV = visited.has(item.id);
                     return `
-                        <div class="${withMeta ? 'timeline-item' : 'timeline-sub-item'}${isV ? ' is-visited' : ''}">
-                            <button class="timeline-open" type="button" data-open="${esc(item.id)}">
+                        <div class="${withMeta ? 'timeline-item' : 'timeline-sub-item'}${isV ? ' is-visited' : ''}"${withMeta && item.time ? ` data-time="${esc(item.time)}"` : ''}>
+                            ${isV ? '<span class="visit-stamp" aria-hidden="true">去過</span>' : ''}
+                            <button class="timeline-open" type="button" data-open="${esc(item.id)}"${isV ? ` aria-label="${esc(item.title)}（去過）"` : ''}>
                                 ${withMeta ? `<span class="timeline-time">${timeHTML(item)}</span>` : ''}
                                 <span class="timeline-text">
                                     ${withMeta ? `<span class="timeline-cat-pill" style="--cat:${c.color}">${icon(c.icon)}${esc(c.label)}</span>` : ''}
                                     <span class="timeline-title">${esc(item.title)}</span>
-                                    ${isV ? '<span class="timeline-stamp-pill">去過</span>' : ''}
                                 </span>
                             </button>
                             <a class="timeline-nav" href="${esc(mapLink(item))}" target="_blank" rel="noopener" aria-label="${esc(item.title)}：用 Google 地圖導航">${icon('nav')}導航</a>
@@ -3606,14 +3665,14 @@
                             const c = catOf(first);
                             const visitedCount = group.filter((it) => visited.has(it.id)).length;
                             return `
-                                <details class="timeline-group">
+                                <details class="timeline-group${visitedCount ? ' is-visited' : ''}"${first.time ? ` data-time="${esc(first.time)}"` : ''}>
                                     <summary class="timeline-summary">
+                                        ${visitedCount ? '<span class="visit-stamp" aria-hidden="true">去過</span>' : ''}
                                         <span class="timeline-time">${timeHTML(first)}</span>
                                         <span class="timeline-left">
                                             <span class="timeline-text">
                                                 <span class="timeline-cat-pill" style="--cat:${c.color}">${icon(c.icon)}${esc(c.label)}</span>
-                                                <span class="timeline-title">${esc(first.title)}</span>
-                                                ${visitedCount ? `<span class="timeline-stamp-pill">${visitedCount} 個去過</span>` : ''}
+                                                <span class="timeline-title">${esc(first.title)}${visitedCount ? '<span class="sr-only">（去過）</span>' : ''}</span>
                                             </span>
                                         </span>
                                         <span class="timeline-count-btn" aria-label="${group.length} 個選項">${group.length > 9 ? '9+' : group.length}${icon('chevron-down')}</span>
@@ -3626,8 +3685,41 @@
                     </div>`;
             }
 
+            markNow();
             fetchWeatherForDay(currentHomeDay);
         }
+
+        // 旅行當天：依現在時間標出「現在」的行程（最後一個已經開始的時段），每分鐘更新
+        function nowHM() {
+            try {
+                return new Intl.DateTimeFormat('en-GB', { timeZone: weatherConf.timezone !== 'auto' ? weatherConf.timezone : undefined, hour: '2-digit', minute: '2-digit', hourCycle: 'h23' }).format(new Date());
+            } catch (e) {
+                const d = new Date();
+                return `${String(d.getHours()).padStart(2, '0')}:${String(d.getMinutes()).padStart(2, '0')}`;
+            }
+        }
+        function markNow() {
+            const rows = Array.from(document.querySelectorAll('#home-today-list .home-timeline > [data-time]'));
+            const date = dateOfDay(currentHomeDay);
+            const isToday = Boolean(date) && date === todayIn(weatherConf.timezone);
+            const hm = nowHM();
+            const current = isToday ? rows.filter((r) => r.dataset.time <= hm).pop() : null;
+            rows.forEach((r) => {
+                const on = r === current;
+                r.classList.toggle('is-now', on);
+                const time = r.querySelector('.timeline-time');
+                let tag = time && time.querySelector('.time-now');
+                if (on && time && !tag) {
+                    tag = document.createElement('small');
+                    tag.className = 'time-now';
+                    tag.textContent = '現在';
+                    time.appendChild(tag);
+                } else if (!on && tag) {
+                    tag.remove();
+                }
+            });
+        }
+        setInterval(() => { if (root.dataset.view === 'home') markNow(); }, 60000);
 
         $('#home-today-list').addEventListener('click', (e) => {
             const btn = e.target.closest('[data-open]');

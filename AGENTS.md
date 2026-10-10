@@ -13,6 +13,7 @@
   - 預覽網址（每次 push 完都要附給使用者，使用者常用手機看）：`https://raw.githack.com/Nigel-wei-zhe/FUKUOKA/<commit sha>/index.html`；用 commit sha 才不會吃到 githack 幾分鐘的快取，分支名稱的網址可當固定入口
   - 每個網址路徑的 Service Worker 是分開的；`index.html`、`trip.json` 網路優先會馬上更新，其他檔案改了照規則把 `sw.js` 的 `VERSION` 加 1
   - githack 只當個人預覽用，不要當正式網址分享
+- **合回 `dev` 時更新版本號**：`index.html` 的 `APP_VERSION`（`日期.當天第幾次`，例如 `2026.10.10.2`），設定最下方會顯示，回報問題時用來確認是哪一版
 - **合回 `dev` 後就清掉功能分支**：確認已完整合進 `dev`（`git branch --merged dev`）後，刪掉本機和 `origin` 上的分支，只留 `main`、`dev`
 - 開發到差不多後，從 `dev` 對 `upstream` 開 PR 同步回原作者；開 PR 前先確認上游最新狀態，有衝突先在 `dev` 解掉
 - README 與下方提到的網址 `05131041.github.io` 是原作者的正式站，不要改成個人 fork 的網址
