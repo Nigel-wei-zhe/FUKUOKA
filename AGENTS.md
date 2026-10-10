@@ -13,6 +13,7 @@
   - 預覽網址（每次 push 完都要附給使用者，使用者常用手機看）：`https://raw.githack.com/Nigel-wei-zhe/FUKUOKA/<commit sha>/index.html`；用 commit sha 才不會吃到 githack 幾分鐘的快取，分支名稱的網址可當固定入口
   - 每個網址路徑的 Service Worker 是分開的；`index.html`、`trip.json` 網路優先會馬上更新，其他檔案改了照規則把 `sw.js` 的 `VERSION` 加 1
   - githack 只當個人預覽用，不要當正式網址分享
+- **試算表同步**：Actions 推到 `sync-sheet` 分支（每次強制覆蓋），跟功能分支一樣預覽後合回 `dev`、更新版本號、刪分支。地點有新字時 `check-trip` 會提醒，合併前跑 `subset-font.py` 並把 `sw.js` 的 `VERSION` 加 1
 - **合回 `dev` 時更新版本號**：`index.html` 的 `APP_VERSION`（`日期.當天第幾次`，例如 `2026.10.10.2`），設定最下方會顯示，回報問題時用來確認是哪一版
 - **合回 `dev` 後就清掉功能分支**：確認已完整合進 `dev`（`git branch --merged dev`）後，刪掉本機和 `origin` 上的分支，只留 `main`、`dev`
 - 開發到差不多後，從 `dev` 對 `upstream` 開 PR 同步回原作者；開 PR 前先確認上游最新狀態，有衝突先在 `dev` 解掉
@@ -27,6 +28,7 @@
 - `index.html`：整個頁面，CSS、SVG 圖示 sprite、JS 都在裡面；啟動時用 fetch 讀 `data/trip.json`
 - `sw.js`：Service Worker。`index.html`、`trip.json`、`info.json` 網路優先，其他同網域檔案快取優先，地圖圖磚另外快取
 - `fonts/huninn-subset.woff2`：只收錄用到的字的粉圓體子集；`huninn-subset.chars.txt` 是它收錄的字元清單
+- `tools/sheet-to-trip.mjs`：試算表 CSV 轉成 `trip.json` 的 `items`（欄位對應在 `tools/sheet-columns.mjs`；GitHub Actions `.github/workflows/sync-sheet.yml` 會呼叫它）；`tools/trip-to-csv.mjs` 反過來，只在第一次建立分頁時用
 - `tools/check-trip.mjs`：檢查 trip.json；`tools/subset-font.py`：重新產生字型子集
 - `vendor/leaflet/`：Leaflet 1.9.4，不要改
 
@@ -77,6 +79,7 @@ python3 tools/subset-font.py       # trip.json 或介面文字加了新字時執
 ## 不要做的事
 
 - 沒被要求就不要改 `trip.json` 的行程內容，資料是行程作者的
+- **不要直接改 `trip.json` 的 `items`**：地點的唯一來源是 Google 試算表的「網站用」分頁，改了會被下次同步蓋掉。要改地點請改試算表，再跑「同步試算表行程」（`tools/sheet-to-trip.mjs`）；`items` 以外的設定（天數標題、天氣、出發日期）照常改 `trip.json`
 - 不要加建置工具、框架或 npm 相依套件
 - 不要恢復 `user-scalable=no`，也不要用其他方式鎖住兩指放大（看不清楚的長輩要能自己放大）；「點兩下放大」已經用 `touch-action: manipulation` 關掉，避免連點按鈕時誤觸放大
 

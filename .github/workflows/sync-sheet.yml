@@ -1,0 +1,62 @@
+# 從 Google 試算表「網站用」分頁同步地點到 data/trip.json。
+# 在 GitHub 的 Actions → 同步試算表行程 → Run workflow 手動執行。
+# 有變動時推到 sync-sheet 分支，執行結果頁面會附上預覽連結；確認沒問題再合回 dev。
+# 試算表發布的 CSV 網址存在 repo 的 Secrets：SHEET_CSV_URL。
+name: 同步試算表行程
+
+on:
+  workflow_dispatch:
+    inputs:
+      allow_delete:
+        description: 允許一次刪除很多地點（確定試算表是對的才勾）
+        type: boolean
+        default: false
+
+permissions:
+  contents: write
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: dev
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: 讀試算表、轉成 trip.json
+        env:
+          SHEET_CSV_URL: ${{ secrets.SHEET_CSV_URL }}
+        run: node tools/sheet-to-trip.mjs ${{ inputs.allow_delete && '--allow-delete' || '' }}
+
+      - name: 檢查 trip.json 格式
+        run: |
+          set +e
+          node tools/check-trip.mjs > "$RUNNER_TEMP/check.txt" 2>&1
+          status=$?
+          cat "$RUNNER_TEMP/check.txt"
+          { echo '### 格式檢查'; echo '```'; cat "$RUNNER_TEMP/check.txt"; echo '```'; } >> "$GITHUB_STEP_SUMMARY"
+          exit $status
+
+      - name: 推到 sync-sheet 分支
+        run: |
+          if git diff --quiet -- data/trip.json; then
+            echo '試算表和網站一樣，沒有要更新的。' >> "$GITHUB_STEP_SUMMARY"
+            exit 0
+          fi
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git switch -c sync-sheet
+          git add data/trip.json
+          git commit -m '從試算表同步行程'
+          git push -f origin sync-sheet
+          sha=$(git rev-parse HEAD)
+          {
+            echo '### 預覽'
+            echo "https://raw.githack.com/${GITHUB_REPOSITORY}/${sha}/index.html"
+            echo ''
+            echo '確認沒問題再把 sync-sheet 合回 dev。'
+          } >> "$GITHUB_STEP_SUMMARY"
