@@ -1261,7 +1261,22 @@
         }
         .day-tab[aria-pressed="true"] small { color: var(--on-accent); opacity: .8; }
 
-        .cats { margin-top: 2px; }
+        .cats {
+            margin-top: 2px;
+            max-height: calc(44px * var(--fs) + 12px);
+            overflow-y: hidden;
+            transition: max-height .28s ease, opacity .2s ease, padding .28s ease, margin .28s ease, visibility 0s;
+        }
+        /* 行程頁往下捲時收起分類那排，往上捲就滑出來；天數按鈕一直留著 */
+        .toolbar.cats-hidden .cats {
+            max-height: 0;
+            margin-top: 0;
+            padding-top: 0;
+            padding-bottom: 0;
+            opacity: 0;
+            visibility: hidden;
+            transition: max-height .28s ease, opacity .2s ease, padding .28s ease, margin .28s ease, visibility 0s .28s;
+        }
         .cat-chip {
             flex: none;
             display: inline-flex;
@@ -3506,6 +3521,40 @@
                 mascotTimer = setTimeout(() => { bubble.hidden = true; }, 320);
             }, 2600);
         });
+
+        // ---------- 行程頁：往下捲收起分類那排，往上捲就滑出來 ----------
+        // 收合時下面的內容會往上移，靠瀏覽器的捲動錨定維持位置；動畫期間不判斷，避免來回抖動
+        let catsLastY = window.scrollY;
+        let catsLockUntil = 0;
+        let catsLastH = 0;
+        let catsQueued = false;
+        function updateCatsBar() {
+            catsQueued = false;
+            const y = window.scrollY;
+            const dy = y - catsLastY;
+            catsLastY = y;
+            const toolbar = $('.toolbar');
+            if (root.dataset.view !== 'list' || state.day === 'prep') {
+                toolbar.classList.remove('cats-hidden');
+                return;
+            }
+            // 篩選列高度正在變（收合動畫中，瀏覽器會自動調整捲動位置）：這段位移不是使用者捲的，不算
+            const h = toolbar.offsetHeight;
+            const resizing = h !== catsLastH;
+            catsLastH = h;
+            if (resizing || performance.now() < catsLockUntil) return;
+            const hidden = toolbar.classList.contains('cats-hidden');
+            let next = hidden;
+            if (y < 60 || dy < -6) next = false;
+            else if (dy > 6 && y > 120) next = true;
+            if (next !== hidden) {
+                toolbar.classList.toggle('cats-hidden', next);
+                catsLockUntil = performance.now() + 350;
+            }
+        }
+        window.addEventListener('scroll', () => {
+            if (!catsQueued) { catsQueued = true; requestAnimationFrame(updateCatsBar); }
+        }, { passive: true });
 
         // ---------- 首頁當天天氣與當日行程邏輯 ----------
         let currentHomeDay = 1;
