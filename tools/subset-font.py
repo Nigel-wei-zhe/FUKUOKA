@@ -30,7 +30,7 @@ def main():
         urllib.request.urlretrieve(SOURCE_URL, CACHE)
 
     text = ''
-    for name in ('index.html', 'data/trip.json', 'data/info.json', 'data/checklist.json', 'manifest.webmanifest'):
+    for name in ('index.html', 'data/trip.json', 'data/info.json', 'data/checklist.json', 'data/ui.json', 'manifest.webmanifest'):
         text += (ROOT / name).read_text(encoding='utf-8')
     chars = set(text) | set(EXTRA) | {chr(c) for c in range(0x20, 0x7F)}
     chars = ''.join(sorted(c for c in chars if ord(c) >= 0x20))

@@ -20,6 +20,7 @@
 ## 檔案地圖
 
 - `data/trip.json`：行程資料（旅程名稱、每天標題、所有地點）。格式規格是 `data/trip.schema.json`，以 schema 為準
+- `data/ui.json`：介面上的趣味文字（明太子的對話等），跟旅程無關，換旅程時沿用
 - `data/checklist.json`：行程頁「行前」的自檢表；勾選紀錄存在 localStorage `trip:<旅程 id>:checklist`，靠項目 `id` 對應，不要改已有的 `id`
 - `data/info.json`：「資訊」分頁的內容（指指卡、退稅、入境規定、緊急聯絡）。指指卡的日文句子要用日本當地自然的說法。規定類的內容要附官方來源連結，並更新 `updated`
 - `index.html`：整個頁面，CSS、SVG 圖示 sprite、JS 都在裡面；啟動時用 fetch 讀 `data/trip.json`
@@ -38,7 +39,7 @@ python3 tools/subset-font.py       # trip.json 或介面文字加了新字時執
 
 ## 規則
 
-- **內容和設定放在 JSON，不要寫死在 `index.html`**：行程、資訊頁內容，以及跟這趟旅程有關的文字、數字、座標（城市名稱、天氣用的經緯度、時間說明、聯絡電話等）都放在 `data/*.json`，頁面只負責讀取和顯示，換一趟旅程只要換 JSON。新增 JSON 檔要加進 `sw.js` 的 `CORE_FILES` 和網路優先的清單，並在 README 說明欄位。按鈕名稱、錯誤訊息這類介面固定文字可以留在頁面裡
+- **內容和設定放在 JSON，不要寫死在 `index.html`**：行程、資訊頁內容，以及跟這趟旅程有關的文字、數字、座標（城市名稱、天氣用的經緯度、時間說明、聯絡電話等）都放在 `data/*.json`，頁面只負責讀取和顯示，換一趟旅程只要換 JSON。`trip.json` 只放這趟旅行本身的資料（天數、地點、住宿、天氣地點）；跟旅程無關的介面文字放 `ui.json`，資訊頁放 `info.json`，自檢表放 `checklist.json`。新增 JSON 檔要加進 `sw.js` 的 `CORE_FILES` 和網路優先的清單，並在 README 說明欄位。按鈕名稱、錯誤訊息這類介面固定文字可以留在頁面裡
 - **路徑一律用相對路徑**（`./data/trip.json`），不要用 `/` 開頭；網站在 `/FUKUOKA/` 子路徑底下
 - **不要引用 CDN**。要離線可用，所有 JS、CSS、字型都放在 repo 裡；新增的檔案要加進 `sw.js` 的 `CORE_FILES`
 - **改了 `index.html`、`trip.json` 以外的檔案**（字型、圖示、Leaflet、manifest），要把 `sw.js` 的 `VERSION` 加 1，否則已安裝的手機不會更新
