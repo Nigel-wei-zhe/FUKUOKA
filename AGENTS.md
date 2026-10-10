@@ -1,6 +1,6 @@
 # AGENTS.md
 
-福岡旅行行程的手機網頁（PWA）。純靜態網站，沒有建置流程，部署在 GitHub Pages 的子路徑 `https://05131041.github.io/FUKUOKA/`。給人看的說明在 `README.md`。
+福岡旅行行程的手機網頁（PWA）。純靜態網站，沒有建置流程，部署在 GitHub Pages 的子路徑 `https://05131041.github.io/FUKUOKA/`。給人看的說明在 `README.md`，**視覺風格（顏色、字級、圓角、元件樣式）在 `DESIGN.md`，改畫面前先讀**。
 
 ## 分支與部署（個人 fork 的開發流程）
 
