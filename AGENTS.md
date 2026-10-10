@@ -76,7 +76,7 @@ python3 tools/subset-font.py       # trip.json 或介面文字加了新字時執
 
 - 沒被要求就不要改 `trip.json` 的行程內容，資料是行程作者的
 - 不要加建置工具、框架或 npm 相依套件
-- 不要恢復 `user-scalable=no`
+- 不要恢復 `user-scalable=no`，也不要用其他方式鎖住兩指放大（看不清楚的長輩要能自己放大）；「點兩下放大」已經用 `touch-action: manipulation` 關掉，避免連點按鈕時誤觸放大
 
 ## 改完怎麼驗證
 

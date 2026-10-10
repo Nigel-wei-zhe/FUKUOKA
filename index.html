@@ -126,6 +126,9 @@
 
         /* ---------- 基礎 ---------- */
         *, *::before, *::after { box-sizing: border-box; }
+        /* 關掉「點兩下放大」，避免長輩連點按鈕時畫面突然放大；兩指放大仍然可以用。
+           用 :where 讓權重為 0，把手、地圖等自己設定 touch-action 的元件不受影響 */
+        :where(*) { touch-action: manipulation; }
         html {
             -webkit-text-size-adjust: 100%;
             text-size-adjust: 100%;
