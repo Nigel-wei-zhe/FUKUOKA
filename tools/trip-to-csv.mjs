@@ -14,8 +14,14 @@ const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), '..');
 const trip = JSON.parse(readFileSync(resolve(ROOT, 'data/trip.json'), 'utf8'));
 
 const rows = [COLUMNS.map((c) => c.header)];
+const named = new Set();
 for (const item of trip.items) {
   const row = { ...item, ...splitDesc(item.desc) };
+  // 當天標題只填在每天的第一列
+  if (!named.has(item.day)) {
+    named.add(item.day);
+    row.dayName = (trip.days || []).find((d) => d.day === item.day)?.name || '';
+  }
   rows.push(COLUMNS.map((c) => (row[c.key] == null ? '' : row[c.key])));
 }
 process.stdout.write(toCSV(rows));

@@ -1,4 +1,5 @@
 // 試算表「網站用」分頁的欄位，和 trip.json 地點欄位的對應。
+// 「當天標題」不是地點的欄位，是 trip.json 的 days[].name：同一天只要在其中一列填。
 // tools/trip-to-csv.mjs 和 tools/sheet-to-trip.mjs 共用，改欄位只改這裡。
 
 export const COLUMNS = [
@@ -16,7 +17,8 @@ export const COLUMNS = [
   { header: '緯度', key: 'lat' },
   { header: '經度', key: 'lng' },
   { header: '日文名稱', key: 'ja' },
-  { header: '日文地址', key: 'address' }
+  { header: '日文地址', key: 'address' },
+  { header: '當天標題', key: 'dayName' }
 ];
 
 // 說明、營業時間、訂位在 trip.json 裡合在 desc 一個欄位，頁面再拆開顯示（index.html 的 parseDesc）

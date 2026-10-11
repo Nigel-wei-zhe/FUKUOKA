@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 // 把 Google 試算表「網站用」分頁（發布成 CSV）轉成 data/trip.json 的地點（items）。
-// trip.json 其他欄位（旅程名稱、天數標題、天氣、出發日期）不動，只換掉 items。
+// 「當天標題」欄有填的話，一起更新 days[].name；trip.json 其他欄位（旅程名稱、天氣、出發日期）不動。
 //
 // 用法（在專案根目錄執行，不需要安裝套件，Node 18 以上）：
 //   SHEET_CSV_URL=<發布的 CSV 網址> node tools/sheet-to-trip.mjs
@@ -57,6 +57,7 @@ const old = JSON.parse(readFileSync(TRIP, 'utf8'));
 const items = [];
 const seen = new Map();
 const pending = []; // 要從地圖連結補經緯度的地點
+const dayNames = new Map(); // 第幾天 → { name, line }：試算表填的當天標題
 
 rows.forEach((cells, i) => {
   const line = i + 2; // 試算表的列號（第 1 列是標題）
@@ -107,6 +108,13 @@ rows.forEach((cells, i) => {
   if (item.category === '住宿' && (!item.ja || !item.address)) {
     warnings.push(`${where}：住宿最好填日文名稱和日文地址，指指卡「帶我回飯店」要給司機看`);
   }
+  const dayName = get('dayName');
+  if (dayName && day >= 1) {
+    const prev = dayNames.get(day);
+    if (!prev) dayNames.set(day, { name: dayName, line });
+    else if (prev.name !== dayName) errors.push(`${where}：第 ${day} 天的當天標題「${dayName}」和第 ${prev.line} 列的「${prev.name}」不一樣。同一天只要在其中一列填，其他列空著`);
+  }
+
   if ((lat === '' || lng === '') && lat !== null && lng !== null) pending.push({ item, where });
   items.push(item);
 });
@@ -148,19 +156,26 @@ if (errors.length) {
   process.exit(1);
 }
 
-summary.push(`試算表共 ${items.length} 個地點：新增 ${added.length}、修改 ${changed.length}、刪除 ${removed.length}`);
+// 當天標題：試算表有填才改，沒填的天維持 trip.json 原本的標題
+const oldDays = old.days || [];
+const renamed = [...dayNames].sort((a, b) => a[0] - b[0])
+  .map(([day, { name }]) => ({ day, name, from: oldDays.find((d) => d.day === day)?.name }))
+  .filter((d) => d.name !== d.from);
+
+summary.push(`試算表共 ${items.length} 個地點：新增 ${added.length}、修改 ${changed.length}、刪除 ${removed.length}${renamed.length ? `；當天標題改了 ${renamed.length} 天` : ''}`);
 added.forEach((it) => summary.push(`＋ 新增 第 ${it.day} 天 ${it.time || '未定'} ${it.title}（id ${it.id}）`));
 changed.forEach((it) => summary.push(`～ 修改 ${it.title}（id ${it.id}）：${diffFields(before.get(it.id), it).join('、')}`));
 removed.forEach((it) => summary.push(`－ 刪除 ${it.title}（id ${it.id}）：這個地點的蓋章紀錄也會不見`));
+renamed.forEach((d) => summary.push(`～ 第 ${d.day} 天標題：${d.from ? `${d.from} → ` : '新增 '}${d.name}`));
 
 report();
 
-if (!added.length && !changed.length && !removed.length) {
+if (!added.length && !changed.length && !removed.length && !renamed.length) {
   console.log('\n和現在的 trip.json 一樣，不用更新。');
 } else if (dryRun) {
   console.log('\n--dry-run：只檢查，沒有寫入。');
 } else {
-  writeFileSync(TRIP, replaceItems(readFileSync(TRIP, 'utf8'), items.map(clean)));
+  writeFileSync(TRIP, renameDays(replaceItems(readFileSync(TRIP, 'utf8'), items.map(clean)), renamed));
   console.log('\n已更新 data/trip.json，接著執行 node tools/check-trip.mjs 檢查。');
 }
 
@@ -246,6 +261,29 @@ function diffFields(a, b) {
   const ca = clean(a);
   const cb = clean(b);
   return Object.keys(names).filter((k) => JSON.stringify(ca[k]) !== JSON.stringify(cb[k])).map((k) => names[k]);
+}
+
+// 只換掉每天那一行的 "name"，排版保持原樣；新的一天加在 days 最後一行；格式認不出來才整個重新排版
+function renameDays(text, list) {
+  for (const { day, name } of list) {
+    const re = new RegExp(`(\\{\\s*"day"\\s*:\\s*${day}\\s*,\\s*"name"\\s*:\\s*)"(?:[^"\\\\]|\\\\.)*"`);
+    const block = /("days"\s*:\s*\[[\s\S]*?\})(\s*\n\s*\])/;
+    if (re.test(text)) {
+      text = text.replace(re, (_, head) => head + JSON.stringify(name));
+    } else if (block.test(text)) {
+      // 新的一天加在 days 最後面
+      text = text.replace(block, (_, body, tail) => `${body},\n    { "day": ${day}, "name": ${JSON.stringify(name)} }${tail}`);
+    } else {
+      const data = JSON.parse(text);
+      const days = data.days || (data.days = []);
+      const found = days.find((d) => d.day === day);
+      if (found) found.name = name;
+      else days.push({ day, name });
+      days.sort((a, b) => a.day - b.day);
+      text = replaceItems(JSON.stringify(data, null, 2) + '\n', data.items);
+    }
+  }
+  return text;
 }
 
 // 只換掉 "items": [ … ] 這一段，其他內容和排版保持原樣；一個地點一行，換天的地方空一行

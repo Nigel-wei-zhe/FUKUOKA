@@ -79,7 +79,7 @@ python3 tools/subset-font.py       # trip.json 或介面文字加了新字時執
 ## 不要做的事
 
 - 沒被要求就不要改 `trip.json` 的行程內容，資料是行程作者的
-- **不要直接改 `trip.json` 的 `items`**：地點的唯一來源是 Google 試算表的「網站用」分頁，改了會被下次同步蓋掉。要改地點請改試算表，再跑「同步試算表行程」（`tools/sheet-to-trip.mjs`）；`items` 以外的設定（天數標題、天氣、出發日期）照常改 `trip.json`
+- **不要直接改 `trip.json` 的 `items`**：地點的唯一來源是 Google 試算表的「網站用」分頁，改了會被下次同步蓋掉。要改地點請改試算表，再跑「同步試算表行程」（`tools/sheet-to-trip.mjs`）。每天的標題（`days[].name`）也以試算表的「當天標題」欄為準；其他設定（天氣、出發日期）照常改 `trip.json`
 - 不要加建置工具、框架或 npm 相依套件
 - 不要恢復 `user-scalable=no`，也不要用其他方式鎖住兩指放大（看不清楚的長輩要能自己放大）；「點兩下放大」已經用 `touch-action: manipulation` 關掉，避免連點按鈕時誤觸放大
 
