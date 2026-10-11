@@ -2566,6 +2566,10 @@
             const d = new Date(Date.parse(ymd));
             return `${d.getUTCMonth() + 1}/${d.getUTCDate()}（${'日一二三四五六'[d.getUTCDay()]}）`;
         }
+        function shortDate(ymd) {
+            const [, m, d] = ymd.split('-').map(Number);
+            return `${m}/${d}`;
+        }
         function dayLabel(n) {
             return `第 ${n} 天`;
         }
@@ -2586,12 +2590,12 @@
         function renderFilters() {
             const dayTabs = [`<button class="day-tab" type="button" data-day="prep" aria-pressed="false"><small id="prep-progress">自檢表</small><span>行前</span></button>`]
                 .concat(days.map((d) => {
-                    // 有出發日期就在天數旁邊加上日期，例如「第 1 天・11/21（六）」
+                    // 有出發日期就在天數旁邊加上日期，例如「第 1 天・11/21」；不放星期，按鈕才不會比地名寬
                     const date = dateOfDay(d.day);
-                    const sub = date ? `${dayLabel(d.day)}・${dateLabel(date)}` : dayLabel(d.day);
+                    const sub = date ? `${dayLabel(d.day)}・${shortDate(date)}` : dayLabel(d.day);
                     return d.name
                         ? `<button class="day-tab" type="button" data-day="${d.day}" aria-pressed="false"><small>${sub}</small><span>${esc(d.name)}</span></button>`
-                        : `<button class="day-tab" type="button" data-day="${d.day}" aria-pressed="false">${date ? `<small>${dateLabel(date)}</small>` : ''}<span>${dayLabel(d.day)}</span></button>`;
+                        : `<button class="day-tab" type="button" data-day="${d.day}" aria-pressed="false">${date ? `<small>${shortDate(date)}</small>` : ''}<span>${dayLabel(d.day)}</span></button>`;
                 }));
             $('#day-tabs').innerHTML = dayTabs.join('');
             syncPressed($('#day-tabs'), 'day', state.day);
