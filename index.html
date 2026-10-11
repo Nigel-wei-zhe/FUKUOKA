@@ -2743,7 +2743,7 @@
                             <h2 class="day-title">
                                 <span class="tape" style="--tape:${tapeColors[(day - 1) % tapeColors.length]}">${dayLabel(day)}</span>
                                 ${info ? esc(info.name) : ''}
-                                <small>${dayItems.length} 個地點</small>
+                                <small>${dateOfDay(day) ? `${dateLabel(dateOfDay(day))}・` : ''}${dayItems.length} 個地點</small>
                                 ${items.filter((it) => it.day == day).every((it) => visited.has(it.id)) ? '<span class="day-done">完成</span>' : ''}
                             </h2>
                             <ol class="stops">${groupStops(dayItems).map(stopHTML).join('')}</ol>
