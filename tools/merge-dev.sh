@@ -18,7 +18,7 @@ run() { if [ -n "$DRY" ]; then echo "  (dry-run) $*"; else "$@"; fi; }
 
 # 在目前所在的 repo 執行（不是腳本所在的資料夾），測試時才不會動到別的 repo
 cd "$(git rev-parse --show-toplevel)" || die '要在 git repo 裡執行'
-[ -z "$(git status --porcelain)" ] || die '有還沒 commit 的變更，先 commit 或收起來（git stash）'
+[ -z "$(git status --porcelain --untracked-files=no)" ] || die '有還沒 commit 的變更，先 commit 或收起來（git stash）'
 
 if [ $# -eq 0 ]; then
   cur=$(git rev-parse --abbrev-ref HEAD)
