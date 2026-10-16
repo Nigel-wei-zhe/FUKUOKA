@@ -151,4 +151,5 @@ python3 -m http.server 8000
 | `vendor/leaflet/` | Leaflet 1.9.4，BSD-2-Clause |
 | `tools/check-trip.mjs` | 檢查 `trip.json` |
 | `tools/subset-font.py` | 重新產生字型子集 |
+| `tools/shot.mjs` | 用無頭 Chrome 截手機畫面（`node tools/shot.mjs 行程 --fs 標準,特大 --theme 白天,夜晚`），需要裝 Chrome |
 | `AGENTS.md`、`CLAUDE.md` | 給 AI 程式助理看的專案說明 |

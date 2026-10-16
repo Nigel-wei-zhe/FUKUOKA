@@ -29,7 +29,7 @@
 - `sw.js`：Service Worker。`index.html`、`trip.json`、`info.json` 網路優先，其他同網域檔案快取優先，地圖圖磚另外快取
 - `fonts/huninn-subset.woff2`：只收錄用到的字的粉圓體子集；`huninn-subset.chars.txt` 是它收錄的字元清單
 - `tools/sheet-to-trip.mjs`：試算表 CSV 轉成 `trip.json` 的 `items`（欄位對應在 `tools/sheet-columns.mjs`；GitHub Actions `.github/workflows/sync-sheet.yml` 會呼叫它）；`tools/trip-to-csv.mjs` 反過來，只在第一次建立分頁時用
-- `tools/check-trip.mjs`：檢查 trip.json；`tools/subset-font.py`：重新產生字型子集
+- `tools/check-trip.mjs`：檢查 trip.json；`tools/subset-font.py`：重新產生字型子集；`tools/shot.mjs`：無頭 Chrome 截手機畫面
 - `vendor/leaflet/`：Leaflet 1.9.4，不要改
 
 ## 常用指令
@@ -38,7 +38,10 @@
 node tools/check-trip.mjs          # 改完 trip.json 一定要跑；有錯誤時結束代碼為 1
 python3 -m http.server 8000        # 預覽：http://localhost:8000/（直接開 file:// 讀不到 JSON）
 python3 tools/subset-font.py       # trip.json 或介面文字加了新字時執行（需要 pip install fonttools brotli）
+node tools/shot.mjs 行程 --day 2 --fs 標準,特大 --theme 白天,夜晚   # 360px 手機截圖，多個組合並排成一張；印出圖片路徑
 ```
+
+改畫面後用 `tools/shot.mjs` 截圖確認，不要另外寫截圖用的頁面。其他選項：`--info 退稅`（資訊頁分類）、`--open 設定`／`--open 地點:<id>`（打開 sheet）、`--scroll 600`、`--height 800`、`--eval "<JS>"`；說明在檔案開頭。找不到的按鈕會寫在圖片的標題上
 
 ## 規則
 
@@ -86,7 +89,7 @@ python3 tools/subset-font.py       # trip.json 或介面文字加了新字時執
 ## 改完怎麼驗證
 
 1. `node tools/check-trip.mjs` 沒有錯誤
-2. 用本機伺服器打開，在 360px 寬度下檢查白天、夜晚兩種模式（右上角切換），以及字級「特大」（右上角設定）
+2. 在 360px 寬度下檢查白天、夜晚兩種模式，以及字級「特大」：`node tools/shot.mjs <頁面> --fs 標準,特大 --theme 白天,夜晚` 一次截四種
 3. 切到地圖分頁、從行程卡片按「看地圖」，確認會定位到該地點
 4. 開發者工具切到離線後重新整理，行程仍然正常顯示
 5. 用「特大」字級從頭操作一次新功能：字有沒有被截掉、按鈕好不好按、會不會需要人教
