@@ -2,22 +2,12 @@
 
 福岡旅行行程的手機網頁（PWA）。純靜態網站，沒有建置流程，部署在 GitHub Pages 的子路徑 `https://05131041.github.io/FUKUOKA/`。給人看的說明在 `README.md`，**視覺風格（顏色、字級、圓角、元件樣式）在 `DESIGN.md`，改畫面前先讀**。
 
-## 分支與部署（個人 fork 的開發流程）
+## 版本號與部署
 
-這個 repo 是 fork，先在個人 `dev` 開發，穩定後再同步回原作者。
-
-- `origin`：個人 fork `Nigel-wei-zhe/FUKUOKA`；`upstream`：原作者 `05131041/FUKUOKA`
-- **開發都在 `dev` 分支**。`main` 是舊的單檔版本，不在上面開發
-- 個人 fork 的 GitHub Pages 來源是 `dev` 分支根目錄（Deploy from a branch，沒有 Actions workflow）。**push 到 `origin/dev` 就會自動部署**到 `https://nigel-wei-zhe.github.io/FUKUOKA/`，可當作預覽站
-- **小功能先開功能分支**：從 `dev` 開 `feat-<名稱>`（不用 `/`），push 到 `origin` 後用 raw.githack 預覽，確認沒問題再合回 `dev`，避免 `dev` 頻繁部署、也讓多個功能互不覆蓋
-  - 預覽網址（每次 push 完都要附給使用者，使用者常用手機看）：`https://raw.githack.com/Nigel-wei-zhe/FUKUOKA/<commit sha>/index.html`；用 commit sha 才不會吃到 githack 幾分鐘的快取，分支名稱的網址可當固定入口
-  - 每個網址路徑的 Service Worker 是分開的；`index.html`、`trip.json` 網路優先會馬上更新，其他檔案改了照規則把 `sw.js` 的 `VERSION` 加 1
-  - githack 只當個人預覽用，不要當正式網址分享
-- **試算表同步**：Actions 推到 `sync-sheet` 分支（每次強制覆蓋），跟功能分支一樣預覽後合回 `dev`、更新版本號、刪分支。地點有新字時 `check-trip` 會提醒，合併前跑 `subset-font.py` 並把 `sw.js` 的 `VERSION` 加 1
-- **合回 `dev` 時更新版本號**：`index.html` 的 `APP_VERSION`（`日期.當天第幾次`，例如 `2026.10.10.2`），設定最下方會顯示，回報問題時用來確認是哪一版
-- **合回 `dev` 後就清掉功能分支**：確認已完整合進 `dev`（`git branch --merged dev`）後，刪掉本機和 `origin` 上的分支，只留 `main`、`dev`
-- 開發到差不多後，從 `dev` 對 `upstream` 開 PR 同步回原作者；開 PR 前先確認上游最新狀態，有衝突先在 `dev` 解掉
-- README 與下方提到的網址 `05131041.github.io` 是原作者的正式站，不要改成個人 fork 的網址
+- GitHub Pages 從分支根目錄部署（Deploy from a branch，沒有建置），push 就會更新網站
+- **發布時更新版本號**：`index.html` 的 `APP_VERSION`（`日期.當天第幾次`，例如 `2026.10.10.2`），設定最下方會顯示，回報問題時用來確認是哪一版
+- **試算表同步**：GitHub Actions「同步試算表行程」有變動時推到 `sync-sheet` 分支（每次強制覆蓋），預覽沒問題再合回。地點有新字時 `check-trip` 會提醒，合併前跑 `subset-font.py` 並把 `sw.js` 的 `VERSION` 加 1
+- 個人的分支、預覽、合併流程寫在 `CLAUDE.local.md`（不進 git）
 
 ## 檔案地圖
 

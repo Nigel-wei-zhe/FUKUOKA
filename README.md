@@ -13,7 +13,7 @@
 1. 在試算表「網站用」分頁新增或修改一列（一列一個地點，欄位見下方）
 2. 等幾分鐘讓發布的 CSV 更新，到 GitHub 的「Actions → 同步試算表行程 → Run workflow」
 3. 有錯誤會寫出是第幾列、哪個欄位；成功的話推到 `sync-sheet` 分支，執行結果頁面有預覽連結
-4. 預覽沒問題，把 `sync-sheet` 合回 `dev`
+4. 預覽沒問題，把 `sync-sheet` 合回開發分支（個人 fork 是 `dev`）
 
 也可以在自己電腦上跑：
 
@@ -152,4 +152,5 @@ python3 -m http.server 8000
 | `tools/check-trip.mjs` | 檢查 `trip.json` |
 | `tools/subset-font.py` | 重新產生字型子集 |
 | `tools/shot.mjs` | 用無頭 Chrome 截手機畫面（`node tools/shot.mjs 行程 --fs 標準,特大 --theme 白天,夜晚`），需要裝 Chrome |
+| `tools/merge-dev.sh` | 功能分支合回 `dev`：rebase、更新版本號、push、刪分支（`--dry-run` 只列出步驟） |
 | `AGENTS.md`、`CLAUDE.md` | 給 AI 程式助理看的專案說明 |
