@@ -732,7 +732,7 @@
         /* 明太子：偶爾眨眼；點了跳一下 */
         .scene .mascot-eye { transform-box: fill-box; transform-origin: center; animation: blink 5.5s infinite; }
         .scene .mascot-body { transform-box: fill-box; transform-origin: 50% 100%; }
-        .scene .mascot-body.is-hopping { animation: hop .6s cubic-bezier(.3, 1.5, .5, 1); }
+        .scene .mascot-body.is-hopping { animation: hop .6s cubic-bezier(.22, 1, .36, 1); }
         @keyframes twinkle { 0%, 100% { opacity: 1; transform: scale(1); } 50% { opacity: .35; transform: scale(.7); } }
         @keyframes lamp { 0%, 100% { opacity: 1; } 45% { opacity: .75; } 55% { opacity: .9; } }
         @keyframes flap { 0%, 100% { transform: scaleY(1); } 50% { transform: scaleY(.45); } }
@@ -762,7 +762,7 @@
             font-size: calc(15px * var(--fs));
             line-height: 1.4;
             box-shadow: var(--shadow);
-            animation: bubble-in .25s cubic-bezier(.3, 1.5, .5, 1);
+            animation: bubble-in .25s cubic-bezier(.22, 1, .36, 1);
         }
         .mascot-bubble::after {
             content: "";
@@ -1178,7 +1178,7 @@
         .list-end-art .end-mascot, .list-end-art .end-flag { transform-box: fill-box; }
         .list-end-art .end-mascot { transform-origin: 50% 100%; }
         .list-end-art .end-flag { transform-origin: 0 50%; }
-        .list-end.is-in .end-mascot { animation: hop .6s cubic-bezier(.3, 1.5, .5, 1) 2; }
+        .list-end.is-in .end-mascot { animation: hop .6s cubic-bezier(.22, 1, .36, 1) 2; }
         .list-end.is-in .end-flag { animation: wave .5s ease-in-out 4 alternate; }
         @keyframes wave { from { transform: skewY(0) scaleX(1); } to { transform: skewY(-8deg) scaleX(.9); } }
         .list-end-text { font-size: calc(16px * var(--fs)); color: var(--ink-soft); }
@@ -1224,7 +1224,7 @@
         }
         .done-stamp::after { content: ""; position: absolute; inset: 4px; border: 1px solid var(--stamp); border-radius: 50%; }
         .checklist.is-done .done-stamp { display: grid; }
-        .checklist.just-done .done-stamp { animation: stamp-in .32s cubic-bezier(.3, 1.6, .5, 1); }
+        .checklist.just-done .done-stamp { animation: stamp-in .32s cubic-bezier(.22, 1, .36, 1); }
         .check-items { margin-top: 6px; }
         .check-items li + li { border-top: 1px solid var(--line); }
         .check-row {
@@ -1735,7 +1735,7 @@
         }
         .stamp-btn[aria-pressed="true"] .stamp-empty { display: none; }
         .stamp-btn[aria-pressed="true"] .stamp-done { display: inline; }
-        .card.just-stamped .stamp-btn { animation: stamp-in .32s cubic-bezier(.3, 1.6, .5, 1); }
+        .card.just-stamped .stamp-btn { animation: stamp-in .32s cubic-bezier(.22, 1, .36, 1); }
         .card.just-stamped { animation: thud .28s ease-out; }
         @keyframes thud { 30% { transform: translateY(2px) scale(.995); } }
         /* 蓋章時濺出的墨點 */
@@ -1767,7 +1767,7 @@
             line-height: 1.5;
             transform: rotate(-8deg);
         }
-        .day-done.just-done { animation: stamp-in .32s cubic-bezier(.3, 1.6, .5, 1); }
+        .day-done.just-done { animation: stamp-in .32s cubic-bezier(.22, 1, .36, 1); }
         @keyframes stamp-in {
             from { transform: rotate(-30deg) scale(1.6); opacity: 0; }
             to { transform: rotate(-14deg) scale(1); opacity: .85; }
@@ -1899,7 +1899,7 @@
         .leaflet-bar { border: 1.5px solid var(--ink) !important; border-radius: 14px !important; overflow: hidden; box-shadow: var(--shadow) !important; }
         .leaflet-bar a { background: var(--card); color: var(--ink); border-bottom-color: var(--line) !important; width: 44px !important; height: 44px !important; line-height: 42px !important; font-size: 22px !important; }
         .leaflet-bar a:hover { background: var(--paper-2); }
-        .leaflet-control-attribution { background: color-mix(in srgb, var(--card) 85%, transparent) !important; color: var(--ink-soft) !important; font-size: calc(10px * var(--fs)); }
+        .leaflet-control-attribution { background: color-mix(in srgb, var(--card) 85%, transparent) !important; color: var(--ink-soft) !important; font-size: calc(12px * var(--fs)); }
         .leaflet-control-attribution a { color: var(--ink-soft) !important; }
         .leaflet-popup-content-wrapper {
             border: 1.5px solid var(--ink);
@@ -1931,7 +1931,7 @@
         }
         .pin .ico { width: 18px; height: 18px; transform: rotate(45deg); }
         /* 切換天數時圖釘一根接一根落下、彈一下 */
-        .pin.drop { animation: pin-drop .45s cubic-bezier(.3, 1.4, .5, 1) backwards; animation-delay: var(--delay, 0s); }
+        .pin.drop { animation: pin-drop .45s cubic-bezier(.22, 1, .36, 1) backwards; animation-delay: var(--delay, 0s); }
         @keyframes pin-drop {
             0% { transform: translateY(-28px) rotate(-45deg); opacity: 0; }
             100% { transform: translateY(0) rotate(-45deg); opacity: 1; }
