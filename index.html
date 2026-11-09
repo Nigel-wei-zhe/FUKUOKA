@@ -244,55 +244,6 @@
         }
         .home-hero-wrap .hero-text { padding-right: 20px; }
 
-        /* 旅行期間的首頁：先回答「下一站去哪」，封面插畫收起來 */
-        .home-pane.is-trip .scene { display: none; }
-        .home-pane.is-trip .home-hero-wrap { margin-bottom: 8px; }
-        .next-card {
-            margin-bottom: 20px;
-            padding: 16px 16px 16px;
-            border: 2px solid var(--ink);
-            border-radius: var(--r-card);
-            background: var(--card);
-            box-shadow: var(--shadow);
-        }
-        .next-card[hidden] { display: none; }
-        .next-label { display: flex; flex-wrap: wrap; align-items: center; gap: 6px 12px; }
-        .next-label .tape { font-size: calc(16px * var(--fs)); }
-        .next-time { font-size: calc(22px * var(--fs)); line-height: 1.2; color: var(--ink); font-variant-numeric: tabular-nums; }
-        .next-time small { margin-left: 4px; font-size: calc(14px * var(--fs)); color: var(--ink-soft); }
-        .next-count { font-size: calc(15px * var(--fs)); color: var(--ink-soft); }
-        .next-choice + .next-choice { margin-top: 14px; padding-top: 14px; border-top: 1.5px dashed var(--line); }
-        .next-cat {
-            display: inline-flex;
-            align-items: center;
-            gap: 4px;
-            margin-top: 12px;
-            font-size: calc(14px * var(--fs));
-            color: var(--ink-soft);
-        }
-        .next-cat .ico { width: 18px; height: 18px; color: var(--cat); }
-        .next-title {
-            margin-top: 2px;
-            font-size: calc(22px * var(--fs));
-            line-height: 1.35;
-            color: var(--ink);
-            overflow-wrap: anywhere;
-        }
-        .next-actions, .next-quick { display: flex; gap: 10px; margin-top: 12px; }
-        .next-actions .chip-btn, .next-quick .chip-btn { flex: 1 1 0; min-height: 52px; font-size: calc(17px * var(--fs)); }
-        .next-actions .chip-btn.nav { flex-grow: 1.4; }
-        .next-quick .chip-btn { min-height: 48px; font-size: calc(16px * var(--fs)); }
-        .next-actions .ico, .next-quick .ico { width: 22px; height: 22px; }
-        .next-now {
-            margin-top: 14px;
-            padding-top: 12px;
-            border-top: 1.5px dashed var(--line);
-            font-size: calc(15px * var(--fs));
-            line-height: 1.6;
-            color: var(--ink-soft);
-        }
-        .next-now b { font-weight: 400; color: var(--ink); }
-
         /* 天氣看板 */
         .weather-card {
             position: relative;
@@ -384,7 +335,7 @@
             letter-spacing: -0.02em;
         }
         .weather-desc-text {
-            font-size: calc(15px * var(--fs));
+            font-size: calc(14px * var(--fs));
             color: var(--ink-soft);
             margin-top: 2px;
         }
@@ -584,7 +535,7 @@
             border-radius: var(--r-inner);
             background: var(--accent);
             color: var(--on-accent);
-            font-size: calc(15px * var(--fs));
+            font-size: calc(13px * var(--fs));
             line-height: 1.2;
             text-decoration: none;
         }
@@ -893,7 +844,7 @@
             border-radius: var(--r-chip);
             font-size: calc(15px * var(--fs));
         }
-        .setting p.setting-note { margin-top: 6px; font-size: calc(15px * var(--fs)); color: var(--ink-soft); }
+        .setting p.setting-note { margin-top: 6px; font-size: calc(13px * var(--fs)); color: var(--ink-soft); }
         .setting .chip-btn.nav { min-height: 48px; }
         .app-version { margin-top: 22px; font-size: calc(13px * var(--fs)); color: var(--ink-soft); text-align: center; font-variant-numeric: tabular-nums; }
 
@@ -916,7 +867,7 @@
             display: flex;
             align-items: center;
             gap: 6px;
-            font-size: calc(15px * var(--fs));
+            font-size: calc(14px * var(--fs));
             color: var(--ink-soft);
         }
         .tz-note .ico { width: 16px; height: 16px; }
@@ -1250,7 +1201,7 @@
         .check-row:active .check-box { transform: scale(.9); }
         .check-text { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
         .check-title { font-size: calc(17px * var(--fs)); line-height: 1.45; color: var(--ink); overflow-wrap: anywhere; }
-        .check-note { font-size: calc(15px * var(--fs)); line-height: 1.5; color: var(--ink-soft); overflow-wrap: anywhere; }
+        .check-note { font-size: calc(14px * var(--fs)); line-height: 1.5; color: var(--ink-soft); overflow-wrap: anywhere; }
         .check-row[aria-checked="true"] .check-title { color: var(--ink-soft); text-decoration: line-through; text-decoration-thickness: 1.5px; }
 
         /* ---------- 篩選列（吸頂） ---------- */
@@ -1284,46 +1235,6 @@
         }
         .scroller::-webkit-scrollbar { display: none; }
 
-        /* 行程頁上方的天數列：前一天／目前這天（點開選單）／後一天 */
-        .day-bar {
-            display: grid;
-            grid-template-columns: auto minmax(0, 1fr) auto;
-            gap: 8px;
-            padding: 2px 16px 6px;
-        }
-        .day-step, .day-current {
-            display: inline-flex;
-            align-items: center;
-            gap: 2px;
-            min-height: 52px;
-            border: 2px solid var(--line-strong);
-            border-radius: var(--r-chip);
-            background: var(--card);
-            color: var(--ink);
-            transition: transform .15s ease;
-        }
-        .day-step { justify-content: center; width: 52px; padding: 0; }
-        .day-step .ico { width: 26px; height: 26px; flex: none; }
-        .day-step:disabled { opacity: .4; }
-        .day-current {
-            justify-content: space-between;
-            gap: 6px;
-            padding: 4px 10px 4px 12px;
-            border-color: var(--ink);
-            background: var(--accent);
-            color: var(--on-accent);
-            box-shadow: var(--shadow);
-            text-align: left;
-        }
-        .day-current-text { display: flex; flex-direction: column; min-width: 0; line-height: 1.3; }
-        .day-current-text small { font-size: calc(13px * var(--fs)); opacity: .85; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-        .day-current-text span { font-size: calc(15px * var(--fs)); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-        .day-current .ico { width: 20px; height: 20px; flex: none; }
-        .day-step:active, .day-current:active { transform: scale(.96); }
-        /* 選單裡的天數：一排一個，大按鈕，日期和標題都完整顯示 */
-        .day-grid { display: grid; gap: 8px; padding: 4px 0 8px; }
-        .day-grid .day-tab { width: 100%; min-height: 56px; padding: 6px 14px 8px; }
-        .day-grid .day-tab span, .day-grid .day-tab small { white-space: normal; }
         .day-tab {
             flex: none;
             scroll-snap-align: start;
@@ -1440,12 +1351,12 @@
             position: absolute;
             top: 14px;
             bottom: 18px;
-            left: 15px;
+            left: calc(48px * var(--fs) + 21px);
             border-left: 2px dashed var(--line-strong);
         }
         .stop {
             display: grid;
-            grid-template-columns: 32px minmax(0, 1fr);
+            grid-template-columns: calc(48px * var(--fs)) 32px minmax(0, 1fr);
             column-gap: 8px;
             align-items: start;
             margin-bottom: 14px;
@@ -1487,19 +1398,8 @@
             box-shadow: var(--shadow);
             overflow: hidden;
         }
-        .card-head { min-height: 48px; }
-        /* 第一行：時間＋分類，右邊讓給蓋章；標題在下面用全寬 */
-        .card-when {
-            display: flex;
-            flex-wrap: wrap;
-            align-items: baseline;
-            column-gap: 10px;
-            min-height: 44px;
-            padding-right: 64px;
-        }
-        .card-time { font-size: calc(20px * var(--fs)); line-height: 1.3; color: var(--ink); font-variant-numeric: tabular-nums; }
-        .card-time .time-tz { margin-left: 4px; font-size: calc(13px * var(--fs)); color: var(--ink-soft); }
-        .card-cat { font-size: calc(14px * var(--fs)); color: var(--ink-soft); }
+        .card-head { padding-right: 58px; min-height: 48px; }
+        .card-cat { font-size: calc(13px * var(--fs)); color: var(--ink-soft); }
         .card h3 { font-size: calc(17px * var(--fs)); line-height: 1.4; overflow-wrap: anywhere; }
         
         /* 關鍵提示小標籤（需預約、公休注意、排隊名店） */
@@ -1525,11 +1425,6 @@
             color: var(--stamp);
             border: 1px solid color-mix(in srgb, var(--stamp) 40%, transparent);
         }
-        .tag--booked {
-            background: color-mix(in srgb, var(--c-sight) 26%, var(--card));
-            color: var(--ink);
-            border: 1px solid var(--line-strong);
-        }
         .tag--closed {
             background: color-mix(in srgb, var(--c-shop) 32%, var(--card));
             color: var(--ink);
@@ -1552,7 +1447,7 @@
             display: flex;
             gap: 6px;
             margin-top: 6px;
-            font-size: calc(15px * var(--fs));
+            font-size: calc(14px * var(--fs));
             line-height: 1.5;
             color: var(--ink);
             overflow-wrap: anywhere;
@@ -1601,7 +1496,7 @@
             display: flex;
             align-items: flex-start;
             gap: 8px;
-            font-size: calc(15px * var(--fs));
+            font-size: calc(14px * var(--fs));
             line-height: 1.5;
             color: var(--ink);
         }
@@ -1718,7 +1613,7 @@
         .card--move .card-head {
             position: relative;
             margin: 0 -14px;
-            padding: 0 14px 8px;
+            padding: 0 72px 8px 14px;
             border-bottom: 2px dashed var(--line-strong);
         }
         .card--move .card-head::before,
@@ -1943,7 +1838,7 @@
             border: 2px solid var(--line-strong);
             border-radius: var(--r-pill);
             background: var(--card);
-            font-size: calc(15px * var(--fs));
+            font-size: calc(13px * var(--fs));
             color: var(--ink);
             white-space: nowrap;
             cursor: pointer;
@@ -1955,6 +1850,7 @@
             background: var(--accent);
             color: var(--on-accent);
             box-shadow: 0 2px 0 var(--line);
+            font-weight: 700;
         }
         .map-day-chip small {
             font-size: calc(12px * var(--fs));
@@ -1986,7 +1882,7 @@
             border-radius: var(--r-chip);
             background: var(--card);
             box-shadow: var(--shadow);
-            font-size: calc(15px * var(--fs));
+            font-size: calc(14px * var(--fs));
         }
 
         .leaflet-container { font-family: var(--font); background: var(--paper-2); }
@@ -1996,7 +1892,7 @@
             filter: invert(1) hue-rotate(180deg) sepia(.45) hue-rotate(178deg) saturate(1.3) brightness(.82) contrast(.88);
         }
         .leaflet-bar { border: 2px solid var(--ink) !important; border-radius: 14px !important; overflow: hidden; box-shadow: var(--shadow) !important; }
-        .leaflet-bar a { background: var(--card); color: var(--ink); border-bottom-color: var(--line) !important; width: 44px !important; height: 44px !important; line-height: 42px !important; font-size: 22px !important; }
+        .leaflet-bar a { background: var(--card); color: var(--ink); border-bottom-color: var(--line) !important; width: 36px !important; height: 36px !important; line-height: 34px !important; }
         .leaflet-bar a:hover { background: var(--paper-2); }
         .leaflet-control-attribution { background: color-mix(in srgb, var(--card) 85%, transparent) !important; color: var(--ink-soft) !important; font-size: calc(10px * var(--fs)); }
         .leaflet-control-attribution a { color: var(--ink-soft) !important; }
@@ -2008,11 +1904,11 @@
             box-shadow: var(--shadow);
         }
         .leaflet-popup-tip { background: var(--card); border: 2px solid var(--ink); box-shadow: none; }
-        .leaflet-popup-content { margin: 12px 44px 12px 14px; font-size: calc(15px * var(--fs)); line-height: 1.5; }
-        .leaflet-container a.leaflet-popup-close-button { color: var(--ink-soft); width: 44px; height: 44px; line-height: 44px; font-size: calc(20px * var(--fs)); }
+        .leaflet-popup-content { margin: 12px 14px; font-size: calc(14px * var(--fs)); line-height: 1.5; }
+        .leaflet-container a.leaflet-popup-close-button { color: var(--ink-soft); width: 28px; height: 28px; font-size: calc(20px * var(--fs)); }
         .popup-meta { font-size: calc(13px * var(--fs)); color: var(--ink-soft); }
         .popup-title { margin: 2px 0 4px; font-size: calc(16px * var(--fs)); line-height: 1.35; }
-        .popup-hours { font-size: calc(15px * var(--fs)); color: var(--ink-soft); }
+        .popup-hours { font-size: calc(13px * var(--fs)); color: var(--ink-soft); }
         .leaflet-popup-content .chip-btn { margin-top: 8px; }
 
         .pin-wrap { background: none; border: 0; }
@@ -2036,84 +1932,6 @@
             100% { transform: translateY(0) rotate(-45deg); opacity: 1; }
         }
         .pin.is-visited { box-shadow: 0 0 0 3px var(--stamp); }
-        /* 單日的站序號碼，跟下方清單對應 */
-        .pin-num {
-            position: absolute;
-            top: -10px;
-            right: -12px;
-            display: grid;
-            place-items: center;
-            min-width: 22px;
-            height: 22px;
-            padding: 0 4px;
-            border: 2px solid var(--ink);
-            border-radius: 999px;
-            background: var(--card);
-            color: var(--ink);
-            font-size: 13px;
-            line-height: 1;
-            font-variant-numeric: tabular-nums;
-        }
-        .map-stops {
-            display: flex;
-            gap: 8px;
-            flex-shrink: 0;
-            overflow-x: auto;
-            padding: 2px 2px 4px;
-            scroll-snap-type: x proximity;
-            scrollbar-width: none;
-        }
-        .map-stops[hidden] { display: none; }
-        .map-stops::-webkit-scrollbar { display: none; }
-        .map-stop {
-            flex: 0 0 auto;
-            max-width: 72%;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            min-height: 56px;
-            padding: 6px 12px 6px 8px;
-            border: 2px solid var(--line-strong);
-            border-radius: var(--r-chip);
-            background: var(--card);
-            color: var(--ink);
-            text-align: left;
-            scroll-snap-align: start;
-        }
-        .map-stop:active { transform: scale(.97); }
-        .map-stop-num {
-            flex: none;
-            display: grid;
-            place-items: center;
-            width: 30px;
-            height: 30px;
-            border: 2px solid var(--ink);
-            border-radius: 50%;
-            background: var(--cat);
-            color: var(--on-cat);
-            font-size: calc(15px * var(--fs));
-        }
-        .map-stop-text { display: flex; flex-direction: column; min-width: 0; line-height: 1.3; }
-        .map-stop-text small { font-size: calc(13px * var(--fs)); color: var(--ink-soft); }
-        .map-stop-text span { font-size: calc(15px * var(--fs)); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-
-        .offline-badge {
-            position: fixed;
-            z-index: 71;
-            left: 50%;
-            bottom: calc(var(--tabbar-h) + env(safe-area-inset-bottom) + 8px);
-            transform: translateX(-50%);
-            padding: 4px 14px;
-            border: 2px solid var(--ink);
-            border-radius: var(--r-pill);
-            background: var(--paper-2);
-            color: var(--ink);
-            font-size: calc(14px * var(--fs));
-            white-space: nowrap;
-            pointer-events: none;
-        }
-        .offline-badge[hidden] { display: none; }
-        @media (min-width: 960px) { .offline-badge { bottom: 16px; } }
 
         /* ---------- 底部分頁 ---------- */
         .tabbar {
@@ -2216,7 +2034,7 @@
             border-radius: var(--r-chip);
             background: var(--card);
             box-shadow: var(--shadow);
-            font-size: calc(15px * var(--fs));
+            font-size: calc(14px * var(--fs));
         }
 
         /* ---------- 桌機：攤開的繪本，左頁行程、右頁地圖 ---------- */
@@ -2268,8 +2086,6 @@
         <symbol id="i-bed" viewBox="0 0 24 24"><path d="M3 7v13M21 12v8M3 16h18M3 12h11a2 2 0 0 1 2 2v2M6 12V9.5A1.5 1.5 0 0 1 7.5 8h2A1.5 1.5 0 0 1 11 9.5V12"/></symbol>
         <symbol id="i-search" viewBox="0 0 24 24"><circle cx="10.8" cy="10.8" r="6.3"/><path d="M20 20l-4.6-4.6"/></symbol>
         <symbol id="i-chevron-down" viewBox="0 0 24 24"><path d="M6 9l6 6 6-6"/></symbol>
-        <symbol id="i-chevron-left" viewBox="0 0 24 24"><path d="M15 6l-6 6 6 6"/></symbol>
-        <symbol id="i-chevron-right" viewBox="0 0 24 24"><path d="M9 6l6 6-6 6"/></symbol>
         <symbol id="i-close" viewBox="0 0 24 24"><path d="M6.5 6.5l11 11M17.5 6.5l-11 11"/></symbol>
         <symbol id="i-home" viewBox="0 0 24 24"><path d="M3 10.5L12 3l9 7.5V20a1.5 1.5 0 0 1-1.5 1.5h-5A1.5 1.5 0 0 1 13 20v-5h-2v5a1.5 1.5 0 0 1-1.5 1.5h-5A1.5 1.5 0 0 1 3 20z"/></symbol>
         <symbol id="i-cloud" viewBox="0 0 24 24"><path d="M6.5 19a4.5 4.5 0 0 1-.5-8.97A7 7 0 0 1 19.5 12a4.5 4.5 0 0 1-2 8.5z"/></symbol>
@@ -2345,22 +2161,6 @@
         </div>
     </dialog>
 
-    <p id="offline-badge" class="offline-badge" role="status" hidden>離線中・天氣可能是舊的</p>
-
-    <!-- 選天數：格狀大按鈕，一眼看到全部天數 -->
-    <dialog id="day-picker" class="sheet-dialog" aria-labelledby="day-picker-title">
-        <div class="sheet-body">
-            <button class="sheet-handle" type="button" aria-label="放大成全螢幕" aria-expanded="false"></button>
-            <div class="sheet-head">
-                <h2 id="day-picker-title">選擇天數</h2>
-                <button class="icon-btn" type="button" data-close aria-label="關閉"><svg class="ico"><use href="#i-close"/></svg></button>
-            </div>
-            <div class="sheet-scroll">
-                <nav id="day-tabs" class="day-grid" aria-label="全部天數"></nav>
-            </div>
-        </div>
-    </dialog>
-
     <!-- 地點詳細資訊彈窗 -->
     <dialog id="detail-modal" class="sheet-dialog detail-sheet" aria-labelledby="detail-title">
         <div class="sheet-body detail-sheet-body">
@@ -2413,9 +2213,6 @@
         <!-- 首頁：封面插畫、天氣看板、今日行程 -->
         <section id="home-pane" class="home-pane" aria-label="首頁概覽">
             <div class="home-hero-wrap" id="home-hero-container"></div>
-
-            <!-- 旅行期間：接下來去哪 -->
-            <section class="next-card" id="home-next" aria-label="接下來的安排" hidden></section>
 
             <!-- 天氣看板 -->
             <section class="weather-card" id="weather-card" aria-label="當天天氣資訊">
@@ -2576,14 +2373,7 @@
             </header>
 
             <div class="toolbar">
-                <nav class="day-bar" aria-label="選擇天數">
-                    <button class="day-step" id="day-prev" type="button" aria-label="前一天"><svg class="ico"><use href="#i-chevron-left"/></svg></button>
-                    <button class="day-current" id="day-current" type="button" aria-haspopup="dialog">
-                        <span class="day-current-text"><small id="day-current-sub"></small><span id="day-current-name"></span></span>
-                        <svg class="ico"><use href="#i-chevron-down"/></svg>
-                    </button>
-                    <button class="day-step" id="day-next" type="button" aria-label="後一天"><svg class="ico"><use href="#i-chevron-right"/></svg></button>
-                </nav>
+                <nav id="day-tabs" class="scroller" aria-label="選擇天數"></nav>
                 <div id="cat-chips" class="scroller cats" role="group" aria-label="選擇類別"></div>
             </div>
 
@@ -2605,8 +2395,6 @@
                     <svg class="ico"><use href="#i-fit"/></svg>顯示全部圖釘
                 </button>
             </div>
-            <!-- 單日：照順序列出當天地點，點一下地圖就移過去（不用在地圖上找圖釘） -->
-            <nav id="map-stops" class="map-stops" aria-label="當天地點順序" hidden></nav>
         </section>
     </div>
 
@@ -2652,13 +2440,13 @@
     <script>
         // ✏️ 行程資料放在 data/trip.json，換一趟旅程只要換這個檔案
         // 版本號：每次合回 dev 時更新（日期.當天第幾次），設定最下方顯示，回報問題時用來確認是哪一版
-        const APP_VERSION = '2026.11.09.1';
+        const APP_VERSION = '2026.10.16.2';
         const TRIP_URL = './data/trip.json';
         const INFO_URL = './data/info.json';
         const CHECKLIST_URL = './data/checklist.json';
         const UI_URL = './data/ui.json';
         const VIEWS = ['home', 'list', 'map', 'info'];
-        let trip = { id: 'trip', title: '', subtitle: '', timeNote: '', zones: {} };
+        let trip = { id: 'trip', title: '', subtitle: '', timeNote: '' };
         let weatherConf = { timezone: 'auto', default: null, climate: null };
         let days = [];
         let items = [];
@@ -2728,11 +2516,7 @@
             text = text.trim();
 
             const tags = [];
-            // 訂位欄寫「已訂位／已訂房／已預約…」表示已經處理好，不要再標成「需預約」
-            const booked = /^已/.test(booking.trim());
-            if (booked) {
-                tags.push({ type: 'booked', text: '已預約', icon: 'check' });
-            } else if (/需預約|要預約|建議預約/.test(text) || (booking && !/附贈|不用|免/.test(booking))) {
+            if (/需預約|要預約|建議預約/.test(text) || booking) {
                 tags.push({ type: 'booking', text: '需預約', icon: 'calendar' });
             }
             const closedMatch = text.match(/(週[一二三四五六日]|禮拜[一二三四五六日天]|星期[一二三四五六日])(?:[、及與和]?(?:週|禮拜|星期)?[一二三四五六日天])*(?:只到[0-9:：]+)?(?:公休|休息|注意)/);
@@ -2762,15 +2546,7 @@
             return esc(item.time) + (item.tz ? `<small class="time-tz">${esc(item.tz)}</small>` : '');
         }
         // 日期一律用 YYYY-MM-DD 字串，以 UTC 計算避免時區差一天
-        // 預覽用：網址加 ?date=2026-11-23 可以假裝今天是那一天，看旅行期間的畫面
-        const PREVIEW_DATE = (() => {
-            try {
-                const d = new URLSearchParams(location.search).get('date');
-                return /^\d{4}-\d{2}-\d{2}$/.test(d || '') ? d : '';
-            } catch (e) { return ''; }
-        })();
         function todayIn(tz) {
-            if (PREVIEW_DATE) return PREVIEW_DATE;
             try {
                 return new Intl.DateTimeFormat('en-CA', { timeZone: tz && tz !== 'auto' ? tz : undefined, year: 'numeric', month: '2-digit', day: '2-digit' }).format(new Date());
             } catch (e) {
@@ -2836,33 +2612,6 @@
             container.querySelectorAll('button').forEach((btn) => {
                 btn.setAttribute('aria-pressed', String(btn.dataset[attr] === String(value)));
             });
-            if (container.id === 'day-tabs') updateDayBar();
-        }
-        // 行程頁上方：目前是哪一天（點了打開格狀選單），左右換前後一天
-        function dayOrder() { return ['prep'].concat(days.map((d) => d.day)); }
-        function updateDayBar() {
-            const sub = $('#day-current-sub');
-            if (!sub) return;
-            if (state.day === 'prep') {
-                sub.textContent = '出發前';
-                $('#day-current-name').textContent = '行前自檢';
-            } else {
-                const d = days.find((x) => x.day === state.day);
-                const date = dateOfDay(state.day);
-                sub.textContent = date ? `${dayLabel(state.day)}・${shortDate(date)}` : dayLabel(state.day);
-                $('#day-current-name').textContent = d && d.name ? d.name : dayLabel(state.day);
-            }
-            const order = dayOrder();
-            const i = order.indexOf(state.day);
-            $('#day-prev').disabled = i <= 0;
-            $('#day-next').disabled = i < 0 || i >= order.length - 1;
-        }
-        function selectDay(day) {
-            state.day = day === 'prep' ? 'prep' : Number(day);
-            if (state.day !== 'prep') currentHomeDay = state.day;
-            syncPressed($('#day-tabs'), 'day', state.day);
-            render();
-            scrollToList();
         }
 
         // ---------- 行程列表 ----------
@@ -2889,7 +2638,7 @@
                     <article class="card card--${c.kind}${isVisited ? ' is-visited' : ''}" data-id="${esc(item.id)}">
                         <div class="card-body">
                             <div class="card-head">
-                                <p class="card-when">${item.time ? `<span class="card-time">${timeHTML(item)}</span>` : ''}<span class="card-cat">${c.label}</span></p>
+                                <p class="card-cat">${c.label}</p>
                                 ${titleHTML}
                                 ${tagsHTML}
                             </div>
@@ -2920,8 +2669,8 @@
         function stopHTML(group) {
             const first = group[0];
             const c = catOf(first);
-            // 時間寫在卡片裡（全寬），左邊只留分類圓點，360px 下標題才不會一直換行
             const head = `
+                    <div class="stop-time">${timeHTML(first)}</div>
                     <div class="stop-node">${icon(c.icon)}</div>`;
             if (group.length === 1) {
                 return `<li class="stop" style="--cat:${c.color}">${head}${cardHTML(first)}</li>`;
@@ -3195,23 +2944,7 @@
         let map = null;
         let markerLayer = null;
         const markersById = new Map();
-        // null：還沒打開過，第一次進地圖跟著目前查看的那一天；'all'：全部旅程
-        let mapDay = null;
-
-        // 首頁、行程、地圖共用「目前查看的那一天」
-        function currentViewDay() {
-            return typeof state.day === 'number' ? state.day : currentHomeDay;
-        }
-        function setViewDay(n) {
-            n = Number(n);
-            if (!days.some((d) => d.day === n)) return;
-            currentHomeDay = n;
-            if (state.day !== n) {
-                state.day = n;
-                syncPressed($('#day-tabs'), 'day', state.day);
-                render();
-            }
-        }
+        let mapDay = 'all';
 
         function getMapItems() {
             return items.filter((it) => {
@@ -3242,14 +2975,7 @@
             document.querySelectorAll('.map-day-chip').forEach((btn) => {
                 btn.setAttribute('aria-pressed', String(btn.dataset.day == mapDay));
             });
-            const pressedChip = $('#map-day-tabs [aria-pressed="true"]');
-            if (pressedChip && root.dataset.view === 'map') pressedChip.scrollIntoView({ inline: 'center', block: 'nearest' });
 
-            updateMapTitle();
-            updateMarkers(fit);
-        }
-
-        function updateMapTitle() {
             const dayInfo = days.find((d) => d.day == mapDay);
             const pins = getMapItems();
             if (mapDay === 'all') {
@@ -3263,6 +2989,8 @@
                 const fitBtn = $('#map-fit');
                 if (fitBtn) fitBtn.innerHTML = `${icon('fit')}重設當日視角`;
             }
+
+            updateMarkers(fit);
         }
 
         function initMap(fit = true) {
@@ -3293,16 +3021,15 @@
             markerLayer.clearLayers();
             markersById.clear();
             const bounds = [];
-            const pins = getMapItems().slice().sort(byTime);
-            const numbered = mapDay !== 'all' && mapDay != null;
+            const pins = getMapItems();
             let pinIndex = 0;
-            pins.forEach((item, n) => {
+            pins.forEach((item) => {
                 const c = catOf(item);
                 const marker = L.marker([item.lat, item.lng], {
                     title: item.title,
                     icon: L.divIcon({
                         className: 'pin-wrap',
-                        html: `<div class="pin${visited.has(item.id) ? ' is-visited' : ''}${fit ? ' drop' : ''}" style="--cat:${c.color};--delay:${Math.min(pinIndex++ * 0.03, 0.6).toFixed(2)}s">${icon(c.icon)}</div>${numbered ? `<span class="pin-num">${n + 1}</span>` : ''}`,
+                        html: `<div class="pin${visited.has(item.id) ? ' is-visited' : ''}${fit ? ' drop' : ''}" style="--cat:${c.color};--delay:${Math.min(pinIndex++ * 0.03, 0.6).toFixed(2)}s">${icon(c.icon)}</div>`,
                         iconSize: [34, 34],
                         iconAnchor: [17, 40],
                         popupAnchor: [0, -34]
@@ -3311,18 +3038,8 @@
                 marker.bindPopup(popupHTML(item), { maxWidth: 260 });
                 marker.addTo(markerLayer);
                 markersById.set(item.id, marker);
-                // 不是當地時間的地點（例如台灣出發）不算進視野，免得一打開就縮成整張東亞地圖
-                if (!item.tz) bounds.push([item.lat, item.lng]);
+                bounds.push([item.lat, item.lng]);
             });
-            if (!bounds.length) pins.forEach((item) => bounds.push([item.lat, item.lng]));
-            const strip = $('#map-stops');
-            strip.hidden = !numbered || !pins.length;
-            strip.innerHTML = numbered ? pins.map((item, n) => `
-                <button class="map-stop" type="button" data-id="${esc(item.id)}" style="--cat:${catOf(item).color}">
-                    <span class="map-stop-num">${n + 1}</span>
-                    <span class="map-stop-text"><small>${item.time ? esc(item.time) : esc(catOf(item).label)}</small><span>${esc(item.title)}</span></span>
-                </button>`).join('') : '';
-            if (numbered) setTimeout(() => map && map.invalidateSize(), 0);
             if (fit && bounds.length) map.fitBounds(bounds, { padding: [36, 36], maxZoom: 15 });
         }
 
@@ -3377,18 +3094,8 @@
                 } catch (e) {}
             }
             if (view === 'map' && opts.init !== false) {
-                const target = currentViewDay();
-                const follow = mapDay !== 'all' && mapDay != target;
-                if (follow) mapDay = target;
-                if (map) {
-                    if (follow) setMapDay(mapDay, true);
-                } else {
-                    initMap();
-                }
-                updateMapTitle();
+                initMap();
                 renderMapDayTabs();
-                const chip = $('#map-day-tabs [aria-pressed="true"]');
-                if (chip) chip.scrollIntoView({ inline: 'center', block: 'nearest' });
                 setTimeout(() => map && map.invalidateSize(), 50);
             }
             if (view === 'home') {
@@ -3636,24 +3343,14 @@
         bindSheet(settings);
 
         // ---------- 事件 ----------
-        const dayPicker = $('#day-picker');
-        bindSheet(dayPicker);
-        $('#day-current').addEventListener('click', () => openSheet(dayPicker));
         $('#day-tabs').addEventListener('click', (e) => {
             const btn = e.target.closest('.day-tab');
             if (!btn) return;
-            selectDay(btn.dataset.day);
-            closeSheet(dayPicker);
-        });
-        $('#day-prev').addEventListener('click', () => {
-            const order = dayOrder();
-            const i = order.indexOf(state.day);
-            if (i > 0) selectDay(order[i - 1]);
-        });
-        $('#day-next').addEventListener('click', () => {
-            const order = dayOrder();
-            const i = order.indexOf(state.day);
-            if (i >= 0 && i < order.length - 1) selectDay(order[i + 1]);
+            state.day = btn.dataset.day === 'prep' ? 'prep' : Number(btn.dataset.day);
+            syncPressed($('#day-tabs'), 'day', state.day);
+            btn.scrollIntoView({ inline: 'nearest', block: 'nearest' });
+            render();
+            scrollToList();
         });
         $('#cat-chips').addEventListener('click', (e) => {
             const btn = e.target.closest('.cat-chip');
@@ -3686,7 +3383,6 @@
             }
             if (act === 'goto-day') {
                 state.day = Number(btn.dataset.day);
-                currentHomeDay = state.day;
                 syncPressed($('#day-tabs'), 'day', state.day);
                 const tab = $(`#day-tabs [data-day="${state.day}"]`);
                 if (tab) tab.scrollIntoView({ inline: 'center', block: 'nearest' });
@@ -3757,7 +3453,7 @@
                 metaItems.push(`<div class="detail-meta-item">${icon('clock')}<div><b>營業時間</b><br>${esc(d.hours)}</div></div>`);
             }
             if (d.booking) {
-                metaItems.push(`<div class="detail-meta-item">${icon('calendar')}<div><b>${/^已/.test(d.booking) ? '訂位紀錄' : '訂位方式'}</b><br>${esc(d.booking)}</div></div>`);
+                metaItems.push(`<div class="detail-meta-item">${icon('calendar')}<div><b>訂位方式</b><br>${esc(d.booking)}</div></div>`);
             }
             if (item.price) {
                 metaItems.push(`<div class="detail-meta-item">${icon('coin')}<div><b>${esc(c.priceLabel)}</b><br>${esc(item.price)}</div></div>`);
@@ -4005,7 +3701,7 @@
                     const c = catOf(item);
                     const isV = visited.has(item.id);
                     return `
-                        <div class="${withMeta ? 'timeline-item' : 'timeline-sub-item'}${isV ? ' is-visited' : ''}"${withMeta && item.time ? ` data-time="${esc(item.time)}"${item.tz ? ` data-tz="${esc(item.tz)}"` : ''}` : ''}>
+                        <div class="${withMeta ? 'timeline-item' : 'timeline-sub-item'}${isV ? ' is-visited' : ''}"${withMeta && item.time ? ` data-time="${esc(item.time)}"` : ''}>
                             ${isV ? '<span class="visit-stamp" aria-hidden="true">去過</span>' : ''}
                             <button class="timeline-open" type="button" data-open="${esc(item.id)}"${isV ? ` aria-label="${esc(item.title)}（去過）"` : ''}>
                                 ${withMeta ? `<span class="timeline-time">${timeHTML(item)}</span>` : ''}
@@ -4027,7 +3723,7 @@
                             const c = catOf(first);
                             const visitedCount = group.filter((it) => visited.has(it.id)).length;
                             return `
-                                <details class="timeline-group${visitedCount ? ' is-visited' : ''}"${first.time ? ` data-time="${esc(first.time)}"${first.tz ? ` data-tz="${esc(first.tz)}"` : ''}` : ''}>
+                                <details class="timeline-group${visitedCount ? ' is-visited' : ''}"${first.time ? ` data-time="${esc(first.time)}"` : ''}>
                                     <summary class="timeline-summary">
                                         ${visitedCount ? '<span class="visit-stamp" aria-hidden="true">去過</span>' : ''}
                                         <span class="timeline-time">${timeHTML(first)}</span>
@@ -4048,78 +3744,24 @@
             }
 
             markNow();
-            renderNext();
             fetchWeatherForDay(currentHomeDay);
         }
 
         // 旅行當天：依現在時間標出「現在」的行程（最後一個已經開始的時段），每分鐘更新
-        // zone：地點的「時區」欄（例如「台灣時間」），對應 trip.json 的 zones；沒有就用當地時間
-        function nowHM(zone) {
-            const tz = (zone && trip.zones && trip.zones[zone]) || (weatherConf.timezone !== 'auto' ? weatherConf.timezone : undefined);
+        function nowHM() {
             try {
-                return new Intl.DateTimeFormat('en-GB', { timeZone: tz, hour: '2-digit', minute: '2-digit', hourCycle: 'h23' }).format(new Date());
+                return new Intl.DateTimeFormat('en-GB', { timeZone: weatherConf.timezone !== 'auto' ? weatherConf.timezone : undefined, hour: '2-digit', minute: '2-digit', hourCycle: 'h23' }).format(new Date());
             } catch (e) {
                 const d = new Date();
                 return `${String(d.getHours()).padStart(2, '0')}:${String(d.getMinutes()).padStart(2, '0')}`;
             }
         }
-        // 旅行當天：照表算出「下一站」（家人跟著帶隊者照表走，不需要手動選）
-        function renderNext() {
-            const box = $('#home-next');
-            const pane = $('#home-pane');
-            const date = dateOfDay(currentHomeDay);
-            const isToday = Boolean(date) && date === todayIn(weatherConf.timezone);
-            pane.classList.toggle('is-trip', isToday);
-            box.hidden = !isToday;
-            if (!isToday) { box.innerHTML = ''; return; }
-
-            const groups = groupStops(items.filter((i) => i.day === currentHomeDay && i.time));
-            const passed = (g) => g[0].time <= nowHM(g[0].tz);
-            const current = groups.filter(passed).pop();
-            const next = groups.find((g) => !passed(g));
-            const tzTag = (it) => (it.tz ? `<small>${esc(it.tz)}</small>` : '');
-            const actions = (it) => `
-                <div class="next-actions">
-                    <button class="chip-btn" type="button" data-open="${esc(it.id)}">${icon('book')}詳細</button>
-                    <a class="chip-btn nav" href="${esc(mapLink(it))}" target="_blank" rel="noopener" aria-label="${esc(it.title)}：用 Google 地圖導航">${icon('nav')}導航</a>
-                </div>`;
-            const quick = `
-                <div class="next-quick">
-                    <button class="chip-btn" type="button" data-quick="hotel">${icon('bed')}回飯店</button>
-                    <button class="chip-btn" type="button" data-quick="sos">${icon('phone')}求助</button>
-                </div>`;
-            const nowLine = current ? `<p class="next-now">現在：<b>${esc(current[0].time)} ${esc(current[0].title)}</b>${current.length > 1 ? `（${current.length} 選 1）` : ''}</p>` : '';
-
-            if (next) {
-                const first = next[0];
-                box.innerHTML = `
-                    <p class="next-label"><span class="tape" style="--tape:${catOf(first).color}">下一站</span><span class="next-time">${esc(first.time)}${tzTag(first)}</span>${next.length > 1 ? `<span class="next-count">${next.length} 個選一個</span>` : ''}</p>
-                    ${next.map((it) => `
-                        <div class="next-choice">
-                            <span class="next-cat" style="--cat:${catOf(it).color}">${icon(catOf(it).icon)}${esc(catOf(it).label)}</span>
-                            <h2 class="next-title">${esc(it.title)}</h2>
-                            ${actions(it)}
-                        </div>`).join('')}
-                    ${nowLine}${quick}`;
-                return;
-            }
-            // 今天都走完了：給今晚的住宿
-            const tonight = hotelStays().find((h) => h.days.includes(currentHomeDay));
-            box.innerHTML = `
-                <p class="next-label"><span class="tape" style="--tape:var(--c-stay)">今天的行程走完了</span></p>
-                ${tonight ? `
-                    <div class="next-choice">
-                        <h2 class="next-title">今晚住：${esc(tonight.stay.title)}</h2>
-                        ${actions(tonight.stay)}
-                    </div>` : ''}
-                ${nowLine}${quick}`;
-        }
-
         function markNow() {
             const rows = Array.from(document.querySelectorAll('#home-today-list .home-timeline > [data-time]'));
             const date = dateOfDay(currentHomeDay);
             const isToday = Boolean(date) && date === todayIn(weatherConf.timezone);
-            const current = isToday ? rows.filter((r) => r.dataset.time <= nowHM(r.dataset.tz)).pop() : null;
+            const hm = nowHM();
+            const current = isToday ? rows.filter((r) => r.dataset.time <= hm).pop() : null;
             rows.forEach((r) => {
                 const on = r === current;
                 r.classList.toggle('is-now', on);
@@ -4135,38 +3777,18 @@
                 }
             });
         }
-        setInterval(() => { if (root.dataset.view === 'home') { markNow(); renderNext(); } }, 60000);
-        document.addEventListener('visibilitychange', () => { if (!document.hidden && root.dataset.view === 'home' && items.length) { markNow(); renderNext(); } });
+        setInterval(() => { if (root.dataset.view === 'home') markNow(); }, 60000);
 
         $('#home-today-list').addEventListener('click', (e) => {
             const btn = e.target.closest('[data-open]');
             if (btn) showDetailModal(btn.dataset.open);
-        });
-        $('#home-next').addEventListener('click', (e) => {
-            const btn = e.target.closest('[data-open]');
-            if (btn) { showDetailModal(btn.dataset.open); return; }
-            const quick = e.target.closest('[data-quick]');
-            if (!quick) return;
-            if (quick.dataset.quick === 'sos') {
-                infoCat = 'sos';
-                setView('info');
-                window.scrollTo(0, 0);
-                return;
-            }
-            // 回飯店：直接打開今晚飯店的日文大字卡（給司機看、可導航）
-            const hotels = hotelStays();
-            const h = hotels.find((x) => x.days.includes(currentHomeDay)) || hotels[hotels.length - 1];
-            if (!h) return;
-            const sec = infoCategories().flatMap((c) => c.sections).find((x) => x && x.type === 'hotel');
-            const phrase = (sec && sec.phrase) || {};
-            showPhrase({ zh: `${phrase.zh || '請帶我到這間飯店'}：${h.stay.title}`, ja: phrase.ja || 'このホテルまでお願いします。', place: h.stay });
         });
 
         $('#home-prev-day-btn').addEventListener('click', () => {
             if (!days.length) return;
             const minDay = days[0].day;
             const maxDay = days[days.length - 1].day;
-            setViewDay(currentHomeDay > minDay ? currentHomeDay - 1 : maxDay);
+            currentHomeDay = currentHomeDay > minDay ? currentHomeDay - 1 : maxDay;
             renderHome();
         });
 
@@ -4174,7 +3796,7 @@
             if (!days.length) return;
             const minDay = days[0].day;
             const maxDay = days[days.length - 1].day;
-            setViewDay(currentHomeDay < maxDay ? currentHomeDay + 1 : minDay);
+            currentHomeDay = currentHomeDay < maxDay ? currentHomeDay + 1 : minDay;
             renderHome();
         });
 
@@ -4190,21 +3812,10 @@
             tab.addEventListener('click', () => setView(tab.dataset.view));
         });
         $('#map-fit').addEventListener('click', () => updateMarkers(true));
-        $('#map-stops').addEventListener('click', (e) => {
-            const btn = e.target.closest('.map-stop');
-            if (!btn || !map) return;
-            const item = items.find((i) => i.id === btn.dataset.id);
-            const marker = markersById.get(btn.dataset.id);
-            if (!item) return;
-            map.closePopup();
-            map.once('moveend', () => { if (marker) marker.openPopup(); });
-            map.flyTo([item.lat, item.lng], Math.max(map.getZoom(), 15), { duration: 0.6 });
-        });
         $('#map-day-tabs').addEventListener('click', (e) => {
             const btn = e.target.closest('.map-day-chip');
             if (!btn) return;
-            if (btn.dataset.day !== 'all') setViewDay(btn.dataset.day);
-            setMapDay(btn.dataset.day === 'all' ? 'all' : Number(btn.dataset.day), true);
+            setMapDay(btn.dataset.day, true);
         });
 
         desktopMQ.addEventListener('change', (e) => {
@@ -4266,11 +3877,8 @@
             clearTimeout(toastTimer);
             if (ms) toastTimer = setTimeout(() => { el.hidden = true; }, ms);
         }
-        // 離線時在分頁列上方一直顯示小標示，才知道天氣、地圖底圖可能是舊的
-        function updateOfflineBadge() { $('#offline-badge').hidden = navigator.onLine !== false; }
-        window.addEventListener('offline', () => { updateOfflineBadge(); toast('目前離線：行程照常可看，地圖只會顯示看過的區域', 4000); });
-        window.addEventListener('online', () => { updateOfflineBadge(); toast('已恢復連線', 1800); });
-        updateOfflineBadge();
+        window.addEventListener('offline', () => toast('目前離線：行程照常可看，地圖只會顯示看過的區域', 4000));
+        window.addEventListener('online', () => toast('已恢復連線', 1800));
 
         // ---------- 分享地點 ----------
         // 手機用系統的分享選單；不支援的瀏覽器改成複製名稱和地圖連結
@@ -4625,7 +4233,6 @@
                 title: String(data.title || '旅行繪本'),
                 subtitle: String(data.subtitle || ''),
                 timeNote: String(data.timeNote || ''),
-                zones: data.zones && typeof data.zones === 'object' ? data.zones : {},
                 startDate: /^\d{4}-\d{2}-\d{2}$/.test(data.startDate || '') ? data.startDate : ''
             };
             items = data.items

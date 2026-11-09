@@ -35,11 +35,6 @@
       "type": "string",
       "description": "行程時間的說明，顯示在行程清單和首頁當日行程上方，例如「時間都是日本時間，比台灣快 1 小時」"
     },
-    "zones": {
-      "type": "object",
-      "description": "地點「時區」欄的文字對應到哪個時區（IANA 名稱），首頁判斷「下一站」時用來換算，例如 { \"台灣時間\": \"Asia/Taipei\" }。沒寫的一律當成當地時間（weather.timezone）",
-      "additionalProperties": { "type": "string" }
-    },
     "weather": {
       "type": "object",
       "description": "首頁天氣看板的設定",
