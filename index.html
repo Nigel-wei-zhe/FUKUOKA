@@ -1284,6 +1284,46 @@
         }
         .scroller::-webkit-scrollbar { display: none; }
 
+        /* 行程頁上方的天數列：前一天／目前這天（點開選單）／後一天 */
+        .day-bar {
+            display: grid;
+            grid-template-columns: auto minmax(0, 1fr) auto;
+            gap: 8px;
+            padding: 2px 16px 6px;
+        }
+        .day-step, .day-current {
+            display: inline-flex;
+            align-items: center;
+            gap: 2px;
+            min-height: 52px;
+            border: 2px solid var(--line-strong);
+            border-radius: var(--r-chip);
+            background: var(--card);
+            color: var(--ink);
+            transition: transform .15s ease;
+        }
+        .day-step { justify-content: center; width: 52px; padding: 0; }
+        .day-step .ico { width: 26px; height: 26px; flex: none; }
+        .day-step:disabled { opacity: .4; }
+        .day-current {
+            justify-content: space-between;
+            gap: 6px;
+            padding: 4px 10px 4px 12px;
+            border-color: var(--ink);
+            background: var(--accent);
+            color: var(--on-accent);
+            box-shadow: var(--shadow);
+            text-align: left;
+        }
+        .day-current-text { display: flex; flex-direction: column; min-width: 0; line-height: 1.3; }
+        .day-current-text small { font-size: calc(13px * var(--fs)); opacity: .85; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+        .day-current-text span { font-size: calc(15px * var(--fs)); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+        .day-current .ico { width: 20px; height: 20px; flex: none; }
+        .day-step:active, .day-current:active { transform: scale(.96); }
+        /* 選單裡的天數：一排一個，大按鈕，日期和標題都完整顯示 */
+        .day-grid { display: grid; gap: 8px; padding: 4px 0 8px; }
+        .day-grid .day-tab { width: 100%; min-height: 56px; padding: 6px 14px 8px; }
+        .day-grid .day-tab span, .day-grid .day-tab small { white-space: normal; }
         .day-tab {
             flex: none;
             scroll-snap-align: start;
@@ -1400,12 +1440,12 @@
             position: absolute;
             top: 14px;
             bottom: 18px;
-            left: calc(48px * var(--fs) + 21px);
+            left: 15px;
             border-left: 2px dashed var(--line-strong);
         }
         .stop {
             display: grid;
-            grid-template-columns: calc(48px * var(--fs)) 32px minmax(0, 1fr);
+            grid-template-columns: 32px minmax(0, 1fr);
             column-gap: 8px;
             align-items: start;
             margin-bottom: 14px;
@@ -1447,8 +1487,19 @@
             box-shadow: var(--shadow);
             overflow: hidden;
         }
-        .card-head { padding-right: 58px; min-height: 48px; }
-        .card-cat { font-size: calc(13px * var(--fs)); color: var(--ink-soft); }
+        .card-head { min-height: 48px; }
+        /* 第一行：時間＋分類，右邊讓給蓋章；標題在下面用全寬 */
+        .card-when {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: baseline;
+            column-gap: 10px;
+            min-height: 44px;
+            padding-right: 64px;
+        }
+        .card-time { font-size: calc(20px * var(--fs)); line-height: 1.3; color: var(--ink); font-variant-numeric: tabular-nums; }
+        .card-time .time-tz { margin-left: 4px; font-size: calc(13px * var(--fs)); color: var(--ink-soft); }
+        .card-cat { font-size: calc(14px * var(--fs)); color: var(--ink-soft); }
         .card h3 { font-size: calc(17px * var(--fs)); line-height: 1.4; overflow-wrap: anywhere; }
         
         /* 關鍵提示小標籤（需預約、公休注意、排隊名店） */
@@ -1667,7 +1718,7 @@
         .card--move .card-head {
             position: relative;
             margin: 0 -14px;
-            padding: 0 72px 8px 14px;
+            padding: 0 14px 8px;
             border-bottom: 2px dashed var(--line-strong);
         }
         .card--move .card-head::before,
@@ -2140,6 +2191,8 @@
         <symbol id="i-bed" viewBox="0 0 24 24"><path d="M3 7v13M21 12v8M3 16h18M3 12h11a2 2 0 0 1 2 2v2M6 12V9.5A1.5 1.5 0 0 1 7.5 8h2A1.5 1.5 0 0 1 11 9.5V12"/></symbol>
         <symbol id="i-search" viewBox="0 0 24 24"><circle cx="10.8" cy="10.8" r="6.3"/><path d="M20 20l-4.6-4.6"/></symbol>
         <symbol id="i-chevron-down" viewBox="0 0 24 24"><path d="M6 9l6 6 6-6"/></symbol>
+        <symbol id="i-chevron-left" viewBox="0 0 24 24"><path d="M15 6l-6 6 6 6"/></symbol>
+        <symbol id="i-chevron-right" viewBox="0 0 24 24"><path d="M9 6l6 6-6 6"/></symbol>
         <symbol id="i-close" viewBox="0 0 24 24"><path d="M6.5 6.5l11 11M17.5 6.5l-11 11"/></symbol>
         <symbol id="i-home" viewBox="0 0 24 24"><path d="M3 10.5L12 3l9 7.5V20a1.5 1.5 0 0 1-1.5 1.5h-5A1.5 1.5 0 0 1 13 20v-5h-2v5a1.5 1.5 0 0 1-1.5 1.5h-5A1.5 1.5 0 0 1 3 20z"/></symbol>
         <symbol id="i-cloud" viewBox="0 0 24 24"><path d="M6.5 19a4.5 4.5 0 0 1-.5-8.97A7 7 0 0 1 19.5 12a4.5 4.5 0 0 1-2 8.5z"/></symbol>
@@ -2211,6 +2264,20 @@
                     <p class="setting-note">加到主畫面後，沒有網路也能看行程。</p>
                 </section>
                 <p id="app-version" class="app-version"></p>
+            </div>
+        </div>
+    </dialog>
+
+    <!-- 選天數：格狀大按鈕，一眼看到全部天數 -->
+    <dialog id="day-picker" class="sheet-dialog" aria-labelledby="day-picker-title">
+        <div class="sheet-body">
+            <button class="sheet-handle" type="button" aria-label="放大成全螢幕" aria-expanded="false"></button>
+            <div class="sheet-head">
+                <h2 id="day-picker-title">選擇天數</h2>
+                <button class="icon-btn" type="button" data-close aria-label="關閉"><svg class="ico"><use href="#i-close"/></svg></button>
+            </div>
+            <div class="sheet-scroll">
+                <nav id="day-tabs" class="day-grid" aria-label="全部天數"></nav>
             </div>
         </div>
     </dialog>
@@ -2430,7 +2497,14 @@
             </header>
 
             <div class="toolbar">
-                <nav id="day-tabs" class="scroller" aria-label="選擇天數"></nav>
+                <nav class="day-bar" aria-label="選擇天數">
+                    <button class="day-step" id="day-prev" type="button" aria-label="前一天"><svg class="ico"><use href="#i-chevron-left"/></svg></button>
+                    <button class="day-current" id="day-current" type="button" aria-haspopup="dialog">
+                        <span class="day-current-text"><small id="day-current-sub"></small><span id="day-current-name"></span></span>
+                        <svg class="ico"><use href="#i-chevron-down"/></svg>
+                    </button>
+                    <button class="day-step" id="day-next" type="button" aria-label="後一天"><svg class="ico"><use href="#i-chevron-right"/></svg></button>
+                </nav>
                 <div id="cat-chips" class="scroller cats" role="group" aria-label="選擇類別"></div>
             </div>
 
@@ -2607,7 +2681,15 @@
             return esc(item.time) + (item.tz ? `<small class="time-tz">${esc(item.tz)}</small>` : '');
         }
         // 日期一律用 YYYY-MM-DD 字串，以 UTC 計算避免時區差一天
+        // 預覽用：網址加 ?date=2026-11-23 可以假裝今天是那一天，看旅行期間的畫面
+        const PREVIEW_DATE = (() => {
+            try {
+                const d = new URLSearchParams(location.search).get('date');
+                return /^\d{4}-\d{2}-\d{2}$/.test(d || '') ? d : '';
+            } catch (e) { return ''; }
+        })();
         function todayIn(tz) {
+            if (PREVIEW_DATE) return PREVIEW_DATE;
             try {
                 return new Intl.DateTimeFormat('en-CA', { timeZone: tz && tz !== 'auto' ? tz : undefined, year: 'numeric', month: '2-digit', day: '2-digit' }).format(new Date());
             } catch (e) {
@@ -2673,6 +2755,33 @@
             container.querySelectorAll('button').forEach((btn) => {
                 btn.setAttribute('aria-pressed', String(btn.dataset[attr] === String(value)));
             });
+            if (container.id === 'day-tabs') updateDayBar();
+        }
+        // 行程頁上方：目前是哪一天（點了打開格狀選單），左右換前後一天
+        function dayOrder() { return ['prep'].concat(days.map((d) => d.day)); }
+        function updateDayBar() {
+            const sub = $('#day-current-sub');
+            if (!sub) return;
+            if (state.day === 'prep') {
+                sub.textContent = '出發前';
+                $('#day-current-name').textContent = '行前自檢';
+            } else {
+                const d = days.find((x) => x.day === state.day);
+                const date = dateOfDay(state.day);
+                sub.textContent = date ? `${dayLabel(state.day)}・${shortDate(date)}` : dayLabel(state.day);
+                $('#day-current-name').textContent = d && d.name ? d.name : dayLabel(state.day);
+            }
+            const order = dayOrder();
+            const i = order.indexOf(state.day);
+            $('#day-prev').disabled = i <= 0;
+            $('#day-next').disabled = i < 0 || i >= order.length - 1;
+        }
+        function selectDay(day) {
+            state.day = day === 'prep' ? 'prep' : Number(day);
+            if (state.day !== 'prep') currentHomeDay = state.day;
+            syncPressed($('#day-tabs'), 'day', state.day);
+            render();
+            scrollToList();
         }
 
         // ---------- 行程列表 ----------
@@ -2699,7 +2808,7 @@
                     <article class="card card--${c.kind}${isVisited ? ' is-visited' : ''}" data-id="${esc(item.id)}">
                         <div class="card-body">
                             <div class="card-head">
-                                <p class="card-cat">${c.label}</p>
+                                <p class="card-when">${item.time ? `<span class="card-time">${timeHTML(item)}</span>` : ''}<span class="card-cat">${c.label}</span></p>
                                 ${titleHTML}
                                 ${tagsHTML}
                             </div>
@@ -2730,8 +2839,8 @@
         function stopHTML(group) {
             const first = group[0];
             const c = catOf(first);
+            // 時間寫在卡片裡（全寬），左邊只留分類圓點，360px 下標題才不會一直換行
             const head = `
-                    <div class="stop-time">${timeHTML(first)}</div>
                     <div class="stop-node">${icon(c.icon)}</div>`;
             if (group.length === 1) {
                 return `<li class="stop" style="--cat:${c.color}">${head}${cardHTML(first)}</li>`;
@@ -3435,15 +3544,24 @@
         bindSheet(settings);
 
         // ---------- 事件 ----------
+        const dayPicker = $('#day-picker');
+        bindSheet(dayPicker);
+        $('#day-current').addEventListener('click', () => openSheet(dayPicker));
         $('#day-tabs').addEventListener('click', (e) => {
             const btn = e.target.closest('.day-tab');
             if (!btn) return;
-            state.day = btn.dataset.day === 'prep' ? 'prep' : Number(btn.dataset.day);
-            if (state.day !== 'prep') currentHomeDay = state.day;
-            syncPressed($('#day-tabs'), 'day', state.day);
-            btn.scrollIntoView({ inline: 'nearest', block: 'nearest' });
-            render();
-            scrollToList();
+            selectDay(btn.dataset.day);
+            closeSheet(dayPicker);
+        });
+        $('#day-prev').addEventListener('click', () => {
+            const order = dayOrder();
+            const i = order.indexOf(state.day);
+            if (i > 0) selectDay(order[i - 1]);
+        });
+        $('#day-next').addEventListener('click', () => {
+            const order = dayOrder();
+            const i = order.indexOf(state.day);
+            if (i >= 0 && i < order.length - 1) selectDay(order[i + 1]);
         });
         $('#cat-chips').addEventListener('click', (e) => {
             const btn = e.target.closest('.cat-chip');
