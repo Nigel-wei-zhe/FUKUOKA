@@ -5,11 +5,11 @@
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
     <title>福岡散步繪本 | FUKUOKA Travel</title>
     <meta name="description" content="福岡八天的吃喝散步路線：景點、美食、點心、購物與交通，附地圖導航，可離線瀏覽。">
-    <meta name="theme-color" content="#211915">
+    <meta name="theme-color" content="#EFE7DA">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-title" content="福岡散步">
-    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-status-bar-style" content="default">
     <link rel="manifest" href="./manifest.webmanifest">
     <link rel="icon" type="image/png" sizes="32x32" href="./icons/favicon-32.png">
     <link rel="apple-touch-icon" href="./icons/apple-touch-icon.png">
@@ -29,7 +29,7 @@
             if (fs === 'l' || fs === 'xl') document.documentElement.dataset.fs = fs;
             var m = document.querySelector('meta[name="theme-color"]');
             // 瀏覽器頂端的顏色跟著每一頁頂端的看板。這裡 CSS 還沒載入、讀不到變數，色碼要和兩套主題的 --board 一致
-            if (m) m.content = t === 'night' ? '#0A0706' : '#211915';
+            if (m) m.content = t === 'night' ? '#0A0706' : '#EFE7DA';
         })();
     </script>
 
@@ -74,13 +74,13 @@
             --on-sign: #FBF5E8;
             --sign-nav: #D9B25E;
             --on-sign-nav: #2B1E17;
-            /* 發車看板：首頁、各頁頂端的深色看板，琥珀色 LED 數字 */
-            --board: #211915;
-            --on-board: #F7F0E3;
-            --board-soft: #BDAC97;
-            --led: #F4B63F;
-            --on-led: #211915;
-            --board-action: #C8343B;
+            /* 看板：白天是月台上白色琺瑯的時刻表牌（比紙深一階的暖灰、漆紅大數字），夜晚才是深色 LED 發車看板 */
+            --board: #EFE7DA;
+            --on-board: #2B1E17;
+            --board-soft: #66554A;
+            --led: #9E1B22;
+            --on-led: #FFFFFF;
+            --board-action: #9E1B22;
             --on-board-action: #FFFFFF;
 
             --hill: #D6E6CF;
@@ -2749,7 +2749,7 @@
             -webkit-backdrop-filter: none;
             backdrop-filter: none;
         }
-        .tabbar { padding-top: 0; border-top: 0; }
+        .tabbar { padding-top: 0; border-top: 0; box-shadow: 0 -1px 0 var(--line); }
         .tab { position: relative; padding-top: 6px; color: var(--board-soft); }
         .tab::before {
             content: "";
@@ -2766,8 +2766,8 @@
         .tab[aria-pressed="true"] .tab-ico { background: transparent !important; color: var(--led) !important; }
         .home-pane .home-hero-wrap, .home-pane.is-trip .home-hero-wrap { margin-bottom: 0; }
         /* 夜晚看板和頁面底色接近：看板下緣加一條細線 */
-        :root[data-theme="night"] .toolbar, :root[data-theme="night"] .map-top, :root[data-theme="night"] .info-board,
-        :root[data-theme="night"] #home-next:not([hidden]), :root[data-theme="night"] .home-hero-wrap:has(+ #home-next[hidden]) {
+        .toolbar, .map-top, .info-board,
+        #home-next:not([hidden]), .home-hero-wrap:has(+ #home-next[hidden]) {
             box-shadow: 0 1px 0 var(--line);
         }
         /* 已過的站：時刻表裡的一列，不是浮起來的按鈕 */
@@ -2822,7 +2822,7 @@
             color: var(--on-board);
         }
         .sheet-dialog:not(.phrase-sheet) .sheet-head :focus-visible { outline-color: var(--led); }
-        :root[data-theme="night"] .sheet-dialog:not(.phrase-sheet) .sheet-head { box-shadow: 0 1px 0 var(--line); }
+        .sheet-dialog:not(.phrase-sheet) .sheet-head { box-shadow: 0 1px 0 var(--line); }
         .settings-sheet .sheet-scroll, #day-picker .sheet-scroll { padding-top: 4px; }
 
         /* 詳細頁的看板：琥珀色大時刻＋天數，下面分類、地名 */
