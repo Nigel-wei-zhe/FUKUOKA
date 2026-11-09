@@ -5,11 +5,11 @@
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
     <title>福岡散步繪本 | FUKUOKA Travel</title>
     <meta name="description" content="福岡八天的吃喝散步路線：景點、美食、點心、購物與交通，附地圖導航，可離線瀏覽。">
-    <meta name="theme-color" content="#FAF8F4">
+    <meta name="theme-color" content="#211915">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-title" content="福岡散步">
-    <meta name="apple-mobile-web-app-status-bar-style" content="default">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <link rel="manifest" href="./manifest.webmanifest">
     <link rel="icon" type="image/png" sizes="32x32" href="./icons/favicon-32.png">
     <link rel="apple-touch-icon" href="./icons/apple-touch-icon.png">
@@ -28,8 +28,8 @@
             try { fs = localStorage.getItem('trip:font-size'); } catch (e) {}
             if (fs === 'l' || fs === 'xl') document.documentElement.dataset.fs = fs;
             var m = document.querySelector('meta[name="theme-color"]');
-            // 這裡 CSS 還沒載入、讀不到變數，色碼要和兩套主題的 --paper 一致
-            if (m) m.content = t === 'night' ? '#17110E' : '#FAF8F4';
+            // 瀏覽器頂端的顏色跟著每一頁頂端的看板。這裡 CSS 還沒載入、讀不到變數，色碼要和兩套主題的 --board 一致
+            if (m) m.content = t === 'night' ? '#0A0706' : '#211915';
         })();
     </script>
 
@@ -121,9 +121,9 @@
             --ink-soft: #BFAF98;
             --line: #3A2D25;
             --line-strong: #7E6A57;
-            --accent: #D9B25E;
+            --accent: #F2B544;
             --on-accent: #17110E;
-            --link: #E3BE6E;
+            --link: #F2B544;
             --stamp: #EE8B7B;
 
             --c-sight: #93B383;
@@ -2831,9 +2831,11 @@
         .detail-head .tag-pill { background: color-mix(in srgb, var(--on-board) 12%, var(--board)); color: var(--on-board); border-color: transparent; }
         .detail-scroll-area { margin-top: 14px; }
 
-        /* ---- 看板上的小恐龍：LED 點陣，站在網站名稱和下一站中間的線上 ---- */
+        /* ---- 看板上的小恐龍：LED 點陣，在網站名稱和下一站中間的線上來回走 ---- */
         .home-hero-wrap .hero-text { padding-bottom: 50px; }
+        .home-hero-wrap .hero { container-type: inline-size; }
         .board-dino {
+            --dino-lane: calc(100cqw - 76px); /* 可以走的距離：看板寬度扣掉恐龍和左右留白 */
             position: absolute;
             right: 12px;
             bottom: 0;
@@ -2846,30 +2848,42 @@
             border: 0;
             background: none;
             cursor: pointer;
+            animation: dino-pace 18s linear infinite;
         }
+        .dino-face { display: block; animation: dino-turn 18s steps(1) infinite; }
         .board-dino svg { display: block; width: 46px; height: 46px; overflow: visible; }
         .board-dino .dino-body { fill: var(--led); }
         .board-dino .dino-cap { fill: var(--on-board); }
         .board-dino .dino-lid { display: none; }
         .board-dino.is-blink .dino-lid { display: inline; }
-        .board-dino g[data-f] { display: none; }
-        .board-dino[data-frame="stand"] g[data-f="stand"],
-        .board-dino[data-frame="a"] g[data-f="a"],
-        .board-dino[data-frame="b"] g[data-f="b"] { display: inline; }
+        /* 兩隻腳輪流踏：a、b 兩張交替；停下來（說話、減少動態效果）時換成站姿 */
+        .board-dino g[data-f="stand"] { display: none; }
+        .board-dino g[data-f="a"] { animation: dino-step-a .36s steps(1) infinite; }
+        .board-dino g[data-f="b"] { animation: dino-step-b .36s steps(1) infinite; }
+        @keyframes dino-step-a { 0% { visibility: visible; } 50% { visibility: hidden; } }
+        @keyframes dino-step-b { 0% { visibility: hidden; } 50% { visibility: visible; } }
+        .board-dino.is-talking, .board-dino.is-talking .dino-face { animation-play-state: paused; }
+        .board-dino.is-talking g[data-f="a"], .board-dino.is-talking g[data-f="b"] { display: none; }
+        .board-dino.is-talking g[data-f="stand"] { display: inline; }
+        /* 右邊 → 左邊 → 右邊；走到頭轉身（只動 transform） */
+        @keyframes dino-pace {
+            0% { transform: translateX(0); }
+            50% { transform: translateX(calc(-1 * var(--dino-lane))); }
+            100% { transform: translateX(0); }
+        }
+        @keyframes dino-turn {
+            0% { transform: scaleX(-1); }
+            50% { transform: scaleX(1); }
+        }
         .board-dino:focus-visible { outline: 3px solid var(--led); outline-offset: 0; border-radius: var(--r-inner); }
-        /* 走進來：從看板左邊外面走到右邊停下（只動 transform） */
-        .board-dino.is-walking { animation: dino-walk 2.4s linear both; }
-        @keyframes dino-walk { from { transform: translateX(calc(-100vw + 60px)); } to { transform: translateX(0); } }
-        @media (min-width: 680px) { @keyframes dino-walk { from { transform: translateX(-600px); } to { transform: translateX(0); } } }
         /* 點一下：往上跳再落下，平順減速，不彈跳 */
         .board-dino.is-jumping svg { animation: dino-jump .5s cubic-bezier(.22, 1, .36, 1); }
         @keyframes dino-jump { 40% { transform: translateY(-16px); } 100% { transform: translateY(0); } }
         .dino-bubble {
             position: absolute;
-            right: 64px;
-            bottom: 10px;
-            z-index: 2;
-            max-width: calc(100% - 96px);
+            bottom: 8px;
+            width: max-content;
+            max-width: calc(100cqw - 100px);
             padding: 6px 12px;
             border-radius: var(--r-inner);
             background: var(--led);
@@ -2877,9 +2891,19 @@
             font-size: calc(15px * var(--fs));
             font-weight: 600;
             line-height: 1.4;
+            text-align: left;
+            white-space: normal;
             animation: bubble-in .25s cubic-bezier(.22, 1, .36, 1);
         }
+        .dino-bubble[data-side="left"] { right: 100%; margin-right: 4px; }
+        .dino-bubble[data-side="right"] { left: 100%; margin-left: 4px; }
         .dino-bubble[hidden] { display: none; }
+        /* 減少動態效果：不走、不踏步，只站著 */
+        @media (prefers-reduced-motion: reduce) {
+            .board-dino, .dino-face { animation: none !important; }
+            .board-dino g[data-f="a"], .board-dino g[data-f="b"] { display: none; }
+            .board-dino g[data-f="stand"] { display: inline; }
+        }
         .home-hero-wrap { position: relative; overflow: hidden; }
     </style>
 </head>
@@ -3202,8 +3226,7 @@
                     </svg>
                 </svg>
                 <!-- 看板上的小恐龍：首頁打開時走進來，點了跳一下、說一句話（句子在 data/ui.json 的 mascot） -->
-                <button id="dino-btn" class="board-dino" type="button" aria-label="小恐龍：點我說說話" data-frame="stand"></button>
-                <p id="dino-bubble" class="dino-bubble" role="status" hidden></p>
+                <button id="dino-btn" class="board-dino" type="button" aria-label="小恐龍：點我說說話"><span class="dino-face"></span><span id="dino-bubble" class="dino-bubble" role="status" hidden></span></button>
                 <!-- 點明太子：跳一下、說一句話（句子在 data/ui.json 的 mascot） -->
                 <button id="mascot-btn" class="mascot-btn" type="button" aria-label="明太子：點我說說話"></button>
                 <p id="mascot-bubble" class="mascot-bubble" role="status" hidden></p>
@@ -4030,7 +4053,7 @@
         // ---------- 日夜切換 ----------
         function applyTheme(theme) {
             root.dataset.theme = theme;
-            document.querySelector('meta[name="theme-color"]').content = getComputedStyle(root).getPropertyValue('--paper').trim();
+            document.querySelector('meta[name="theme-color"]').content = getComputedStyle(root).getPropertyValue('--board').trim();
             document.querySelectorAll('[data-theme-choice]').forEach((b) => b.setAttribute('aria-pressed', String(b.dataset.themeChoice === theme)));
         }
         function setTheme(theme, origin) {
@@ -4507,47 +4530,36 @@
         (function setupDino() {
             const btn = $('#dino-btn');
             if (!btn) return;
-            btn.innerHTML = `<svg viewBox="0 0 16 16" aria-hidden="true">${dinoDots(DINO_TOP, 0, 'dino-body')}`
+            btn.querySelector('.dino-face').innerHTML = `<svg viewBox="0 0 16 16" aria-hidden="true">${dinoDots(DINO_TOP, 0, 'dino-body')}`
                 + `<rect class="dino-body dino-lid" x="8.1" y="4.1" width=".8" height=".8" rx=".18"/>`
                 + Object.entries(DINO_LEGS).map(([f, rows]) => `<g data-f="${f}">${dinoDots(rows, 14, 'dino-body')}</g>`).join('')
                 + '</svg>';
-            let walked = false;
-            let stepTimer = null;
-            // 首頁第一次出現時從左邊走到右邊的位置（約 2.4 秒），走完停下來
-            window.dinoWalk = function () {
-                if (walked || root.dataset.view !== 'home' || !btn.offsetParent) return;
-                walked = true;
-                if (reduceMotion()) return;
-                btn.classList.add('is-walking');
-                let i = 0;
-                stepTimer = setInterval(() => { btn.dataset.frame = i++ % 2 ? 'b' : 'a'; }, 160);
-                const done = () => {
-                    clearInterval(stepTimer);
-                    btn.classList.remove('is-walking');
-                    btn.dataset.frame = 'stand';
-                };
-                btn.addEventListener('animationend', done, { once: true });
-                setTimeout(done, 3000);
-            };
-            // 偶爾眨眼（只有首頁看得到的時候）
+            // 走路、轉身都是 CSS 動畫；這裡只管眨眼和點了之後的反應
             setInterval(() => {
                 if (root.dataset.view !== 'home' || document.hidden || reduceMotion()) return;
                 btn.classList.add('is-blink');
                 setTimeout(() => btn.classList.remove('is-blink'), 180);
             }, 5200);
+            const bubble = $('#dino-bubble');
             let lineTimer = null;
+            // 點一下：停下來、跳一下、說一句話，2.8 秒後繼續走
             btn.addEventListener('click', () => {
+                btn.classList.add('is-talking');
                 if (!reduceMotion()) {
                     btn.classList.remove('is-jumping');
                     void btn.getBoundingClientRect();
                     btn.classList.add('is-jumping');
                 }
-                if (!mascotLines.length) return;
-                const bubble = $('#dino-bubble');
-                bubble.textContent = mascotLines[mascotIndex++ % mascotLines.length];
-                bubble.hidden = false;
+                if (mascotLines.length) {
+                    // 泡泡往看板中間那一側長，不會超出畫面
+                    const box = btn.parentElement.getBoundingClientRect();
+                    const r = btn.getBoundingClientRect();
+                    bubble.dataset.side = r.left + r.width / 2 < box.left + box.width / 2 ? 'right' : 'left';
+                    bubble.textContent = mascotLines[mascotIndex++ % mascotLines.length];
+                    bubble.hidden = false;
+                }
                 clearTimeout(lineTimer);
-                lineTimer = setTimeout(() => { bubble.hidden = true; }, 2800);
+                lineTimer = setTimeout(() => { bubble.hidden = true; btn.classList.remove('is-talking'); }, 2800);
             });
             btn.addEventListener('animationend', (e) => { if (e.animationName === 'dino-jump') btn.classList.remove('is-jumping'); });
         })();
@@ -4744,7 +4756,6 @@
             markNow();
             renderNext();
             fetchWeatherForDay(currentHomeDay);
-            if (window.dinoWalk) requestAnimationFrame(() => window.dinoWalk());
         }
 
         // 旅行當天：依現在時間標出「現在」的行程（最後一個已經開始的時段），每分鐘更新
