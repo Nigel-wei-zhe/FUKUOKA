@@ -941,7 +941,7 @@
             border-radius: 5px;
             background: color-mix(in srgb, var(--c-move) 55%, transparent);
             color: var(--ink);
-            font-size: calc(12px * var(--fs));
+            font-size: calc(13px * var(--fs));
             font-weight: 400;
             line-height: 1.4;
             white-space: nowrap;
@@ -2477,6 +2477,81 @@
         #weather-card .weather-range-box { grid-area: range; margin: 0; font-size: calc(13px * var(--fs)); line-height: 1.3; text-align: right; }
         #weather-card .weather-status-tag,
         #weather-card .weather-tips { display: none; }
+
+        /* ===== 天氣條：地點旁邊標「今天／11/23 預報」；可能下雨時多一行帶傘提醒 ===== */
+        #weather-card { grid-template-areas: "icon temp desc range" "icon temp city range" "tip tip tip tip"; }
+        #weather-card .weather-header { display: flex; grid-area: city; align-self: start; align-items: baseline; gap: 6px; min-width: 0; margin: 0; }
+        #weather-card .weather-header .weather-city-badge { grid-area: auto; flex: 0 1 auto; }
+        #weather-card .weather-status-tag { display: inline; flex: none; padding: 0; border: 0; background: none; font-size: calc(13px * var(--fs)); color: var(--ink-soft); }
+        #weather-card .weather-status-tag::before { content: "・"; }
+        #weather-card .weather-range-box { font-size: calc(14px * var(--fs)); }
+        #weather-card .weather-range-box div:last-child { font-size: calc(15px * var(--fs)); color: var(--ink); }
+        #weather-card .weather-tips:not([hidden]) {
+            display: flex;
+            grid-area: tip;
+            align-items: center;
+            gap: 6px;
+            margin: 10px 0 0;
+            padding: 0;
+            border: 0;
+            font-size: calc(15px * var(--fs));
+            font-weight: 600;
+            color: var(--ink);
+        }
+        #weather-card .weather-tips .ico { width: 18px; height: 18px; color: var(--link); }
+
+        /* ===== 站牌：二選一改成兩個可以點的大列；收尾、倒數 ===== */
+        .next-options { display: grid; gap: 8px; margin-top: 12px; }
+        .next-option {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 10px;
+            min-height: 56px;
+            padding: 10px 14px;
+            border: 1px solid color-mix(in srgb, var(--on-sign) 16%, transparent);
+            border-radius: var(--r-chip);
+            background: color-mix(in srgb, var(--on-sign) 10%, transparent);
+            color: var(--on-sign);
+            font: inherit;
+            text-align: left;
+        }
+        .next-option:active { background: color-mix(in srgb, var(--on-sign) 18%, transparent); transform: scale(.98); }
+        .next-option-title { font-size: calc(19px * var(--fs)); font-weight: 700; line-height: 1.3; overflow-wrap: anywhere; }
+        .next-option .ico { flex: none; width: 22px; height: 22px; }
+        .next-sub { margin-top: 6px; font-size: calc(16px * var(--fs)); line-height: 1.5; color: var(--on-sign); opacity: .9; }
+        .next-countdown b { font-size: calc(44px * var(--fs)); line-height: 1; font-variant-numeric: tabular-nums; letter-spacing: -.02em; }
+        .next-progress { height: 8px; margin-top: 14px; border-radius: 999px; background: color-mix(in srgb, var(--on-sign) 18%, transparent); overflow: hidden; }
+        .next-progress span { display: block; height: 100%; border-radius: inherit; background: var(--on-sign); }
+
+        /* ===== 首頁：回今天、已過的站收起來 ===== */
+        .home-today-btn { min-height: 48px; padding: 4px 14px; }
+        .home-today-btn[hidden] { display: none; }
+        .home-day-selector { flex-wrap: wrap; justify-content: flex-end; }
+        .stops.hide-past .stop.is-past { display: none; }
+        .past-toggle { width: 100%; min-height: 48px; margin-bottom: 8px; justify-content: flex-start; padding: 4px 14px; color: var(--ink-soft); }
+        .past-toggle .ico { width: 18px; height: 18px; }
+        /* 日期放前面（今天・北九州市 (門司港)），地名太長時從尾端省略 */
+        #weather-card .weather-status-tag { order: -1; }
+        #weather-card .weather-status-tag::before { content: none; }
+        #weather-card .weather-status-tag::after { content: "・"; }
+        #weather-card .weather-header .weather-city-badge { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+        /* 首頁天數標題獨占一行，換天的按鈕放下一行靠右 */
+        .home-section-head h2 { flex: 1 1 100%; }
+        .home-day-selector { width: 100%; }
+
+        /* ===== polish ===== */
+        /* 標題上方不放小標：「第 3 天」併進標題同一行，用主色區分 */
+        .day-title .tape { display: inline; margin-right: .35em; font-size: inherit; letter-spacing: 0; }
+        .next-card .next-title:first-child { margin-top: 0; }
+        /* 瀏覽器自己畫的部分也跟著主題：選取、游標、鍵盤焦點 */
+        ::selection { background: color-mix(in srgb, var(--accent) 30%, transparent); color: var(--ink); }
+        input, textarea { caret-color: var(--accent); }
+        :focus-visible { outline: 3px solid var(--link); outline-offset: 2px; }
+        .next-card :focus-visible { outline-color: var(--on-sign); }
+        .day-title { display: block; }
+        .day-title small { display: block; margin-top: 4px; }
+        .day-title .day-done { margin-left: 8px; vertical-align: middle; }
     </style>
 </head>
 <body>
@@ -2669,7 +2744,7 @@
                     </div>
                 </div>
                 <div class="weather-tips" id="weather-tip-row">
-                    <svg class="ico"><use href="#i-bowl"/></svg>
+                    <svg class="ico"><use id="weather-tip-icon" href="#i-info"/></svg>
                     <span id="weather-outfit-tip"></span>
                 </div>
             </section>
@@ -2679,6 +2754,7 @@
                 <div class="home-section-head">
                     <h2><svg class="ico"><use href="#i-calendar"/></svg><span id="home-today-title">今日行程</span></h2>
                     <div class="home-day-selector">
+                        <button class="chip-btn home-today-btn" id="home-today-btn" type="button" hidden><svg class="ico"><use href="#i-calendar"/></svg>回今天</button>
                         <button class="day-step" id="home-prev-day-btn" type="button" aria-label="前一天"><svg class="ico"><use href="#i-chevron-left"/></svg></button>
                         <button class="day-step" id="home-next-day-btn" type="button" aria-label="後一天"><svg class="ico"><use href="#i-chevron-right"/></svg></button>
                     </div>
@@ -3091,7 +3167,6 @@
         }
         function selectDay(day) {
             state.day = day === 'prep' ? 'prep' : Number(day);
-            if (state.day !== 'prep') currentHomeDay = state.day;
             syncPressed($('#day-tabs'), 'day', state.day);
             render();
             scrollToList();
@@ -3419,7 +3494,6 @@
         function setViewDay(n) {
             n = Number(n);
             if (!days.some((d) => d.day === n)) return;
-            currentHomeDay = n;
             if (state.day !== n) {
                 state.day = n;
                 syncPressed($('#day-tabs'), 'day', state.day);
@@ -3607,6 +3681,7 @@
                 setTimeout(() => map && map.invalidateSize(), 50);
             }
             if (view === 'home') {
+                resetHomeToToday();
                 renderHome();
             }
             if (view === 'info') {
@@ -3906,7 +3981,6 @@
             }
             if (act === 'goto-day') {
                 state.day = Number(btn.dataset.day);
-                currentHomeDay = state.day;
                 syncPressed($('#day-tabs'), 'day', state.day);
                 const tab = $(`#day-tabs [data-day="${state.day}"]`);
                 if (tab) tab.scrollIntoView({ inline: 'center', block: 'nearest' });
@@ -4097,6 +4171,18 @@
 
         // ---------- 首頁當天天氣與當日行程邏輯 ----------
         let currentHomeDay = 1;
+        let homePastOpen = false; // 首頁「已過 N 站」是否展開
+        // 旅行期間今天是第幾天；不在旅程中回傳 null
+        function tripToday() {
+            if (!trip.startDate) return null;
+            const n = daysBetween(trip.startDate, todayIn(weatherConf.timezone)) + 1;
+            return days.some((d) => d.day === n) ? n : null;
+        }
+        // 首頁永遠回答「今天」：切回首頁、App 從背景回來時都重設
+        function resetHomeToToday() {
+            const t = tripToday();
+            if (t && currentHomeDay !== t) { currentHomeDay = t; homePastOpen = false; }
+        }
 
         const weatherCodes = {
             0: { desc: '晴天朗朗', icon: 'i-sun', outfit: '天氣晴朗舒適，早晚偏涼建議攜帶薄外套。' },
@@ -4139,7 +4225,7 @@
             const today = todayIn(weatherConf.timezone);
             const date = dateOfDay(dayNum);
             const ahead = date ? daysBetween(today, date) : 0;
-            $('#weather-date-label').textContent = date ? `${dayLabel(dayNum)}・${dateLabel(date)}` : `${dayLabel(dayNum)} 預報`;
+            $('#weather-date-label').textContent = date ? (date === today ? '今天' : `${shortDate(date)} 預報`) : `${dayLabel(dayNum)} 預報`;
 
             if (ahead >= FORECAST_DAYS) {
                 applyWeatherUI({ state: 'later', ahead });
@@ -4208,6 +4294,11 @@
                 loading: '',
                 error: `請確認網路連線。${climateText()}`
             }[w.state];
+            // 一條天氣：有預報時只在可能下雨才多一行「記得帶傘」；沒有預報時說明原因
+            if (hasData) {
+                $('#weather-outfit-tip').textContent = w.rain != null && w.rain >= 50 ? `降雨機率 ${w.rain}%，出門記得帶傘` : '';
+            }
+            $('#weather-tip-icon').setAttribute('href', hasData ? '#i-rain' : '#i-info');
             $('#weather-tip-row').hidden = !$('#weather-outfit-tip').textContent;
             // 沒有數字時不顯示「--°」，只留文字說明
             $('#weather-temp-row').hidden = !hasData;
@@ -4225,6 +4316,13 @@
             container.innerHTML = dayItems.length
                 ? `<ol class="stops">${groupStops(dayItems).map(stopHTML).join('')}</ol>`
                 : `<div class="today-empty"><p>這一天尚未安排行程。</p></div>`;
+
+            const minDay = days.length ? days[0].day : 1;
+            const maxDay = days.length ? days[days.length - 1].day : 1;
+            $('#home-prev-day-btn').disabled = currentHomeDay <= minDay;
+            $('#home-next-day-btn').disabled = currentHomeDay >= maxDay;
+            const t = tripToday();
+            $('#home-today-btn').hidden = !t || t === currentHomeDay;
 
             markNow();
             renderNext();
@@ -4249,6 +4347,24 @@
             const date = dateOfDay(currentHomeDay);
             const isToday = Boolean(date) && date === todayIn(weatherConf.timezone);
             pane.classList.toggle('is-trip', isToday);
+            // 出發前：倒數＋行前自檢進度
+            const until = trip.startDate ? daysBetween(todayIn(weatherConf.timezone), trip.startDate) : -1;
+            if (!isToday && until > 0) {
+                const all = checklistItems();
+                const done = all.filter((it) => checked.has(it.id)).length;
+                box.hidden = false;
+                box.style.setProperty('--cat', 'var(--c-sight)');
+                box.innerHTML = `
+                    <h2 class="next-title next-countdown">還有 <b>${until}</b> 天出發</h2>
+                    <p class="next-sub">${esc(dateLabel(trip.startDate))} 從台灣出發</p>
+                    ${all.length ? `
+                        <div class="next-progress" role="img" aria-label="行前自檢完成 ${done} / ${all.length} 項"><span style="width:${Math.round(done / all.length * 100)}%"></span></div>
+                        <p class="next-sub">行前自檢 ${done} / ${all.length} 項</p>` : ''}
+                    <div class="next-actions">
+                        <button class="chip-btn nav" type="button" data-go-prep>${icon('check')}${done === all.length && all.length ? '再看一次行前自檢' : '繼續行前自檢'}</button>
+                    </div>`;
+                return;
+            }
             box.hidden = !isToday;
             if (!isToday) { box.innerHTML = ''; return; }
 
@@ -4274,26 +4390,35 @@
                 box.style.setProperty('--cat', catOf(first).color);
                 box.innerHTML = `
                     <p class="next-label"><span class="tape" style="--tape:${catOf(first).color}">下一站</span><span class="next-time">${esc(first.time)}${tzTag(first)}</span>${next.length > 1 ? `<span class="next-count">${next.length} 個選一個</span>` : ''}</p>
-                    ${next.map((it) => `
+                    ${next.length === 1 ? `
                         <div class="next-choice">
-                            <span class="next-cat" style="--cat:${catOf(it).color}">${icon(catOf(it).icon)}${esc(catOf(it).label)}</span>
-                            <h2 class="next-title">${esc(it.title)}</h2>
-                            ${actions(it)}
-                        </div>`).join('')}
+                            <span class="next-cat" style="--cat:${catOf(first).color}">${icon(catOf(first).icon)}${esc(catOf(first).label)}</span>
+                            <h2 class="next-title">${esc(first.title)}</h2>
+                            ${actions(first)}
+                        </div>` : `
+                        <div class="next-options">
+                            ${next.map((it) => `
+                                <button class="next-option" type="button" data-open="${esc(it.id)}">
+                                    <span class="next-option-title">${esc(it.title)}</span>
+                                    ${icon('chevron-right')}
+                                </button>`).join('')}
+                        </div>`}
                     ${nowLine}${quick}`;
                 return;
             }
-            // 今天都走完了：給今晚的住宿
+            // 今天都走完了：一句收尾＋明天第一站；最後一天說平安回家
             box.style.setProperty('--cat', 'var(--c-stay)');
-            const tonight = hotelStays().find((h) => h.days.includes(currentHomeDay));
-            box.innerHTML = `
-                <p class="next-label"><span class="tape" style="--tape:var(--c-stay)">今天的行程走完了</span></p>
-                ${tonight ? `
-                    <div class="next-choice">
-                        <h2 class="next-title">今晚住：${esc(tonight.stay.title)}</h2>
-                        ${actions(tonight.stay)}
-                    </div>` : ''}
-                ${nowLine}${quick}`;
+            const tomorrow = days.find((d) => d.day === currentHomeDay + 1);
+            const tFirst = tomorrow ? items.filter((i) => i.day === tomorrow.day && i.time).sort(byTime)[0] : null;
+            box.innerHTML = tomorrow ? `
+                <h2 class="next-title">${tFirst ? `明天 ${esc(tFirst.time)} 出發` : '明天見'}</h2>
+                <p class="next-sub">今天辛苦了。${tFirst ? `明天第一站：${esc(tFirst.title)}` : ''}</p>
+                <div class="next-actions">
+                    <button class="chip-btn nav" type="button" data-go-day="${tomorrow.day}">${icon('calendar')}看明天</button>
+                </div>
+                ${quick}` : `
+                <h2 class="next-title">旅程結束，平安回家</h2>
+                ${quick}`;
         }
 
         function markNow() {
@@ -4301,6 +4426,26 @@
             const date = dateOfDay(currentHomeDay);
             const isToday = Boolean(date) && date === todayIn(weatherConf.timezone);
             const current = isToday ? rows.filter((r) => r.dataset.time <= nowHM(r.dataset.tz)).pop() : null;
+            // 已經過去的站收起來（「現在」那站之前的），可以點開
+            const curIdx = current ? rows.indexOf(current) : -1;
+            const list = $('#home-today-list .stops');
+            let toggle = $('#home-past-toggle');
+            if (list) {
+                rows.forEach((r, i) => r.classList.toggle('is-past', i < curIdx));
+                list.classList.toggle('hide-past', curIdx > 0 && !homePastOpen);
+                if (curIdx > 0) {
+                    if (!toggle) {
+                        toggle = document.createElement('button');
+                        toggle.type = 'button';
+                        toggle.id = 'home-past-toggle';
+                        toggle.className = 'chip-btn past-toggle';
+                        toggle.addEventListener('click', () => { homePastOpen = !homePastOpen; markNow(); });
+                        list.before(toggle);
+                    }
+                    toggle.innerHTML = `${icon(homePastOpen ? 'chevron-down' : 'chevron-right')}${homePastOpen ? '收起已過的站' : `已過 ${curIdx} 站，點開來看`}`;
+                    toggle.setAttribute('aria-expanded', String(homePastOpen));
+                } else if (toggle) toggle.remove();
+            }
             rows.forEach((r) => {
                 const on = r === current;
                 r.classList.toggle('is-now', on);
@@ -4317,7 +4462,11 @@
             });
         }
         setInterval(() => { if (root.dataset.view === 'home') { markNow(); renderNext(); } }, 60000);
-        document.addEventListener('visibilitychange', () => { if (!document.hidden && root.dataset.view === 'home' && items.length) { markNow(); renderNext(); } });
+        document.addEventListener('visibilitychange', () => {
+            if (document.hidden || root.dataset.view !== 'home' || !items.length) return;
+            resetHomeToToday();
+            renderHome();
+        });
 
         $('#home-today-list').addEventListener('click', (e) => {
             const btn = e.target.closest('[data-act="detail"]');
@@ -4327,6 +4476,9 @@
         $('#home-next').addEventListener('click', (e) => {
             const btn = e.target.closest('[data-open]');
             if (btn) { showDetailModal(btn.dataset.open); return; }
+            const go = e.target.closest('[data-go-day]');
+            if (go) { currentHomeDay = Number(go.dataset.goDay); homePastOpen = false; renderHome(); window.scrollTo({ top: 0, behavior: 'smooth' }); return; }
+            if (e.target.closest('[data-go-prep]')) { selectDay('prep'); setView('list'); window.scrollTo(0, 0); return; }
             const quick = e.target.closest('[data-quick]');
             if (!quick) return;
             if (quick.dataset.quick === 'sos') {
@@ -4348,18 +4500,21 @@
             if (!days.length) return;
             const minDay = days[0].day;
             const maxDay = days[days.length - 1].day;
-            setViewDay(currentHomeDay > minDay ? currentHomeDay - 1 : maxDay);
-            renderHome();
+            if (currentHomeDay > minDay) { currentHomeDay -= 1; homePastOpen = false; renderHome(); }
         });
 
         $('#home-next-day-btn').addEventListener('click', () => {
             if (!days.length) return;
             const minDay = days[0].day;
             const maxDay = days[days.length - 1].day;
-            setViewDay(currentHomeDay < maxDay ? currentHomeDay + 1 : minDay);
-            renderHome();
+            if (currentHomeDay < maxDay) { currentHomeDay += 1; homePastOpen = false; renderHome(); }
         });
 
+        $('#home-today-btn').addEventListener('click', () => {
+            resetHomeToToday();
+            renderHome();
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        });
         $('#home-view-all-btn').addEventListener('click', () => {
             state.day = currentHomeDay;
             syncPressed($('#day-tabs'), 'day', state.day);
