@@ -3005,7 +3005,23 @@
         let map = null;
         let markerLayer = null;
         const markersById = new Map();
-        let mapDay = 'all';
+        // null：還沒打開過，第一次進地圖跟著目前查看的那一天；'all'：全部旅程
+        let mapDay = null;
+
+        // 首頁、行程、地圖共用「目前查看的那一天」
+        function currentViewDay() {
+            return typeof state.day === 'number' ? state.day : currentHomeDay;
+        }
+        function setViewDay(n) {
+            n = Number(n);
+            if (!days.some((d) => d.day === n)) return;
+            currentHomeDay = n;
+            if (state.day !== n) {
+                state.day = n;
+                syncPressed($('#day-tabs'), 'day', state.day);
+                render();
+            }
+        }
 
         function getMapItems() {
             return items.filter((it) => {
@@ -3037,6 +3053,11 @@
                 btn.setAttribute('aria-pressed', String(btn.dataset.day == mapDay));
             });
 
+            updateMapTitle();
+            updateMarkers(fit);
+        }
+
+        function updateMapTitle() {
             const dayInfo = days.find((d) => d.day == mapDay);
             const pins = getMapItems();
             if (mapDay === 'all') {
@@ -3050,8 +3071,6 @@
                 const fitBtn = $('#map-fit');
                 if (fitBtn) fitBtn.innerHTML = `${icon('fit')}重設當日視角`;
             }
-
-            updateMarkers(fit);
         }
 
         function initMap(fit = true) {
@@ -3099,8 +3118,10 @@
                 marker.bindPopup(popupHTML(item), { maxWidth: 260 });
                 marker.addTo(markerLayer);
                 markersById.set(item.id, marker);
-                bounds.push([item.lat, item.lng]);
+                // 不是當地時間的地點（例如台灣出發）不算進視野，免得一打開就縮成整張東亞地圖
+                if (!item.tz) bounds.push([item.lat, item.lng]);
             });
+            if (!bounds.length) pins.forEach((item) => bounds.push([item.lat, item.lng]));
             if (fit && bounds.length) map.fitBounds(bounds, { padding: [36, 36], maxZoom: 15 });
         }
 
@@ -3155,8 +3176,18 @@
                 } catch (e) {}
             }
             if (view === 'map' && opts.init !== false) {
-                initMap();
+                const target = currentViewDay();
+                const follow = mapDay !== 'all' && mapDay != target;
+                if (follow) mapDay = target;
+                if (map) {
+                    if (follow) setMapDay(mapDay, true);
+                } else {
+                    initMap();
+                }
+                updateMapTitle();
                 renderMapDayTabs();
+                const chip = $('#map-day-tabs [aria-pressed="true"]');
+                if (chip) chip.scrollIntoView({ inline: 'center', block: 'nearest' });
                 setTimeout(() => map && map.invalidateSize(), 50);
             }
             if (view === 'home') {
@@ -3408,6 +3439,7 @@
             const btn = e.target.closest('.day-tab');
             if (!btn) return;
             state.day = btn.dataset.day === 'prep' ? 'prep' : Number(btn.dataset.day);
+            if (state.day !== 'prep') currentHomeDay = state.day;
             syncPressed($('#day-tabs'), 'day', state.day);
             btn.scrollIntoView({ inline: 'nearest', block: 'nearest' });
             render();
@@ -3444,6 +3476,7 @@
             }
             if (act === 'goto-day') {
                 state.day = Number(btn.dataset.day);
+                currentHomeDay = state.day;
                 syncPressed($('#day-tabs'), 'day', state.day);
                 const tab = $(`#day-tabs [data-day="${state.day}"]`);
                 if (tab) tab.scrollIntoView({ inline: 'center', block: 'nearest' });
@@ -3923,7 +3956,7 @@
             if (!days.length) return;
             const minDay = days[0].day;
             const maxDay = days[days.length - 1].day;
-            currentHomeDay = currentHomeDay > minDay ? currentHomeDay - 1 : maxDay;
+            setViewDay(currentHomeDay > minDay ? currentHomeDay - 1 : maxDay);
             renderHome();
         });
 
@@ -3931,7 +3964,7 @@
             if (!days.length) return;
             const minDay = days[0].day;
             const maxDay = days[days.length - 1].day;
-            currentHomeDay = currentHomeDay < maxDay ? currentHomeDay + 1 : minDay;
+            setViewDay(currentHomeDay < maxDay ? currentHomeDay + 1 : minDay);
             renderHome();
         });
 
@@ -3950,7 +3983,8 @@
         $('#map-day-tabs').addEventListener('click', (e) => {
             const btn = e.target.closest('.map-day-chip');
             if (!btn) return;
-            setMapDay(btn.dataset.day, true);
+            if (btn.dataset.day !== 'all') setViewDay(btn.dataset.day);
+            setMapDay(btn.dataset.day === 'all' ? 'all' : Number(btn.dataset.day), true);
         });
 
         desktopMQ.addEventListener('change', (e) => {
