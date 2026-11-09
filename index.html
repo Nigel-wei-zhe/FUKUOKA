@@ -65,6 +65,11 @@
             --c-move: #9CB1D6;
             --c-stay: #BBA6D6;
             --on-cat: #1D2A48;
+            /* 站牌（首頁下一站）：白天紺底白字，夜晚燈籠黃底紺字 */
+            --sign: #1D2A48;
+            --on-sign: #FFFFFF;
+            --sign-nav: #B8324A;
+            --on-sign-nav: #FFFFFF;
 
             --hill: #D6E6CF;
             --sea: #C3D7E6;
@@ -115,6 +120,10 @@
             --c-move: #8AA2CC;
             --c-stay: #A794CC;
             --on-cat: #0F1830;
+            --sign: #F2C14E;
+            --on-sign: #0F1830;
+            --sign-nav: #0F1830;
+            --on-sign-nav: #F2C14E;
 
             --hill: #22304F;
             --sea: #1F3A5E;
@@ -2140,6 +2149,157 @@
 
         /* 日夜切換的圓形擴散過場 */
         ::view-transition-old(root), ::view-transition-new(root) { animation: none; mix-blend-mode: normal; }
+
+        /* ================= 路線圖式清單（行程頁、首頁共用） =================
+           左：粗體時間｜中：路線直線＋分類色圓點｜右：地名一列，點整列看詳細，最右邊導航 */
+        .stops::before { display: none; }
+        .stops { margin: 0; padding: 0; list-style: none; }
+        .stop {
+            position: relative;
+            display: grid;
+            grid-template-columns: calc(50px * var(--fs)) 16px minmax(0, 1fr);
+            column-gap: 10px;
+            margin: 0;
+        }
+        .stop::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            bottom: 0;
+            left: calc(50px * var(--fs) + 17px);
+            border-left: 2px solid var(--line);
+        }
+        .stop:first-child::before { top: 24px; }
+        .stop:last-child::before { bottom: auto; height: 24px; }
+        .stop:only-child::before { display: none; }
+        .stop-time {
+            padding-top: 14px;
+            text-align: right;
+            font-size: calc(17px * var(--fs));
+            font-weight: 700;
+            line-height: 1.3;
+            color: var(--ink);
+            font-variant-numeric: tabular-nums;
+            white-space: nowrap;
+        }
+        .stop-time .time-tz { display: block; margin: 2px 0 0; font-size: calc(13px * var(--fs)); font-weight: 400; color: var(--ink-soft); white-space: nowrap; }
+        .stop-time .time-now { display: block; width: fit-content; margin: 4px 0 0 auto; font-size: calc(13px * var(--fs)); font-weight: 600; }
+        .stop-node {
+            position: relative;
+            z-index: 1;
+            width: 16px;
+            height: 16px;
+            margin-top: 17px;
+            border: 3px solid var(--paper);
+            border-radius: 50%;
+            background: var(--cat);
+            box-shadow: 0 0 0 1.5px var(--ink);
+        }
+        .stop.is-now .stop-node { box-shadow: 0 0 0 1.5px var(--ink), 0 0 0 6px color-mix(in srgb, var(--accent) 35%, transparent); }
+        .stop-body { min-width: 0; padding: 4px 0 8px; border-bottom: 1px solid var(--line); }
+        .stop:last-child .stop-body { border-bottom: 0; }
+        .stop-choice { padding-top: 10px; font-size: calc(13px * var(--fs)); font-weight: 600; color: var(--link); }
+        .card.row {
+            display: flex;
+            flex-direction: row;
+            align-items: center;
+            gap: 10px;
+            min-height: 0;
+            padding: 0;
+            border: 0;
+            border-radius: 0;
+            background: none;
+            box-shadow: none;
+            overflow: visible;
+            cursor: default;
+        }
+        .card.row::before { display: none; }
+        .card.row + .card.row { border-top: 1px solid var(--line); }
+        .row-open {
+            flex: 1;
+            min-width: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 3px;
+            min-height: 56px;
+            padding: 10px 0;
+            border: 0;
+            background: none;
+            color: var(--ink);
+            text-align: left;
+            font: inherit;
+            cursor: pointer;
+        }
+        .row-open:active { opacity: .6; }
+        .row-cat { display: inline-flex; align-items: center; gap: 6px; font-size: calc(13px * var(--fs)); color: var(--ink-soft); }
+        .row-swatch { width: 8px; height: 8px; border-radius: 2px; background: var(--cat); }
+        .row-done { display: inline-flex; align-items: center; gap: 2px; margin-left: 4px; color: var(--ink); font-weight: 600; }
+        .row-done .ico { width: 14px; height: 14px; }
+        .row-title { font-size: calc(17px * var(--fs)); font-weight: 600; line-height: 1.35; overflow-wrap: anywhere; }
+        .row-title.route { display: flex; flex-wrap: wrap; align-items: center; gap: 0 6px; }
+        .row-title .route-arrow .ico { width: 16px; height: 16px; }
+        .row-desc {
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+            font-size: calc(15px * var(--fs));
+            line-height: 1.5;
+            color: var(--ink-soft);
+        }
+        .row-open .card-tags { margin-top: 2px; }
+        .card.row.is-visited .row-title { color: var(--ink-soft); }
+        .row-nav {
+            flex: none;
+            display: inline-flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 2px;
+            min-width: 60px;
+            min-height: 56px;
+            padding: 4px 8px;
+            border: 1.5px solid var(--ink);
+            border-radius: var(--r-chip);
+            background: var(--accent);
+            color: var(--on-accent);
+            font-size: calc(15px * var(--fs));
+            font-weight: 600;
+            text-decoration: none;
+        }
+        .row-nav .ico { width: 20px; height: 20px; }
+        .row-nav:active { transform: scale(.95); }
+        .day-section + .day-section { margin-top: 28px; }
+
+        /* ================= 首頁 ================= */
+        .home-hero-wrap .scene { display: none; }
+        .home-hero-wrap .hero-text { padding-bottom: 12px; }
+
+        /* 站牌：首頁「下一站」，全站唯一的大膽元素 */
+        .next-card {
+            border: 0;
+            background: var(--sign);
+            color: var(--on-sign);
+            box-shadow: none;
+        }
+        .next-card::before {
+            border-bottom-color: var(--on-sign);
+            background: repeating-linear-gradient(90deg,
+                var(--cat) 0 18px, var(--on-sign) 18px 20px, var(--cat) 20px 24px, var(--on-sign) 24px 26px,
+                var(--cat) 26px 44px, var(--sign) 44px 46px, var(--on-sign) 46px 52px, var(--sign) 52px 54px);
+        }
+        .next-card .tape { color: var(--on-sign); opacity: .8; }
+        .next-card .next-time { font-size: calc(36px * var(--fs)); line-height: 1.1; color: var(--on-sign); }
+        .next-card .next-time small { color: var(--on-sign); opacity: .75; }
+        .next-card .next-count, .next-card .next-cat { color: var(--on-sign); opacity: .8; }
+        .next-card .next-cat .ico { color: var(--on-sign); }
+        .next-card .next-title { font-size: calc(26px * var(--fs)); font-weight: 700; color: var(--on-sign); }
+        .next-card .chip-btn { border-color: color-mix(in srgb, var(--on-sign) 55%, transparent); color: var(--on-sign); }
+        .next-card .chip-btn.nav { border-color: var(--on-sign); background: var(--sign-nav); color: var(--on-sign-nav); }
+        .next-card .next-choice + .next-choice, .next-card .next-now { border-top-color: color-mix(in srgb, var(--on-sign) 25%, transparent); }
+        .next-card .next-now, .next-card .next-now b { color: var(--on-sign); }
+        .next-card .next-now { opacity: .9; }
     </style>
 </head>
 <body>
@@ -2267,6 +2427,7 @@
             </div>
             <div class="detail-actions">
                 <button id="detail-map-btn" class="chip-btn" type="button"><svg class="ico"><use href="#i-pin"/></svg>看地圖</button>
+                <button id="detail-visit-btn" class="chip-btn stamp-btn" type="button" aria-pressed="false"><svg class="ico"><use href="#i-check"/></svg><span class="stamp-empty">去過</span><span class="stamp-done">已去過</span></button>
                 <button id="detail-share-btn" class="chip-btn" type="button"><svg class="ico"><use href="#i-share"/></svg>分享</button>
                 <a id="detail-nav-btn" class="chip-btn nav" href="#" target="_blank" rel="noopener"><svg class="ico"><use href="#i-nav"/></svg>導航</a>
             </div>
@@ -2358,7 +2519,7 @@
                 <div class="hero-text">
                     <h1 id="trip-title"></h1>
                     <p class="hero-sub"><span id="trip-subtitle"></span>共 <strong id="total-count">0</strong> 個地點</p>
-                    <p class="hero-sub hero-sub-2">已經蓋章 <strong id="visited-count">0</strong> 個</p>
+                    <p class="hero-sub hero-sub-2">已去過 <strong id="visited-count">0</strong> 個地點</p>
                 </div>
 
                 <!-- 封面插畫：白天有雲和海鷗，夜晚屋台燈籠會亮 -->
@@ -2753,44 +2914,34 @@
         }
 
         // ---------- 行程列表 ----------
+        // 路線圖式清單的一列：點整列看詳細，右邊是導航
         function cardHTML(item) {
             const c = catOf(item);
             const d = parseDesc(item.desc);
             const isVisited = visited.has(item.id);
-
-            // 標籤徽章
             const tagsHTML = d.tags && d.tags.length
-                ? `<div class="card-tags">${d.tags.map((t) => `<span class="tag-pill tag--${t.type}">${icon(t.icon)}${esc(t.text)}</span>`).join('')}</div>`
+                ? `<span class="card-tags">${d.tags.map((t) => `<span class="tag-pill tag--${t.type}">${icon(t.icon)}${esc(t.text)}</span>`).join('')}</span>`
                 : '';
-
-            // 交通的「A → B」拆成起點和終點
-            let titleHTML = `<h3>${esc(item.title)}</h3>`;
+            let titleHTML = `<span class="row-title">${esc(item.title)}</span>`;
             if (c.kind === 'move') {
                 const parts = item.title.split(/\s*(?:➔|→|->|⇒)\s*/).filter(Boolean);
                 if (parts.length >= 2) {
-                    titleHTML = `<h3 class="route">${parts.map((p) => `<span>${esc(p)}</span>`).join(`<span class="route-arrow" aria-label="到">${icon('arrow')}</span>`)}</h3>`;
+                    titleHTML = `<span class="row-title route">${parts.map((p) => `<span>${esc(p)}</span>`).join(`<span class="route-arrow" aria-label="到">${icon('arrow')}</span>`)}</span>`;
                 }
             }
-
+            const desc = d.summary || d.text;
             return `
-                    <article class="card card--${c.kind}${isVisited ? ' is-visited' : ''}" data-id="${esc(item.id)}">
-                        <div class="card-body">
-                            <div class="card-head">
-                                <p class="card-when">${item.time ? `<span class="card-time">${timeHTML(item)}</span>` : ''}<span class="card-cat">${c.label}</span></p>
-                                ${titleHTML}
-                                ${tagsHTML}
-                            </div>
-                            ${d.summary ? `<p class="card-desc">${esc(d.summary)}</p>` : (d.text ? `<p class="card-desc">${esc(d.text)}</p>` : '')}
-                        </div>
-                        <div class="card-actions">
-                            <button class="chip-btn stamp-btn" type="button" data-act="stamp" aria-pressed="${isVisited}" aria-label="${esc(item.title)}：標記為去過，再按一次取消">${icon('check')}<span class="stamp-empty">去過</span><span class="stamp-done">已去過</span></button>
-                            <button class="chip-btn" type="button" data-act="detail" aria-label="${esc(item.title)}：詳細資訊、看地圖、分享">${icon('book')}詳細</button>
-                            <a class="chip-btn nav" href="${esc(mapLink(item))}" target="_blank" rel="noopener" aria-label="${esc(item.title)}：用 Google 地圖導航">${icon('nav')}導航</a>
-                        </div>
+                    <article class="card row card--${c.kind}${isVisited ? ' is-visited' : ''}" data-id="${esc(item.id)}" style="--cat:${c.color}">
+                        <button class="row-open" type="button" data-act="detail" aria-label="${esc(item.title)}${isVisited ? '（已去過）' : ''}：看詳細">
+                            <span class="row-cat"><i class="row-swatch" aria-hidden="true"></i>${c.label}${isVisited ? `<span class="row-done">${icon('check')}已去過</span>` : ''}</span>
+                            ${titleHTML}
+                            ${tagsHTML}
+                            ${desc ? `<span class="row-desc">${esc(desc)}</span>` : ''}
+                        </button>
+                        <a class="row-nav" href="${esc(mapLink(item))}" target="_blank" rel="noopener" aria-label="${esc(item.title)}：用 Google 地圖導航">${icon('nav')}<span>導航</span></a>
                     </article>`;
         }
-
-        // 同一天、同一時間、同一分類的地點是「擇一」的選項，排成可以左右滑的一組
+        // 同一天、同一時間、同一分類的地點是「擇一」的選項，排在同一站底下
         function groupStops(dayItems) {
             const groups = [];
             dayItems.forEach((item) => {
@@ -2800,23 +2951,16 @@
             });
             return groups;
         }
-
         function stopHTML(group) {
             const first = group[0];
             const c = catOf(first);
-            // 時間寫在卡片裡（全寬），左邊只留分類圓點，360px 下標題才不會一直換行
-            const head = `
-                    <div class="stop-node">${icon(c.icon)}</div>`;
-            if (group.length === 1) {
-                return `<li class="stop" style="--cat:${c.color}">${head}${cardHTML(first)}</li>`;
-            }
             return `
-                <li class="stop" style="--cat:${c.color}">${head}
-                    <div class="choices">
-                        <div class="choices-track" tabindex="0" role="region" aria-label="${esc(first.time)} 有 ${group.length} 個選項，可左右滑動">
-                            ${group.map(cardHTML).join('')}
-                        </div>
-                        <div class="choices-dots">${group.map((it, i) => `<button type="button"${i ? '' : ' class="on"'} data-idx="${i}" aria-label="第 ${i + 1} 個選項：${esc(it.title)}"><span></span></button>`).join('')}</div>
+                <li class="stop" style="--cat:${c.color}"${first.time ? ` data-time="${esc(first.time)}"${first.tz ? ` data-tz="${esc(first.tz)}"` : ''}` : ''}>
+                    <div class="stop-time timeline-time">${first.time ? timeHTML(first) : ''}</div>
+                    <div class="stop-node" aria-hidden="true"></div>
+                    <div class="stop-body">
+                        ${group.length > 1 ? `<p class="stop-choice">${group.length} 個選一個</p>` : ''}
+                        ${group.map(cardHTML).join('')}
                     </div>
                 </li>`;
         }
@@ -3587,26 +3731,29 @@
             if (act === 'detail') showDetailModal(id);
             if (act === 'share') shareItem(id);
             if (act === 'stamp') {
-                const on = !visited.has(id);
-                on ? visited.add(id) : visited.delete(id);
-                save(visitedKey, Array.from(visited));
-                card.classList.toggle('is-visited', on);
-                card.classList.remove('just-stamped');
-                void card.offsetWidth; // 重新觸發蓋章動畫
-                if (on) {
-                    card.classList.add('just-stamped');
-                    inkSplash(btn);
-                }
-                btn.setAttribute('aria-pressed', String(on));
-                updateDayDone(Number(items.find((it) => it.id === id).day), on);
-                const marker = markersById.get(id);
-                if (marker) {
-                    const pin = marker.getElement() && marker.getElement().querySelector('.pin');
-                    if (pin) pin.classList.toggle('is-visited', on);
-                }
-                updateCounts();
+                toggleVisited(id);
+                return;
             }
         });
+
+        // 去過／取消：存起來，重畫清單、首頁、圖釘
+        function toggleVisited(id) {
+            const item = items.find((it) => it.id === id);
+            if (!item) return false;
+            const on = !visited.has(id);
+            on ? visited.add(id) : visited.delete(id);
+            save(visitedKey, Array.from(visited));
+            render();
+            if (root.dataset.view === 'home') renderHome();
+            updateDayDone(Number(item.day), on);
+            const marker = markersById.get(id);
+            if (marker) {
+                const pin = marker.getElement() && marker.getElement().querySelector('.pin');
+                if (pin) pin.classList.toggle('is-visited', on);
+            }
+            updateCounts();
+            return on;
+        }
 
         // ---------- 地點詳細彈窗邏輯 ----------
         const detailModal = $('#detail-modal');
@@ -3669,6 +3816,9 @@
             }
 
             $('#detail-share-btn').onclick = () => shareItem(id);
+            const visitBtn = $('#detail-visit-btn');
+            visitBtn.setAttribute('aria-pressed', String(visited.has(id)));
+            visitBtn.onclick = () => visitBtn.setAttribute('aria-pressed', String(toggleVisited(id)));
 
             const navBtn = $('#detail-nav-btn');
             navBtn.href = mapLink(item);
@@ -3882,56 +4032,9 @@
 
             const dayItems = items.filter((i) => i.day === currentHomeDay);
             const container = $('#home-today-list');
-            if (!dayItems.length) {
-                container.innerHTML = `<div class="today-empty"><p>這一天尚未安排行程。</p></div>`;
-            } else {
-                const groups = groupStops(dayItems);
-                // 點地點先打開詳細資訊；要導航按右邊的「導航」，不會一點就跳到地圖 App
-                const rowHTML = (item, withMeta) => {
-                    const c = catOf(item);
-                    const isV = visited.has(item.id);
-                    return `
-                        <div class="${withMeta ? 'timeline-item' : 'timeline-sub-item'}${isV ? ' is-visited' : ''}"${withMeta && item.time ? ` data-time="${esc(item.time)}"${item.tz ? ` data-tz="${esc(item.tz)}"` : ''}` : ''}>
-                            ${isV ? '<span class="visit-stamp" aria-hidden="true">去過</span>' : ''}
-                            <button class="timeline-open" type="button" data-open="${esc(item.id)}"${isV ? ` aria-label="${esc(item.title)}（去過）"` : ''}>
-                                ${withMeta ? `<span class="timeline-time">${timeHTML(item)}</span>` : ''}
-                                <span class="timeline-text">
-                                    ${withMeta ? `<span class="timeline-cat-pill" style="--cat:${c.color}">${icon(c.icon)}${esc(c.label)}</span>` : ''}
-                                    <span class="timeline-title">${esc(item.title)}</span>
-                                </span>
-                            </button>
-                            <a class="timeline-nav" href="${esc(mapLink(item))}" target="_blank" rel="noopener" aria-label="${esc(item.title)}：用 Google 地圖導航">${icon('nav')}導航</a>
-                        </div>`;
-                };
-                container.innerHTML = `
-                    <div class="home-timeline">
-                        ${groups.map((group) => {
-                            const first = group[0];
-                            if (group.length === 1) return rowHTML(first, true);
-
-                            // 同時段有多個地點（擇一選項）：收合呈現，打開後每個都能看詳細、導航
-                            const c = catOf(first);
-                            const visitedCount = group.filter((it) => visited.has(it.id)).length;
-                            return `
-                                <details class="timeline-group${visitedCount ? ' is-visited' : ''}"${first.time ? ` data-time="${esc(first.time)}"${first.tz ? ` data-tz="${esc(first.tz)}"` : ''}` : ''}>
-                                    <summary class="timeline-summary">
-                                        ${visitedCount ? '<span class="visit-stamp" aria-hidden="true">去過</span>' : ''}
-                                        <span class="timeline-time">${timeHTML(first)}</span>
-                                        <span class="timeline-left">
-                                            <span class="timeline-text">
-                                                <span class="timeline-cat-pill" style="--cat:${c.color}">${icon(c.icon)}${esc(c.label)}</span>
-                                                <span class="timeline-title">${esc(first.title)}${visitedCount ? '<span class="sr-only">（去過）</span>' : ''}</span>
-                                            </span>
-                                        </span>
-                                        <span class="timeline-count-btn" aria-label="${group.length} 個選項">${group.length > 9 ? '9+' : group.length}${icon('chevron-down')}</span>
-                                    </summary>
-                                    <div class="timeline-group-items">
-                                        ${group.map((item) => rowHTML(item, false)).join('')}
-                                    </div>
-                                </details>`;
-                        }).join('')}
-                    </div>`;
-            }
+            container.innerHTML = dayItems.length
+                ? `<ol class="stops">${groupStops(dayItems).map(stopHTML).join('')}</ol>`
+                : `<div class="today-empty"><p>這一天尚未安排行程。</p></div>`;
 
             markNow();
             renderNext();
@@ -4004,7 +4107,7 @@
         }
 
         function markNow() {
-            const rows = Array.from(document.querySelectorAll('#home-today-list .home-timeline > [data-time]'));
+            const rows = Array.from(document.querySelectorAll('#home-today-list .stop[data-time]'));
             const date = dateOfDay(currentHomeDay);
             const isToday = Boolean(date) && date === todayIn(weatherConf.timezone);
             const current = isToday ? rows.filter((r) => r.dataset.time <= nowHM(r.dataset.tz)).pop() : null;
@@ -4027,8 +4130,9 @@
         document.addEventListener('visibilitychange', () => { if (!document.hidden && root.dataset.view === 'home' && items.length) { markNow(); renderNext(); } });
 
         $('#home-today-list').addEventListener('click', (e) => {
-            const btn = e.target.closest('[data-open]');
-            if (btn) showDetailModal(btn.dataset.open);
+            const btn = e.target.closest('[data-act="detail"]');
+            const card = btn && btn.closest('.card');
+            if (card) showDetailModal(card.dataset.id);
         });
         $('#home-next').addEventListener('click', (e) => {
             const btn = e.target.closest('[data-open]');
