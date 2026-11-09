@@ -2793,6 +2793,94 @@
         }
         .info-list .phrase-row:active { background: var(--fill); }
         .info-list .phrase-row + .phrase-row { margin-top: 0; }
+        /* ---- Sheet 也從看板開始：把手和標題列是看板色（指指卡全螢幕除外，給日本人看的要越素越好） ---- */
+        .sheet-dialog:not(.phrase-sheet) { border-color: var(--board); box-shadow: 0 160px 0 var(--card); }
+        .sheet-dialog:not(.phrase-sheet) .sheet-handle { background: var(--board); }
+        .sheet-dialog:not(.phrase-sheet) .sheet-handle::before { background: color-mix(in srgb, var(--on-board) 35%, var(--board)); }
+        .sheet-dialog:not(.phrase-sheet) .sheet-handle:active::before,
+        .sheet-dialog.is-dragging:not(.phrase-sheet) .sheet-handle::before { background: var(--board-soft); }
+        .sheet-dialog:not(.phrase-sheet) .sheet-handle:focus-visible::before { background: var(--led); }
+        .sheet-dialog:not(.phrase-sheet) .sheet-head {
+            margin: 0 -20px;
+            padding: 2px 20px 16px;
+            border-bottom: 0;
+            background: var(--board);
+            color: var(--on-board);
+        }
+        .sheet-dialog:not(.phrase-sheet) .sheet-head h2 { font-weight: 700; color: var(--on-board); }
+        .sheet-dialog:not(.phrase-sheet) .sheet-head .icon-btn {
+            flex: none;
+            width: 48px;
+            height: 48px;
+            border: 0;
+            border-radius: var(--r-chip);
+            background: color-mix(in srgb, var(--on-board) 11%, var(--board));
+            color: var(--on-board);
+        }
+        .sheet-dialog:not(.phrase-sheet) .sheet-head :focus-visible { outline-color: var(--led); }
+        :root[data-theme="night"] .sheet-dialog:not(.phrase-sheet) .sheet-head { box-shadow: 0 1px 0 var(--line); }
+        .settings-sheet .sheet-scroll, #day-picker .sheet-scroll { padding-top: 4px; }
+
+        /* 詳細頁的看板：琥珀色大時刻＋天數，下面分類、地名 */
+        .detail-head > div { display: flex; flex-direction: column; min-width: 0; }
+        .detail-head #detail-when { order: -1; display: flex; align-items: baseline; flex-wrap: wrap; gap: 0 10px; margin: 0 0 4px; }
+        .dw-time { font-size: calc(36px * var(--fs)); font-weight: 700; line-height: 1.1; letter-spacing: -.02em; color: var(--led); font-variant-numeric: tabular-nums; }
+        .dw-day { font-size: calc(15px * var(--fs)); color: var(--board-soft); }
+        .detail-head .card-cat { color: var(--board-soft); }
+        .detail-head h2 { font-size: calc(24px * var(--fs)); }
+        .detail-head .tag-pill { background: color-mix(in srgb, var(--on-board) 12%, var(--board)); color: var(--on-board); border-color: transparent; }
+        .detail-scroll-area { margin-top: 14px; }
+
+        /* ---- 看板上的小恐龍：LED 點陣，站在網站名稱和下一站中間的線上 ---- */
+        .home-hero-wrap .hero-text { padding-bottom: 50px; }
+        .board-dino {
+            position: absolute;
+            right: 12px;
+            bottom: 0;
+            z-index: 2;
+            display: grid;
+            place-items: end center;
+            width: 52px;
+            height: 52px;
+            padding: 0 0 2px;
+            border: 0;
+            background: none;
+            cursor: pointer;
+        }
+        .board-dino svg { display: block; width: 46px; height: 46px; overflow: visible; }
+        .board-dino .dino-body { fill: var(--led); }
+        .board-dino .dino-cap { fill: var(--on-board); }
+        .board-dino .dino-lid { display: none; }
+        .board-dino.is-blink .dino-lid { display: inline; }
+        .board-dino g[data-f] { display: none; }
+        .board-dino[data-frame="stand"] g[data-f="stand"],
+        .board-dino[data-frame="a"] g[data-f="a"],
+        .board-dino[data-frame="b"] g[data-f="b"] { display: inline; }
+        .board-dino:focus-visible { outline: 3px solid var(--led); outline-offset: 0; border-radius: var(--r-inner); }
+        /* 走進來：從看板左邊外面走到右邊停下（只動 transform） */
+        .board-dino.is-walking { animation: dino-walk 2.4s linear both; }
+        @keyframes dino-walk { from { transform: translateX(calc(-100vw + 60px)); } to { transform: translateX(0); } }
+        @media (min-width: 680px) { @keyframes dino-walk { from { transform: translateX(-600px); } to { transform: translateX(0); } } }
+        /* 點一下：往上跳再落下，平順減速，不彈跳 */
+        .board-dino.is-jumping svg { animation: dino-jump .5s cubic-bezier(.22, 1, .36, 1); }
+        @keyframes dino-jump { 40% { transform: translateY(-16px); } 100% { transform: translateY(0); } }
+        .dino-bubble {
+            position: absolute;
+            right: 64px;
+            bottom: 10px;
+            z-index: 2;
+            max-width: calc(100% - 96px);
+            padding: 6px 12px;
+            border-radius: var(--r-inner);
+            background: var(--led);
+            color: var(--on-led);
+            font-size: calc(15px * var(--fs));
+            font-weight: 600;
+            line-height: 1.4;
+            animation: bubble-in .25s cubic-bezier(.22, 1, .36, 1);
+        }
+        .dino-bubble[hidden] { display: none; }
+        .home-hero-wrap { position: relative; overflow: hidden; }
     </style>
 </head>
 <body>
@@ -3113,6 +3201,9 @@
                         </g>
                     </svg>
                 </svg>
+                <!-- 看板上的小恐龍：首頁打開時走進來，點了跳一下、說一句話（句子在 data/ui.json 的 mascot） -->
+                <button id="dino-btn" class="board-dino" type="button" aria-label="小恐龍：點我說說話" data-frame="stand"></button>
+                <p id="dino-bubble" class="dino-bubble" role="status" hidden></p>
                 <!-- 點明太子：跳一下、說一句話（句子在 data/ui.json 的 mascot） -->
                 <button id="mascot-btn" class="mascot-btn" type="button" aria-label="明太子：點我說說話"></button>
                 <p id="mascot-bubble" class="mascot-bubble" role="status" hidden></p>
@@ -4278,7 +4369,7 @@
 
             $('#detail-cat').textContent = c.label;
             $('#detail-title').textContent = item.title;
-            $('#detail-when').textContent = [dayLabel(item.day), item.time ? item.time + (item.tz ? `（${item.tz}）` : '') : ''].filter(Boolean).join('　');
+            $('#detail-when').innerHTML = `${item.time ? `<b class="dw-time">${esc(item.time)}</b>` : ''}<span class="dw-day">${esc(dayLabel(item.day))}${item.tz ? `・${esc(item.tz)}` : ''}</span>`;
 
             // 標籤
             const tagsBox = $('#detail-tags');
@@ -4381,6 +4472,85 @@
                 mascotTimer = setTimeout(() => { bubble.hidden = true; }, 320);
             }, 2600);
         });
+
+        // ---------- 看板上的小恐龍（LED 點陣，自己畫的）：首頁打開時走進來，平常偶爾眨眼，點了跳一下說一句話 ----------
+        // 每個字元一顆燈：# 琥珀色身體、c 象牙白站長帽、. 不亮；眼睛是身體中間不亮的那一格
+        const DINO_TOP = [
+            '.........cccc...',
+            '........cccccc..',
+            '.......cccccccc.',
+            '.......########.',
+            '.......#.######.',
+            '.......########.',
+            '.......#####....',
+            '......#######...',
+            '#....########...',
+            '##..##########..',
+            '###########..#..',
+            '.##########.....',
+            '..########......',
+            '...######.......'
+        ];
+        const DINO_LEGS = {
+            stand: ['...##...##......', '...###..###.....'],
+            a: ['...##...##......', '...###..........'],
+            b: ['...##...##......', '........###.....']
+        };
+        function dinoDots(rows, top, cls) {
+            let out = '';
+            rows.forEach((row, y) => [...row].forEach((ch, x) => {
+                if (ch === '.') return;
+                out += `<rect class="${ch === 'c' ? 'dino-cap' : cls}" x="${x + .1}" y="${y + top + .1}" width=".8" height=".8" rx=".18"/>`;
+            }));
+            return out;
+        }
+        (function setupDino() {
+            const btn = $('#dino-btn');
+            if (!btn) return;
+            btn.innerHTML = `<svg viewBox="0 0 16 16" aria-hidden="true">${dinoDots(DINO_TOP, 0, 'dino-body')}`
+                + `<rect class="dino-body dino-lid" x="8.1" y="4.1" width=".8" height=".8" rx=".18"/>`
+                + Object.entries(DINO_LEGS).map(([f, rows]) => `<g data-f="${f}">${dinoDots(rows, 14, 'dino-body')}</g>`).join('')
+                + '</svg>';
+            let walked = false;
+            let stepTimer = null;
+            // 首頁第一次出現時從左邊走到右邊的位置（約 2.4 秒），走完停下來
+            window.dinoWalk = function () {
+                if (walked || root.dataset.view !== 'home' || !btn.offsetParent) return;
+                walked = true;
+                if (reduceMotion()) return;
+                btn.classList.add('is-walking');
+                let i = 0;
+                stepTimer = setInterval(() => { btn.dataset.frame = i++ % 2 ? 'b' : 'a'; }, 160);
+                const done = () => {
+                    clearInterval(stepTimer);
+                    btn.classList.remove('is-walking');
+                    btn.dataset.frame = 'stand';
+                };
+                btn.addEventListener('animationend', done, { once: true });
+                setTimeout(done, 3000);
+            };
+            // 偶爾眨眼（只有首頁看得到的時候）
+            setInterval(() => {
+                if (root.dataset.view !== 'home' || document.hidden || reduceMotion()) return;
+                btn.classList.add('is-blink');
+                setTimeout(() => btn.classList.remove('is-blink'), 180);
+            }, 5200);
+            let lineTimer = null;
+            btn.addEventListener('click', () => {
+                if (!reduceMotion()) {
+                    btn.classList.remove('is-jumping');
+                    void btn.getBoundingClientRect();
+                    btn.classList.add('is-jumping');
+                }
+                if (!mascotLines.length) return;
+                const bubble = $('#dino-bubble');
+                bubble.textContent = mascotLines[mascotIndex++ % mascotLines.length];
+                bubble.hidden = false;
+                clearTimeout(lineTimer);
+                lineTimer = setTimeout(() => { bubble.hidden = true; }, 2800);
+            });
+            btn.addEventListener('animationend', (e) => { if (e.animationName === 'dino-jump') btn.classList.remove('is-jumping'); });
+        })();
 
         // ---------- 行程頁：往下捲收起分類那排，往上捲就滑出來 ----------
         // 收合時下面的內容會往上移，靠瀏覽器的捲動錨定維持位置；動畫期間不判斷，避免來回抖動
@@ -4574,6 +4744,7 @@
             markNow();
             renderNext();
             fetchWeatherForDay(currentHomeDay);
+            if (window.dinoWalk) requestAnimationFrame(() => window.dinoWalk());
         }
 
         // 旅行當天：依現在時間標出「現在」的行程（最後一個已經開始的時段），每分鐘更新
