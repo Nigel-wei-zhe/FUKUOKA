@@ -2416,6 +2416,39 @@
         .cats { max-height: calc(88px * var(--fs) + 20px); }
         #cat-chips .cat-chip { padding: 4px 2px; font-size: calc(15px * var(--fs)); }
         :root[data-fs="l"] #cat-chips, :root[data-fs="xl"] #cat-chips { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+
+        /* ===== 1. 數字：溫度也用等寬數字、字距收緊，像時刻表一樣對齊 ===== */
+        .weather-temp-now, .weather-range-box strong, .next-time, .stop-time, .card-time {
+            font-variant-numeric: tabular-nums;
+            letter-spacing: -.02em;
+        }
+
+        /* ===== 2. 站牌精緻化：頂部一點高光、內側亮邊；次要按鈕半透明＋細邊；分隔線變細 ===== */
+        .next-card {
+            background:
+                linear-gradient(180deg, color-mix(in srgb, #FFFFFF 9%, transparent), transparent 55%),
+                var(--sign);
+            box-shadow: inset 0 1px 0 color-mix(in srgb, #FFFFFF 14%, transparent);
+        }
+        .next-card .chip-btn:not(.nav) {
+            border: 1px solid color-mix(in srgb, var(--on-sign) 16%, transparent) !important;
+            background: color-mix(in srgb, var(--on-sign) 10%, transparent) !important;
+            color: var(--on-sign) !important;
+            box-shadow: none !important;
+        }
+        .next-card .chip-btn:not(.nav):active { background: color-mix(in srgb, var(--on-sign) 18%, transparent) !important; transform: scale(.98); }
+        .next-card .chip-btn.nav { box-shadow: 0 4px 14px color-mix(in srgb, var(--sign-nav) 40%, transparent) !important; }
+        .next-card .next-choice + .next-choice,
+        .next-card .next-now { border-top: 1px dashed color-mix(in srgb, var(--on-sign) 22%, transparent); }
+
+        /* ===== 3. 底部分頁列：半透明毛玻璃，捲動時內容隱約透過去 ===== */
+        .tabbar, .tabbar::after {
+            background: color-mix(in srgb, var(--card) 80%, transparent);
+            -webkit-backdrop-filter: blur(18px) saturate(1.4);
+            backdrop-filter: blur(18px) saturate(1.4);
+        }
+        .tabbar { border-top: 1px solid color-mix(in srgb, var(--ink) 10%, transparent); }
+        .tab-ico { transition: background-color .3s ease-out, padding .3s ease-out; }
     </style>
 </head>
 <body>
