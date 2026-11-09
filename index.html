@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
     <title>福岡散步繪本 | FUKUOKA Travel</title>
     <meta name="description" content="福岡八天的吃喝散步路線：景點、美食、點心、購物與交通，附地圖導航，可離線瀏覽。">
-    <meta name="theme-color" content="#FBF5E9">
+    <meta name="theme-color" content="#F5F0E6">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-title" content="福岡散步">
@@ -30,7 +30,7 @@
             if (fs === 'l' || fs === 'xl') document.documentElement.dataset.fs = fs;
             var m = document.querySelector('meta[name="theme-color"]');
             // 這裡 CSS 還沒載入、讀不到變數，色碼要和兩套主題的 --paper 一致
-            if (m) m.content = t === 'night' ? '#1E2436' : '#FBF5E9';
+            if (m) m.content = t === 'night' ? '#111726' : '#F5F0E6';
         })();
     </script>
 
@@ -46,30 +46,30 @@
         /* ---------- 色票：白天是紙張與明太子粉，夜晚是博多灣與屋台燈籠 ---------- */
         :root {
             color-scheme: light;
-            --paper: #FBF5E9;
-            --paper-2: #F2E5CD;
-            --card: #FFFDF7;
-            --ink: #4A3B33;
-            --ink-soft: #6A594E;
-            --line: #EADFCB;
-            --line-strong: #A08B70;
-            --accent: #F28C85;
-            --on-accent: #3E302A;
-            --link: #A84A46;
-            --stamp: #C9433D;
+            --paper: #F5F0E6;
+            --paper-2: #EBE3D3;
+            --card: #FFFCF5;
+            --ink: #2A231F;
+            --ink-soft: #61564D;
+            --line: #E2D8C5;
+            --line-strong: #968670;
+            --accent: #B5432F;
+            --on-accent: #FFFCF5;
+            --link: #A13A28;
+            --stamp: #B3312A;
 
-            --c-sight: #A8CC92;
-            --c-food: #F59C94;
-            --c-sweet: #F2C1D3;
-            --c-shop: #F5CB66;
-            --c-move: #95C9DC;
-            --c-stay: #BBA4E0;
-            --on-cat: #3E302A;
+            --c-sight: #A7BE8C;
+            --c-food: #E7A08C;
+            --c-sweet: #E4B3C2;
+            --c-shop: #E4BD68;
+            --c-move: #8DB7C8;
+            --c-stay: #B1A2CE;
+            --on-cat: #2A231F;
 
             --hill: #DCE8CB;
             --sea: #BFDDE6;
             --sea-line: #86B8CA;
-            --torii: #E7897B;
+            --torii: #C8553D;
             --lamp: #F5C85E;
             --window: #FFFDF7;
 
@@ -94,34 +94,34 @@
 
         :root[data-theme="night"] {
             color-scheme: dark;
-            --paper: #1E2436;
-            --paper-2: #262E46;
-            --card: #283049;
-            --ink: #F1E8D8;
-            --ink-soft: #BDB3A3;
-            --line: #353E5A;
-            --line-strong: #7380AC;
-            --accent: #F6CD6E;
-            --on-accent: #1E2436;
-            --link: #F6CD6E;
-            --stamp: #F08A80;
+            --paper: #111726;
+            --paper-2: #192133;
+            --card: #1C2538;
+            --ink: #EFE7D9;
+            --ink-soft: #B2A999;
+            --line: #29334A;
+            --line-strong: #66729B;
+            --accent: #E2B04A;
+            --on-accent: #111726;
+            --link: #E8BE66;
+            --stamp: #EE8B7B;
 
-            --c-sight: #A3C493;
-            --c-food: #F0938D;
-            --c-sweet: #E6A8C2;
-            --c-shop: #F3C766;
-            --c-move: #8EC1D6;
-            --c-stay: #B3A2DA;
-            --on-cat: #1E2436;
+            --c-sight: #93AE7E;
+            --c-food: #E0907E;
+            --c-sweet: #D7A0B5;
+            --c-shop: #E2B85E;
+            --c-move: #7FA9BC;
+            --c-stay: #A595C6;
+            --on-cat: #111726;
 
             --hill: #2B3552;
             --sea: #25405F;
             --sea-line: #4A70A0;
-            --torii: #D9786B;
+            --torii: #C9614F;
             --lamp: #FFD27A;
             --window: #FFD98A;
 
-            --shadow: 0 3px 0 #161B2A;
+            --shadow: 0 3px 0 #090D18;
             --noise-opacity: .05;
             --noise-blend: screen;
         }
