@@ -80,6 +80,8 @@
             --board-soft: #BDAC97;
             --led: #F4B63F;
             --on-led: #211915;
+            --board-action: #C8343B;
+            --on-board-action: #FFFFFF;
 
             --hill: #D6E6CF;
             --sea: #C3D7E6;
@@ -121,9 +123,9 @@
             --ink-soft: #BFAF98;
             --line: #3A2D25;
             --line-strong: #7E6A57;
-            --accent: #F2B544;
-            --on-accent: #17110E;
-            --link: #F2B544;
+            --accent: #C8343B;
+            --on-accent: #FFFFFF;
+            --link: #F08A7E;
             --stamp: #EE8B7B;
 
             --c-sight: #93B383;
@@ -146,6 +148,8 @@
             --board-soft: #AD9C86;
             --led: #F2B544;
             --on-led: #0A0706;
+            --board-action: #C8343B;
+            --on-board-action: #FFFFFF;
 
             --hill: #22304F;
             --sea: #1F3A5E;
@@ -2656,8 +2660,8 @@
         .toolbar .day-step:disabled, .map-top .day-step:disabled { background: transparent !important; box-shadow: none !important; opacity: .35; }
         #home-next .chip-btn.nav {
             border: 0 !important;
-            background: var(--led) !important;
-            color: var(--on-led) !important;
+            background: var(--board-action) !important;
+            color: var(--on-board-action) !important;
             box-shadow: none !important;
             font-weight: 700;
         }
@@ -2726,7 +2730,7 @@
         .row-open { min-height: 64px; padding: 12px 0; }
         .row-nav { min-width: 60px; min-height: 52px; border-radius: var(--r-inner); }
         .stop.is-now { background: color-mix(in srgb, var(--accent) 10%, var(--paper)); box-shadow: inset 5px 0 0 var(--accent); }
-        .stop.is-now .stop-time { color: var(--accent); }
+        .stop.is-now .stop-time { color: var(--link); }
         .stop.is-past .stop-time, .stop.is-past .row-title { color: var(--ink-soft); }
         .day-section { padding: 20px 0 4px; }
         .day-section .day-title { margin: 0 16px 12px; font-size: calc(22px * var(--fs)); font-weight: 700; }
