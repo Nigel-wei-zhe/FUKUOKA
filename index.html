@@ -80,7 +80,7 @@
 
             --shadow: none;
             /* 次要按鈕的淡底色（不用外框）；日夜跟著 --ink、--paper 自動換 */
-            --fill: color-mix(in srgb, var(--ink) 8%, var(--paper));
+            --fill: color-mix(in srgb, var(--ink) 11%, var(--paper));
             --fill-strong: color-mix(in srgb, var(--ink) 14%, var(--paper));
             --noise-opacity: 0;
             --noise-blend: multiply;
@@ -136,7 +136,7 @@
             --window: #FFD98A;
 
             --shadow: none;
-            --fill: color-mix(in srgb, var(--ink) 9%, var(--paper));
+            --fill: color-mix(in srgb, var(--ink) 12%, var(--paper));
             --fill-strong: color-mix(in srgb, var(--ink) 16%, var(--paper));
             --noise-opacity: 0;
             --noise-blend: screen;
@@ -2363,6 +2363,59 @@
         /* 清單的導航：淡底＋主色字，不搶站牌的實心主按鈕 */
         .row-nav { background: var(--fill) !important; color: var(--link) !important; }
         .row-nav:active { background: var(--fill-strong) !important; }
+
+        /* ================= 按鈕系統 =================
+           紅色（夜晚黃色）＝要做的動作；紺色（夜晚米白）＝目前選中、你在這裡；淡底＋底部色邊＝次要按鈕 */
+        .day-current,
+        .day-tab[aria-pressed="true"],
+        .cat-chip[aria-pressed="true"], .cat-chip[data-cat="all"][aria-pressed="true"],
+        .info-cat[aria-pressed="true"],
+        .seg button[aria-pressed="true"],
+        .tab[aria-pressed="true"] .tab-ico {
+            background: var(--ink) !important;
+            color: var(--paper) !important;
+        }
+        .day-tab[aria-pressed="true"] small { color: var(--paper); opacity: .8; }
+        .cat-chip[aria-pressed="true"] .dot { box-shadow: 0 0 0 1.5px var(--paper); }
+        .chip-btn:not(.nav), .day-step:not(:disabled), .day-tab:not([aria-pressed="true"]),
+        .cat-chip:not([aria-pressed="true"]), .info-cat:not([aria-pressed="true"]),
+        .seg button:not([aria-pressed="true"]), .phrase-row, .map-stop, .row-nav, .today-view-all-btn {
+            box-shadow: inset 0 -2px 0 color-mix(in srgb, var(--ink) 18%, transparent) !important;
+        }
+        .next-card .chip-btn:not(.nav) { box-shadow: inset 0 -2px 0 color-mix(in srgb, var(--on-sign) 22%, transparent) !important; }
+
+        /* 分類篩選：一排分段，不用左右捲；特大字級自動換成兩排 */
+        #cat-chips {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(calc(44px * var(--fs)), 1fr));
+            gap: 6px;
+            overflow: visible;
+            padding: 2px 16px 8px;
+        }
+        #cat-chips .cat-chip { justify-content: center; gap: 5px; min-width: 0; padding: 4px; border-radius: var(--r-chip); white-space: nowrap; }
+        #cat-chips .cat-chip .dot { margin-left: 0; flex: none; }
+
+        /* 資訊頁第二層：分段控制（淡底容器，選中的那格浮起來），一看就比上一層小一級 */
+        .info-subtabs { gap: 4px; padding: 4px; border-radius: var(--r-chip); background: var(--fill); }
+        .info-subtab { min-height: 52px; background: transparent !important; box-shadow: none !important; }
+        .info-subtab[aria-pressed="true"] {
+            background: var(--card) !important;
+            color: var(--ink) !important;
+            font-weight: 600;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, .18) !important;
+        }
+
+        /* 天數選單：從地圖打開時才有「全部地點」，沒有「行前」 */
+        #day-picker:not([data-target="map"]) .day-tab-all,
+        #day-picker[data-target="map"] .day-tab[data-day="prep"] { display: none; }
+        .map-day-bar { padding: 2px 0 4px; }
+        .home-section-head h2 { flex: 1 1 0; min-width: 0; }
+        .home-day-selector { display: flex; gap: 8px; }
+        .home-day-selector .day-step { width: 48px; min-height: 48px; }
+        /* 分類在特大字級會排成兩排：收合動畫的高度上限要放得下兩排 */
+        .cats { max-height: calc(88px * var(--fs) + 20px); }
+        #cat-chips .cat-chip { padding: 4px 2px; font-size: calc(15px * var(--fs)); }
+        :root[data-fs="l"] #cat-chips, :root[data-fs="xl"] #cat-chips { grid-template-columns: repeat(3, minmax(0, 1fr)); }
     </style>
 </head>
 <body>
@@ -2565,8 +2618,8 @@
                 <div class="home-section-head">
                     <h2><svg class="ico"><use href="#i-calendar"/></svg><span id="home-today-title">今日行程</span></h2>
                     <div class="home-day-selector">
-                        <button class="home-day-btn" id="home-prev-day-btn" type="button" aria-label="切換前一天">前一天</button>
-                        <button class="home-day-btn" id="home-next-day-btn" type="button" aria-label="切換後一天">後一天</button>
+                        <button class="day-step" id="home-prev-day-btn" type="button" aria-label="前一天"><svg class="ico"><use href="#i-chevron-left"/></svg></button>
+                        <button class="day-step" id="home-next-day-btn" type="button" aria-label="後一天"><svg class="ico"><use href="#i-chevron-right"/></svg></button>
                     </div>
                 </div>
                 <p id="home-tz-note" class="tz-note" hidden></p>
@@ -2708,7 +2761,14 @@
                     <h2 id="map-title">全部地點</h2>
                     <p id="map-sub">點圖釘看店家資訊，按「導航」開 Google 地圖</p>
                 </div>
-                <nav id="map-day-tabs" class="map-day-scroller" aria-label="選擇地圖天數"></nav>
+                <nav class="day-bar map-day-bar" aria-label="選擇地圖天數">
+                    <button class="day-step" id="map-prev" type="button" aria-label="前一天"><svg class="ico"><use href="#i-chevron-left"/></svg></button>
+                    <button class="day-current" id="map-current" type="button" aria-haspopup="dialog">
+                        <span class="day-current-text"><small id="map-current-sub"></small><span id="map-current-name"></span></span>
+                        <svg class="ico"><use href="#i-chevron-down"/></svg>
+                    </button>
+                    <button class="day-step" id="map-next" type="button" aria-label="後一天"><svg class="ico"><use href="#i-chevron-right"/></svg></button>
+                </nav>
             </div>
             <div class="map-frame">
                 <div id="map"></div>
@@ -2923,7 +2983,7 @@
 
         // ---------- 篩選按鈕 ----------
         function renderFilters() {
-            const dayTabs = [`<button class="day-tab" type="button" data-day="prep" aria-pressed="false"><small id="prep-progress">自檢表</small><span>行前</span></button>`]
+            const dayTabs = [`<button class="day-tab day-tab-all" type="button" data-day="all" aria-pressed="false"><small>地圖</small><span>全部地點</span></button>`, `<button class="day-tab" type="button" data-day="prep" aria-pressed="false"><small id="prep-progress">自檢表</small><span>行前</span></button>`]
                 .concat(days.map((d) => {
                     // 有出發日期就在天數旁邊加上日期，例如「第 1 天・11/21」；不放星期，按鈕才不會比地名寬
                     const date = dateOfDay(d.day);
@@ -3314,29 +3374,31 @@
             });
         }
 
+        // 地圖上方的天數列：‹ 第幾天 ›，最前面是「全部地點」；點中間打開同一個天數選單
+        function mapDayOrder() { return ['all'].concat(days.map((d) => d.day)); }
         function renderMapDayTabs() {
-            const container = $('#map-day-tabs');
-            if (!container) return;
-            const totalWithCoords = items.filter((it) => it.lat && it.lng).length;
-            const tabs = [
-                `<button class="map-day-chip" type="button" data-day="all" aria-pressed="${String(mapDay === 'all')}">全部 <small>${totalWithCoords}</small></button>`
-            ];
-            days.forEach((d) => {
-                const count = items.filter((it) => it.day == d.day && it.lat && it.lng).length;
-                tabs.push(
-                    `<button class="map-day-chip" type="button" data-day="${d.day}" aria-pressed="${String(mapDay == d.day)}">${dayLabel(d.day)} ${esc(d.name)} <small>${count}</small></button>`
-                );
-            });
-            container.innerHTML = tabs.join('');
+            const sub = $('#map-current-sub');
+            if (!sub) return;
+            const shown = mapDay == null ? currentViewDay() : mapDay;
+            const withCoords = (it) => it.lat && it.lng;
+            if (shown === 'all') {
+                sub.textContent = '全部天數';
+                $('#map-current-name').textContent = `全部地點（${items.filter(withCoords).length}）`;
+            } else {
+                const d = days.find((x) => x.day == shown);
+                const date = dateOfDay(Number(shown));
+                sub.textContent = `${dayLabel(shown)}${date ? '・' + shortDate(date) : ''}・${items.filter((it) => it.day == shown && withCoords(it)).length} 個地點`;
+                $('#map-current-name').textContent = d && d.name ? d.name : dayLabel(shown);
+            }
+            const order = mapDayOrder();
+            const i = order.findIndex((x) => String(x) === String(shown));
+            $('#map-prev').disabled = i <= 0;
+            $('#map-next').disabled = i < 0 || i >= order.length - 1;
         }
 
         function setMapDay(targetDay, fit = true) {
             mapDay = targetDay;
-            document.querySelectorAll('.map-day-chip').forEach((btn) => {
-                btn.setAttribute('aria-pressed', String(btn.dataset.day == mapDay));
-            });
-            const pressedChip = $('#map-day-tabs [aria-pressed="true"]');
-            if (pressedChip && root.dataset.view === 'map') pressedChip.scrollIntoView({ inline: 'center', block: 'nearest' });
+            renderMapDayTabs();
 
             updateMapTitle();
             updateMarkers(fit);
@@ -3480,8 +3542,7 @@
                 }
                 updateMapTitle();
                 renderMapDayTabs();
-                const chip = $('#map-day-tabs [aria-pressed="true"]');
-                if (chip) chip.scrollIntoView({ inline: 'center', block: 'nearest' });
+
                 setTimeout(() => map && map.invalidateSize(), 50);
             }
             if (view === 'home') {
@@ -3731,11 +3792,16 @@
         // ---------- 事件 ----------
         const dayPicker = $('#day-picker');
         bindSheet(dayPicker);
-        $('#day-current').addEventListener('click', () => openSheet(dayPicker));
+        $('#day-current').addEventListener('click', () => {
+            dayPicker.dataset.target = 'list';
+            syncPressed($('#day-tabs'), 'day', state.day);
+            openSheet(dayPicker);
+        });
         $('#day-tabs').addEventListener('click', (e) => {
             const btn = e.target.closest('.day-tab');
             if (!btn) return;
-            selectDay(btn.dataset.day);
+            if (dayPicker.dataset.target === 'map') goMapDay(btn.dataset.day);
+            else selectDay(btn.dataset.day);
             closeSheet(dayPicker);
         });
         $('#day-prev').addEventListener('click', () => {
@@ -4255,11 +4321,24 @@
             map.once('moveend', () => { if (marker) marker.openPopup(); });
             map.flyTo([item.lat, item.lng], Math.max(map.getZoom(), 15), { duration: 0.6 });
         });
-        $('#map-day-tabs').addEventListener('click', (e) => {
-            const btn = e.target.closest('.map-day-chip');
-            if (!btn) return;
-            if (btn.dataset.day !== 'all') setViewDay(btn.dataset.day);
-            setMapDay(btn.dataset.day === 'all' ? 'all' : Number(btn.dataset.day), true);
+        function goMapDay(day) {
+            if (day !== 'all') setViewDay(day);
+            setMapDay(day === 'all' ? 'all' : Number(day), true);
+        }
+        $('#map-prev').addEventListener('click', () => {
+            const order = mapDayOrder();
+            const i = order.findIndex((x) => String(x) === String(mapDay));
+            if (i > 0) goMapDay(order[i - 1]);
+        });
+        $('#map-next').addEventListener('click', () => {
+            const order = mapDayOrder();
+            const i = order.findIndex((x) => String(x) === String(mapDay));
+            if (i >= 0 && i < order.length - 1) goMapDay(order[i + 1]);
+        });
+        $('#map-current').addEventListener('click', () => {
+            dayPicker.dataset.target = 'map';
+            $('#day-tabs').querySelectorAll('button').forEach((b) => b.setAttribute('aria-pressed', String(b.dataset.day === String(mapDay))));
+            openSheet(dayPicker);
         });
 
         desktopMQ.addEventListener('change', (e) => {
