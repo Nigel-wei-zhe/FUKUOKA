@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
     <title>福岡散步繪本 | FUKUOKA Travel</title>
     <meta name="description" content="福岡八天的吃喝散步路線：景點、美食、點心、購物與交通，附地圖導航，可離線瀏覽。">
-    <meta name="theme-color" content="#F3F4EF">
+    <meta name="theme-color" content="#FAF8F4">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-title" content="福岡散步">
@@ -13,7 +13,6 @@
     <link rel="manifest" href="./manifest.webmanifest">
     <link rel="icon" type="image/png" sizes="32x32" href="./icons/favicon-32.png">
     <link rel="apple-touch-icon" href="./icons/apple-touch-icon.png">
-    <link rel="preload" href="./fonts/huninn-subset.woff2" as="font" type="font/woff2" crossorigin>
     <link rel="stylesheet" href="./vendor/leaflet/leaflet.css">
 
     <!-- 在畫面渲染前決定日夜主題，避免閃爍 -->
@@ -30,7 +29,7 @@
             if (fs === 'l' || fs === 'xl') document.documentElement.dataset.fs = fs;
             var m = document.querySelector('meta[name="theme-color"]');
             // 這裡 CSS 還沒載入、讀不到變數，色碼要和兩套主題的 --paper 一致
-            if (m) m.content = t === 'night' ? '#0F1830' : '#F3F4EF';
+            if (m) m.content = t === 'night' ? '#17110E' : '#FAF8F4';
         })();
     </script>
 
@@ -46,30 +45,35 @@
         /* ---------- 色票：白天是紙張與明太子粉，夜晚是博多灣與屋台燈籠 ---------- */
         :root {
             color-scheme: light;
-            --paper: #F3F4EF;
-            --paper-2: #E8EAE3;
+            --paper: #FAF8F4;
+            --paper-2: #F0EBE2;
             --card: #FFFFFF;
-            --ink: #1D2A48;
-            --ink-soft: #4F5A70;
-            --line: #DFE2DA;
-            --line-strong: #7F8899;
-            --accent: #B8324A;
+            --ink: #2B1E17;
+            --ink-soft: #6B5A4E;
+            --line: #E6DED2;
+            --line-strong: #8E7C6A;
+            --accent: #9E1B22;
             --on-accent: #FFFFFF;
-            --link: #A82D43;
-            --stamp: #B8324A;
+            --link: #9E1B22;
+            --stamp: #9E1B22;
 
-            --c-sight: #9CC39A;
-            --c-food: #EE9C93;
+            --c-sight: #A7C495;
+            --c-food: #E9A585;
             --c-sweet: #EDB3C6;
-            --c-shop: #ECC65C;
-            --c-move: #9CB1D6;
-            --c-stay: #BBA6D6;
-            --on-cat: #1D2A48;
+            --c-shop: #E8C66C;
+            --c-move: #9DBDD0;
+            --c-stay: #BCA9D3;
+            --on-cat: #2B1E17;
             /* 站牌（首頁下一站）：白天紺底白字，夜晚燈籠黃底紺字 */
-            --sign: #1D2A48;
-            --on-sign: #FFFFFF;
-            --sign-nav: #B8324A;
-            --on-sign-nav: #FFFFFF;
+            --sign: #7A1A1F;
+            /* 九州觀光列車：黃銅（細線、深色底上的大數字）與車廂內裝（底部分頁列） */
+            --brass: #B08A3E;
+            --brass-hi: #E8C77E;
+            --shell: #2B1E17;
+            --on-shell: #F3E9D8;
+            --on-sign: #FBF5E8;
+            --sign-nav: #D9B25E;
+            --on-sign-nav: #2B1E17;
 
             --hill: #D6E6CF;
             --sea: #C3D7E6;
@@ -104,29 +108,33 @@
 
         :root[data-theme="night"] {
             color-scheme: dark;
-            --paper: #0F1830;
-            --paper-2: #16203B;
-            --card: #18233F;
-            --ink: #F1EDE4;
-            --ink-soft: #B4B3B8;
-            --line: #26324F;
-            --line-strong: #5F6E96;
-            --accent: #F2C14E;
-            --on-accent: #0F1830;
-            --link: #F2C14E;
-            --stamp: #F08C84;
+            --paper: #17110E;
+            --paper-2: #1E1612;
+            --card: #221915;
+            --ink: #F3E9D8;
+            --ink-soft: #BFAF98;
+            --line: #3A2D25;
+            --line-strong: #7E6A57;
+            --accent: #D9B25E;
+            --on-accent: #17110E;
+            --link: #E3BE6E;
+            --stamp: #EE8B7B;
 
-            --c-sight: #8DB58A;
-            --c-food: #E48B82;
+            --c-sight: #93B383;
+            --c-food: #E0957A;
             --c-sweet: #D99FB4;
-            --c-shop: #E8BC4E;
-            --c-move: #8AA2CC;
-            --c-stay: #A794CC;
-            --on-cat: #0F1830;
-            --sign: #F2C14E;
-            --on-sign: #0F1830;
-            --sign-nav: #0F1830;
-            --on-sign-nav: #F2C14E;
+            --c-shop: #E3BE5E;
+            --c-move: #86A9BE;
+            --c-stay: #A894C6;
+            --on-cat: #17110E;
+            --sign: #8E2027;
+            --brass: #C9A255;
+            --brass-hi: #EBCB85;
+            --shell: #0F0A08;
+            --on-shell: #F3E9D8;
+            --on-sign: #FBF5E8;
+            --sign-nav: #D9B25E;
+            --on-sign-nav: #17110E;
 
             --hill: #22304F;
             --sea: #1F3A5E;
@@ -1894,7 +1902,7 @@
         /* 底圖調成紙張色調；夜晚反轉成博多灣的深藍 */
         .leaflet-tile-pane { filter: sepia(.2) saturate(.8) brightness(1.02); }
         [data-theme="night"] .leaflet-tile-pane {
-            filter: invert(1) hue-rotate(180deg) sepia(.45) hue-rotate(178deg) saturate(1.3) brightness(.82) contrast(.88);
+            filter: invert(1) hue-rotate(180deg) sepia(.6) saturate(.85) brightness(.78) contrast(.9);
         }
         .leaflet-bar { border: 1.5px solid var(--ink) !important; border-radius: 14px !important; overflow: hidden; box-shadow: var(--shadow) !important; }
         .leaflet-bar a { background: var(--card); color: var(--ink); border-bottom-color: var(--line) !important; width: 44px !important; height: 44px !important; line-height: 42px !important; font-size: 22px !important; }
@@ -2552,6 +2560,51 @@
         .day-title { display: block; }
         .day-title small { display: block; margin-top: 4px; }
         .day-title .day-done { margin-left: 8px; vertical-align: middle; }
+
+        /* ================= 九州觀光列車 ================= */
+        /* 網站名稱：像列車銘牌的字，不用圓體 */
+        .hero h1 { font-family: var(--font); font-weight: 700; letter-spacing: .08em; }
+
+        /* 招牌：「下一站」黃銅銘牌（漆紅底、黃銅雙細框、四角鉚釘、黃銅大時間） */
+        .next-card {
+            padding: 22px 20px 20px;
+            background:
+                linear-gradient(180deg, color-mix(in srgb, #FFFFFF 7%, transparent), transparent 50%),
+                var(--sign);
+            box-shadow:
+                inset 0 0 0 1px var(--brass),
+                inset 0 0 0 5px var(--sign),
+                inset 0 0 0 6px color-mix(in srgb, var(--brass) 70%, transparent),
+                0 6px 18px -8px color-mix(in srgb, var(--sign) 60%, transparent);
+        }
+        .next-card::before {
+            inset: 9px;
+            height: auto;
+            border: 0;
+            background:
+                radial-gradient(circle at 0 0, var(--brass-hi) 0 2.5px, transparent 3px) top left / 10px 10px no-repeat,
+                radial-gradient(circle at 100% 0, var(--brass-hi) 0 2.5px, transparent 3px) top right / 10px 10px no-repeat,
+                radial-gradient(circle at 0 100%, var(--brass-hi) 0 2.5px, transparent 3px) bottom left / 10px 10px no-repeat,
+                radial-gradient(circle at 100% 100%, var(--brass-hi) 0 2.5px, transparent 3px) bottom right / 10px 10px no-repeat;
+            pointer-events: none;
+        }
+        .next-card .next-time, .next-card .next-countdown b { color: var(--brass-hi); }
+        .next-card .chip-btn.nav { box-shadow: 0 4px 14px -4px color-mix(in srgb, var(--brass) 55%, transparent) !important; }
+        .next-progress span { background: var(--brass-hi); }
+
+        /* 停車站案內：黃銅圓點，現在這站漆紅實心 */
+        .stop::before { border-left-color: color-mix(in srgb, var(--brass) 40%, var(--paper)); }
+        .stop-node { border-color: var(--paper); box-shadow: 0 0 0 1.5px var(--brass); }
+        .stop.is-now .stop-node { background: var(--accent); box-shadow: 0 0 0 1.5px var(--accent), 0 0 0 6px color-mix(in srgb, var(--accent) 25%, transparent); }
+
+        /* 車廂內裝：底部分頁列深胡桃色，選中的分頁是黃銅 */
+        .tabbar, .tabbar::after {
+            background: color-mix(in srgb, var(--shell) 92%, transparent);
+        }
+        .tabbar { border-top: 1px solid color-mix(in srgb, var(--brass) 45%, transparent); }
+        .tab { color: color-mix(in srgb, var(--on-shell) 78%, transparent); }
+        .tab[aria-pressed="true"] { color: var(--on-shell); }
+        .tab[aria-pressed="true"] .tab-ico { background: var(--brass-hi) !important; color: var(--shell) !important; }
     </style>
 </head>
 <body>
