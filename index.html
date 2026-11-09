@@ -82,6 +82,7 @@
             --on-led: #FFFFFF;
             --board-action: #9E1B22;
             --on-board-action: #FFFFFF;
+            --board-raised: #FFFFFF; /* 看板上選中的那格 */
 
             --hill: #D6E6CF;
             --sea: #C3D7E6;
@@ -150,6 +151,7 @@
             --on-led: #0A0706;
             --board-action: #C8343B;
             --on-board-action: #FFFFFF;
+            --board-raised: #463A32;
 
             --hill: #22304F;
             --sea: #1F3A5E;
@@ -2665,16 +2667,21 @@
             box-shadow: none !important;
             font-weight: 700;
         }
+        /* 看板上的「選中」：浮起來的淺色塊＋粗體＋下緣一條指示燈（跟底部分頁同一套），不用深色實心，免得在看板上跳色 */
         .toolbar .day-current, .map-top .day-current,
         .toolbar .cat-chip[aria-pressed="true"],
         .info-board .info-cat[aria-pressed="true"] {
             border: 0 !important;
-            background: var(--on-board) !important;
-            color: var(--board) !important;
-            box-shadow: none !important;
+            background: var(--board-raised) !important;
+            color: var(--on-board) !important;
+            font-weight: 700;
+            box-shadow: 0 1px 2px color-mix(in srgb, var(--on-board) 14%, transparent) !important;
         }
-        .toolbar .day-current small, .map-top .day-current small { color: var(--board); opacity: .75; }
-        .toolbar .cat-chip[aria-pressed="true"] .dot { box-shadow: 0 0 0 1.5px var(--board); }
+        .toolbar .cat-chip[aria-pressed="true"],
+        .info-board .info-cat[aria-pressed="true"] {
+            box-shadow: inset 0 -3px 0 var(--led), 0 1px 2px color-mix(in srgb, var(--on-board) 14%, transparent) !important;
+        }
+        .toolbar .day-current small, .map-top .day-current small { color: var(--board-soft); opacity: 1; font-weight: 400; }
         .toolbar :focus-visible, .map-top :focus-visible, .info-board :focus-visible { outline-color: var(--led); }
 
         /* 行程頁工具列、地圖上方：看板底色延伸到最上方 */
@@ -2694,7 +2701,7 @@
             align-items: center;
             gap: 12px;
             padding: 8px 16px;
-            border-bottom: 2px solid var(--ink);
+            border-bottom: 2px solid var(--line-strong);
             font-size: calc(13px * var(--fs));
             font-weight: 600;
             letter-spacing: .12em;
@@ -2786,7 +2793,7 @@
         .home-hero-wrap .hero-text:has(.board-clock:not([hidden])) > :not(.board-clock) { padding-right: calc(76px * var(--fs)); }
         /* 資訊頁的段落標題：像時刻表的表頭，下面一條粗線 */
         .info-list .info-card { padding: 0 0 20px; border-bottom: 0; }
-        .info-list .info-card h2 { padding-bottom: 10px; border-bottom: 2px solid var(--ink); font-weight: 700; }
+        .info-list .info-card h2 { padding-bottom: 10px; border-bottom: 2px solid var(--line-strong); font-weight: 700; }
         #home-today-list .past-toggle { display: flex; width: calc(100% + 32px); }
         /* 資訊頁可以點的列（指指卡、飯店）：時刻表的列，不是一張張卡片 */
         .info-list .phrase-row {
