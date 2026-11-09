@@ -5,6 +5,7 @@
   "subtitle": "2026/11/21–11/28 八天七夜",
   "startDate": "2026-11-21",
   "timeNote": "時間都是日本時間，比台灣快 1 小時",
+  "zones": { "台灣時間": "Asia/Taipei" },
   "weather": {
     "timezone": "Asia/Tokyo",
     "default": { "name": "福岡市 (博多)", "lat": 33.5902, "lng": 130.4207 },

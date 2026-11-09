@@ -244,6 +244,74 @@
         }
         .home-hero-wrap .hero-text { padding-right: 20px; }
 
+        /* 旅行期間的首頁：先回答「下一站去哪」，封面插畫收起來 */
+        .home-pane.is-trip .scene { display: none; }
+        .home-pane.is-trip .home-hero-wrap { margin-bottom: 8px; }
+        .next-card {
+            margin-bottom: 20px;
+            padding: 16px 18px 18px;
+            border: 2px solid var(--ink);
+            border-radius: var(--r-card);
+            background: var(--card);
+            box-shadow: var(--shadow);
+        }
+        .next-card[hidden] { display: none; }
+        .next-label {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            gap: 6px 10px;
+            font-size: calc(15px * var(--fs));
+            color: var(--ink-soft);
+        }
+        .next-label strong {
+            padding: 2px 10px;
+            border-radius: 999px;
+            background: var(--accent);
+            color: var(--on-accent);
+            font-weight: 600;
+        }
+        .next-time { font-size: calc(20px * var(--fs)); color: var(--ink); font-weight: 600; }
+        .next-time small { margin-left: 4px; font-size: calc(13px * var(--fs)); font-weight: 400; color: var(--ink-soft); }
+        .next-choice + .next-choice { margin-top: 14px; padding-top: 14px; border-top: 2px dashed var(--line); }
+        .next-title {
+            margin-top: 8px;
+            font-size: calc(22px * var(--fs));
+            line-height: 1.35;
+            color: var(--ink);
+            overflow-wrap: anywhere;
+        }
+        .next-choices-note { margin-top: 6px; font-size: calc(15px * var(--fs)); color: var(--ink-soft); }
+        .next-actions { display: flex; gap: 10px; margin-top: 12px; }
+        .next-actions > * {
+            flex: 1;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            min-height: 52px;
+            padding: 8px 12px;
+            border: 2px solid var(--ink);
+            border-radius: var(--r-inner);
+            background: var(--card);
+            color: var(--ink);
+            font-size: calc(17px * var(--fs));
+            font-weight: 600;
+            text-decoration: none;
+        }
+        .next-actions .next-nav { flex: 1.4; background: var(--accent); color: var(--on-accent); }
+        .next-actions .ico { width: 22px; height: 22px; }
+        .next-actions > *:active { transform: scale(.97); }
+        .next-now {
+            margin-top: 14px;
+            padding-top: 12px;
+            border-top: 2px dashed var(--line);
+            font-size: calc(15px * var(--fs));
+            line-height: 1.5;
+            color: var(--ink-soft);
+        }
+        .next-now strong { font-weight: 400; color: var(--ink); }
+
         /* 天氣看板 */
         .weather-card {
             position: relative;
@@ -2214,6 +2282,9 @@
         <section id="home-pane" class="home-pane" aria-label="首頁概覽">
             <div class="home-hero-wrap" id="home-hero-container"></div>
 
+            <!-- 旅行期間：接下來去哪 -->
+            <section class="next-card" id="home-next" aria-label="接下來的安排" hidden></section>
+
             <!-- 天氣看板 -->
             <section class="weather-card" id="weather-card" aria-label="當天天氣資訊">
                 <div class="weather-header">
@@ -2446,7 +2517,7 @@
         const CHECKLIST_URL = './data/checklist.json';
         const UI_URL = './data/ui.json';
         const VIEWS = ['home', 'list', 'map', 'info'];
-        let trip = { id: 'trip', title: '', subtitle: '', timeNote: '' };
+        let trip = { id: 'trip', title: '', subtitle: '', timeNote: '', zones: {} };
         let weatherConf = { timezone: 'auto', default: null, climate: null };
         let days = [];
         let items = [];
@@ -3701,7 +3772,7 @@
                     const c = catOf(item);
                     const isV = visited.has(item.id);
                     return `
-                        <div class="${withMeta ? 'timeline-item' : 'timeline-sub-item'}${isV ? ' is-visited' : ''}"${withMeta && item.time ? ` data-time="${esc(item.time)}"` : ''}>
+                        <div class="${withMeta ? 'timeline-item' : 'timeline-sub-item'}${isV ? ' is-visited' : ''}"${withMeta && item.time ? ` data-time="${esc(item.time)}"${item.tz ? ` data-tz="${esc(item.tz)}"` : ''}` : ''}>
                             ${isV ? '<span class="visit-stamp" aria-hidden="true">去過</span>' : ''}
                             <button class="timeline-open" type="button" data-open="${esc(item.id)}"${isV ? ` aria-label="${esc(item.title)}（去過）"` : ''}>
                                 ${withMeta ? `<span class="timeline-time">${timeHTML(item)}</span>` : ''}
@@ -3723,7 +3794,7 @@
                             const c = catOf(first);
                             const visitedCount = group.filter((it) => visited.has(it.id)).length;
                             return `
-                                <details class="timeline-group${visitedCount ? ' is-visited' : ''}"${first.time ? ` data-time="${esc(first.time)}"` : ''}>
+                                <details class="timeline-group${visitedCount ? ' is-visited' : ''}"${first.time ? ` data-time="${esc(first.time)}"${first.tz ? ` data-tz="${esc(first.tz)}"` : ''}` : ''}>
                                     <summary class="timeline-summary">
                                         ${visitedCount ? '<span class="visit-stamp" aria-hidden="true">去過</span>' : ''}
                                         <span class="timeline-time">${timeHTML(first)}</span>
@@ -3744,24 +3815,72 @@
             }
 
             markNow();
+            renderNext();
             fetchWeatherForDay(currentHomeDay);
         }
 
         // 旅行當天：依現在時間標出「現在」的行程（最後一個已經開始的時段），每分鐘更新
-        function nowHM() {
+        // zone：地點的「時區」欄（例如「台灣時間」），對應 trip.json 的 zones；沒有就用當地時間
+        function nowHM(zone) {
+            const tz = (zone && trip.zones && trip.zones[zone]) || (weatherConf.timezone !== 'auto' ? weatherConf.timezone : undefined);
             try {
-                return new Intl.DateTimeFormat('en-GB', { timeZone: weatherConf.timezone !== 'auto' ? weatherConf.timezone : undefined, hour: '2-digit', minute: '2-digit', hourCycle: 'h23' }).format(new Date());
+                return new Intl.DateTimeFormat('en-GB', { timeZone: tz, hour: '2-digit', minute: '2-digit', hourCycle: 'h23' }).format(new Date());
             } catch (e) {
                 const d = new Date();
                 return `${String(d.getHours()).padStart(2, '0')}:${String(d.getMinutes()).padStart(2, '0')}`;
             }
         }
+        // 旅行當天：照表算出「下一站」（家人跟著帶隊者照表走，不需要手動選）
+        function renderNext() {
+            const box = $('#home-next');
+            const pane = $('#home-pane');
+            const date = dateOfDay(currentHomeDay);
+            const isToday = Boolean(date) && date === todayIn(weatherConf.timezone);
+            pane.classList.toggle('is-trip', isToday);
+            box.hidden = !isToday;
+            if (!isToday) { box.innerHTML = ''; return; }
+
+            const groups = groupStops(items.filter((i) => i.day === currentHomeDay && i.time));
+            const passed = (g) => g[0].time <= nowHM(g[0].tz);
+            const current = groups.filter(passed).pop();
+            const next = groups.find((g) => !passed(g));
+            const tzTag = (it) => (it.tz ? `<small>${esc(it.tz)}</small>` : '');
+            const actions = (it) => `
+                <div class="next-actions">
+                    <button type="button" data-open="${esc(it.id)}">${icon('book')}詳細</button>
+                    <a class="next-nav" href="${esc(mapLink(it))}" target="_blank" rel="noopener" aria-label="${esc(it.title)}：用 Google 地圖導航">${icon('nav')}導航</a>
+                </div>`;
+            const nowLine = current ? `<p class="next-now">現在：<strong>${esc(current[0].time)} ${esc(current[0].title)}</strong>${current.length > 1 ? `（${current.length} 選 1）` : ''}</p>` : '';
+
+            if (next) {
+                const first = next[0];
+                box.innerHTML = `
+                    <p class="next-label"><strong>下一站</strong><span class="next-time">${esc(first.time)}${tzTag(first)}</span>${next.length > 1 ? `<span>${next.length} 個選一個</span>` : ''}</p>
+                    ${next.map((it) => `
+                        <div class="next-choice">
+                            <h2 class="next-title">${esc(it.title)}</h2>
+                            ${actions(it)}
+                        </div>`).join('')}
+                    ${nowLine}`;
+                return;
+            }
+            // 今天都走完了：給今晚的住宿
+            const tonight = hotelStays().find((h) => h.days.includes(currentHomeDay));
+            box.innerHTML = `
+                <p class="next-label"><strong>今天的行程走完了</strong></p>
+                ${tonight ? `
+                    <div class="next-choice">
+                        <h2 class="next-title">今晚住：${esc(tonight.stay.title)}</h2>
+                        ${actions(tonight.stay)}
+                    </div>` : ''}
+                ${nowLine}`;
+        }
+
         function markNow() {
             const rows = Array.from(document.querySelectorAll('#home-today-list .home-timeline > [data-time]'));
             const date = dateOfDay(currentHomeDay);
             const isToday = Boolean(date) && date === todayIn(weatherConf.timezone);
-            const hm = nowHM();
-            const current = isToday ? rows.filter((r) => r.dataset.time <= hm).pop() : null;
+            const current = isToday ? rows.filter((r) => r.dataset.time <= nowHM(r.dataset.tz)).pop() : null;
             rows.forEach((r) => {
                 const on = r === current;
                 r.classList.toggle('is-now', on);
@@ -3777,9 +3896,14 @@
                 }
             });
         }
-        setInterval(() => { if (root.dataset.view === 'home') markNow(); }, 60000);
+        setInterval(() => { if (root.dataset.view === 'home') { markNow(); renderNext(); } }, 60000);
+        document.addEventListener('visibilitychange', () => { if (!document.hidden && root.dataset.view === 'home' && items.length) { markNow(); renderNext(); } });
 
         $('#home-today-list').addEventListener('click', (e) => {
+            const btn = e.target.closest('[data-open]');
+            if (btn) showDetailModal(btn.dataset.open);
+        });
+        $('#home-next').addEventListener('click', (e) => {
             const btn = e.target.closest('[data-open]');
             if (btn) showDetailModal(btn.dataset.open);
         });
@@ -4233,6 +4357,7 @@
                 title: String(data.title || '旅行繪本'),
                 subtitle: String(data.subtitle || ''),
                 timeNote: String(data.timeNote || ''),
+                zones: data.zones && typeof data.zones === 'object' ? data.zones : {},
                 startDate: /^\d{4}-\d{2}-\d{2}$/.test(data.startDate || '') ? data.startDate : ''
             };
             items = data.items
