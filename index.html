@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
     <title>福岡散步繪本 | FUKUOKA Travel</title>
     <meta name="description" content="福岡八天的吃喝散步路線：景點、美食、點心、購物與交通，附地圖導航，可離線瀏覽。">
-    <meta name="theme-color" content="#F5F0E6">
+    <meta name="theme-color" content="#F3F4EF">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-title" content="福岡散步">
@@ -30,7 +30,7 @@
             if (fs === 'l' || fs === 'xl') document.documentElement.dataset.fs = fs;
             var m = document.querySelector('meta[name="theme-color"]');
             // 這裡 CSS 還沒載入、讀不到變數，色碼要和兩套主題的 --paper 一致
-            if (m) m.content = t === 'night' ? '#111726' : '#F5F0E6';
+            if (m) m.content = t === 'night' ? '#0F1830' : '#F3F4EF';
         })();
     </script>
 
@@ -46,40 +46,40 @@
         /* ---------- 色票：白天是紙張與明太子粉，夜晚是博多灣與屋台燈籠 ---------- */
         :root {
             color-scheme: light;
-            --paper: #F5F0E6;
-            --paper-2: #EBE3D3;
-            --card: #FFFCF5;
-            --ink: #2A231F;
-            --ink-soft: #61564D;
-            --line: #E2D8C5;
-            --line-strong: #968670;
-            --accent: #B5432F;
-            --on-accent: #FFFCF5;
-            --link: #A13A28;
-            --stamp: #B3312A;
+            --paper: #F3F4EF;
+            --paper-2: #E8EAE3;
+            --card: #FFFFFF;
+            --ink: #1D2A48;
+            --ink-soft: #4F5A70;
+            --line: #DFE2DA;
+            --line-strong: #7F8899;
+            --accent: #B8324A;
+            --on-accent: #FFFFFF;
+            --link: #A82D43;
+            --stamp: #B8324A;
 
-            --c-sight: #A7BE8C;
-            --c-food: #E7A08C;
-            --c-sweet: #E4B3C2;
-            --c-shop: #E4BD68;
-            --c-move: #8DB7C8;
-            --c-stay: #B1A2CE;
-            --on-cat: #2A231F;
+            --c-sight: #9CC39A;
+            --c-food: #EE9C93;
+            --c-sweet: #EDB3C6;
+            --c-shop: #ECC65C;
+            --c-move: #9CB1D6;
+            --c-stay: #BBA6D6;
+            --on-cat: #1D2A48;
 
-            --hill: #DCE8CB;
-            --sea: #BFDDE6;
-            --sea-line: #86B8CA;
-            --torii: #C8553D;
+            --hill: #D6E6CF;
+            --sea: #C3D7E6;
+            --sea-line: #7FA3C4;
+            --torii: #C2453F;
             --lamp: #F5C85E;
             --window: #FFFDF7;
 
-            --shadow: 0 3px 0 var(--line);
+            --shadow: 0 2px 0 color-mix(in srgb, var(--ink) 14%, transparent);
             --noise-opacity: .07;
             --noise-blend: multiply;
 
-            --r-card: 18px 24px 16px 22px / 20px 16px 22px 18px;
-            --r-chip: 14px 16px 13px 15px / 15px 13px 16px 14px;
-            --r-inner: 12px;   /* 卡片裡面的小卡、小按鈕 */
+            --r-card: 14px;
+            --r-chip: 12px;
+            --r-inner: 10px;   /* 卡片裡面的小卡、小按鈕 */
             --r-pill: 999px;   /* 膠囊形：標籤、分類篩選 */
             --scrim: rgba(30, 36, 54, .45); /* sheet 後面的暗色遮罩（日夜共用） */
             /* 雲朵形狀（只當遮罩用，顏色由 background 決定，日夜都適用） */
@@ -94,34 +94,34 @@
 
         :root[data-theme="night"] {
             color-scheme: dark;
-            --paper: #111726;
-            --paper-2: #192133;
-            --card: #1C2538;
-            --ink: #EFE7D9;
-            --ink-soft: #B2A999;
-            --line: #29334A;
-            --line-strong: #66729B;
-            --accent: #E2B04A;
-            --on-accent: #111726;
-            --link: #E8BE66;
-            --stamp: #EE8B7B;
+            --paper: #0F1830;
+            --paper-2: #16203B;
+            --card: #18233F;
+            --ink: #F1EDE4;
+            --ink-soft: #B4B3B8;
+            --line: #26324F;
+            --line-strong: #5F6E96;
+            --accent: #F2C14E;
+            --on-accent: #0F1830;
+            --link: #F2C14E;
+            --stamp: #F08C84;
 
-            --c-sight: #93AE7E;
-            --c-food: #E0907E;
-            --c-sweet: #D7A0B5;
-            --c-shop: #E2B85E;
-            --c-move: #7FA9BC;
-            --c-stay: #A595C6;
-            --on-cat: #111726;
+            --c-sight: #8DB58A;
+            --c-food: #E48B82;
+            --c-sweet: #D99FB4;
+            --c-shop: #E8BC4E;
+            --c-move: #8AA2CC;
+            --c-stay: #A794CC;
+            --on-cat: #0F1830;
 
-            --hill: #2B3552;
-            --sea: #25405F;
+            --hill: #22304F;
+            --sea: #1F3A5E;
             --sea-line: #4A70A0;
-            --torii: #C9614F;
+            --torii: #C9564D;
             --lamp: #FFD27A;
             --window: #FFD98A;
 
-            --shadow: 0 3px 0 #090D18;
+            --shadow: 0 2px 0 rgba(0, 0, 0, .35);
             --noise-opacity: .05;
             --noise-blend: screen;
         }
@@ -247,15 +247,37 @@
         /* 旅行期間的首頁：先回答「下一站去哪」，封面插畫收起來 */
         .home-pane.is-trip .scene { display: none; }
         .home-pane.is-trip .home-hero-wrap { margin-bottom: 8px; }
+        /* 唯一的重點：上緣是博多織「獻上柄」條紋帶（粗條＋細線的節奏），顏色跟著下一站的分類 */
         .next-card {
+            --cat: var(--accent);
+            position: relative;
+            overflow: hidden;
             margin-bottom: 20px;
-            padding: 16px 16px 16px;
-            border: 2px solid var(--ink);
+            padding: 32px 16px 16px;
+            border: 1.5px solid var(--ink);
             border-radius: var(--r-card);
             background: var(--card);
             box-shadow: var(--shadow);
         }
         .next-card[hidden] { display: none; }
+        .next-card::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 14px;
+            border-bottom: 1.5px solid var(--ink);
+            background: repeating-linear-gradient(90deg,
+                var(--cat) 0 18px,
+                var(--ink) 18px 20px,
+                var(--cat) 20px 24px,
+                var(--ink) 24px 26px,
+                var(--cat) 26px 44px,
+                var(--card) 44px 46px,
+                var(--ink) 46px 52px,
+                var(--card) 52px 54px);
+        }
         .next-label { display: flex; flex-wrap: wrap; align-items: center; gap: 6px 12px; }
         .next-label .tape { font-size: calc(16px * var(--fs)); }
         .next-time { font-size: calc(22px * var(--fs)); line-height: 1.2; color: var(--ink); font-variant-numeric: tabular-nums; }
@@ -300,7 +322,7 @@
             overflow: hidden;
             margin-bottom: 20px;
             padding: 16px 18px;
-            border: 2px solid var(--ink);
+            border: 1.5px solid var(--ink);
             border-radius: var(--r-card);
             background: var(--card);
             box-shadow: var(--shadow);
@@ -369,7 +391,7 @@
             border-radius: 50%;
             background: var(--paper-2);
             color: var(--lamp);
-            border: 2px solid var(--line-strong);
+            border: 1.5px solid var(--line-strong);
         }
         .weather-icon-box .ico { width: 32px; height: 32px; }
         .weather-temp-main {
@@ -437,7 +459,7 @@
             min-height: 44px;
             padding: 6px 14px;
             white-space: nowrap;
-            border: 2px solid var(--line-strong);
+            border: 1.5px solid var(--line-strong);
             border-radius: var(--r-chip);
             background: var(--card);
             font-size: calc(15px * var(--fs));
@@ -457,7 +479,7 @@
             align-items: center;
             gap: 8px;
             padding: 6px 8px 6px 4px;
-            border: 2px solid var(--line-strong);
+            border: 1.5px solid var(--line-strong);
             border-radius: var(--r-chip);
             background: var(--card);
             box-shadow: 0 2px 0 var(--line);
@@ -580,7 +602,7 @@
             min-width: 56px;
             min-height: 52px;
             padding: 4px 6px;
-            border: 2px solid var(--ink);
+            border: 1.5px solid var(--ink);
             border-radius: var(--r-inner);
             background: var(--accent);
             color: var(--on-accent);
@@ -593,7 +615,7 @@
 
         /* 同時段多地點折疊組件 (details/summary) */
         .timeline-group {
-            border: 2px solid var(--line-strong);
+            border: 1.5px solid var(--line-strong);
             border-radius: var(--r-chip);
             background: var(--card);
             box-shadow: 0 2px 0 var(--line);
@@ -650,7 +672,7 @@
         .today-empty {
             padding: 24px 16px;
             text-align: center;
-            border: 2px dashed var(--line-strong);
+            border: 1.5px dashed var(--line-strong);
             border-radius: var(--r-card);
             background: var(--card);
             color: var(--ink-soft);
@@ -664,7 +686,7 @@
             width: 100%;
             margin-top: 16px;
             padding: 14px;
-            border: 2px solid var(--ink);
+            border: 1.5px solid var(--ink);
             border-radius: var(--r-card);
             background: var(--card);
             color: var(--ink);
@@ -720,7 +742,7 @@
             bottom: 30%;
             max-width: 64%;
             padding: 6px 12px;
-            border: 2px solid var(--ink);
+            border: 1.5px solid var(--ink);
             border-radius: var(--r-chip);
             background: var(--card);
             color: var(--ink);
@@ -736,8 +758,8 @@
             bottom: -8px;
             width: 12px;
             height: 12px;
-            border-right: 2px solid var(--ink);
-            border-bottom: 2px solid var(--ink);
+            border-right: 1.5px solid var(--ink);
+            border-bottom: 1.5px solid var(--ink);
             background: var(--card);
             transform: rotate(45deg);
         }
@@ -756,7 +778,7 @@
             height: 48px;
             display: grid;
             place-items: center;
-            border: 2px solid var(--ink);
+            border: 1.5px solid var(--ink);
             border-radius: 50%;
             background: var(--card);
             color: var(--ink);
@@ -773,7 +795,7 @@
             right: 2px;
             width: 12px;
             height: 12px;
-            border: 2px solid var(--card);
+            border: 1.5px solid var(--card);
             border-radius: 50%;
             background: var(--stamp);
         }
@@ -793,7 +815,7 @@
             max-height: 88dvh;
             margin: 0 auto;
             padding: 0;
-            border: 2px solid var(--ink);
+            border: 1.5px solid var(--ink);
             border-bottom: 0;
             border-radius: 26px 28px 0 0;
             background: var(--card);
@@ -878,7 +900,7 @@
             gap: 6px;
             min-height: 52px;
             padding: 6px 8px;
-            border: 2px solid var(--line-strong);
+            border: 1.5px solid var(--line-strong);
             border-radius: var(--r-chip);
             background: var(--paper);
             font-size: 16px; /* 固定大小，切換字級時按鈕不會跳位 */
@@ -889,7 +911,7 @@
         .fs-preview {
             margin-top: 10px;
             padding: 10px 12px;
-            border: 2px dashed var(--line);
+            border: 1.5px dashed var(--line);
             border-radius: var(--r-chip);
             font-size: calc(15px * var(--fs));
         }
@@ -944,7 +966,7 @@
             gap: 8px;
             min-height: 56px;
             padding: 8px 10px;
-            border: 2px solid var(--line-strong);
+            border: 1.5px solid var(--line-strong);
             border-radius: var(--r-chip);
             background: var(--card);
             font-size: calc(17px * var(--fs));
@@ -977,7 +999,7 @@
         .info-list[data-tint="stamp"] { --tint: var(--stamp); }
         .info-card {
             padding: 18px 16px 16px;
-            border: 2px solid var(--line-strong);
+            border: 1.5px solid var(--line-strong);
             border-radius: var(--r-card);
             background: var(--card);
             box-shadow: var(--shadow);
@@ -995,7 +1017,7 @@
             flex: none;
             width: 36px;
             height: 36px;
-            border: 2px solid var(--ink);
+            border: 1.5px solid var(--ink);
             border-radius: 50%;
             background: var(--c-sight);
             color: var(--on-cat);
@@ -1063,7 +1085,7 @@
             gap: 2px;
             min-height: 60px;
             padding: 6px 4px;
-            border: 2px solid var(--line-strong);
+            border: 1.5px solid var(--line-strong);
             border-radius: var(--r-chip);
             background: var(--card);
             font-size: calc(15px * var(--fs));
@@ -1080,7 +1102,7 @@
             width: 100%;
             min-height: 64px;
             padding: 10px 10px 10px 14px;
-            border: 2px solid var(--line-strong);
+            border: 1.5px solid var(--line-strong);
             border-radius: var(--r-chip);
             background: var(--paper);
             text-align: left;
@@ -1126,7 +1148,7 @@
         .phrase-ja { font-size: clamp(30px, 9.5vw, 52px); line-height: 1.45; font-weight: 600; }
         .phrase-place {
             padding: 16px;
-            border: 2px solid var(--line-strong);
+            border: 1.5px solid var(--line-strong);
             border-radius: var(--r-chip);
             background: var(--paper);
         }
@@ -1167,7 +1189,7 @@
         .check-bar {
             height: 12px;
             margin-top: 8px;
-            border: 2px solid var(--line-strong);
+            border: 1.5px solid var(--line-strong);
             border-radius: var(--r-pill);
             background: var(--card);
             overflow: hidden;
@@ -1222,7 +1244,7 @@
             width: 30px;
             height: 30px;
             margin-top: 1px;
-            border: 2px solid var(--ink);
+            border: 1.5px solid var(--ink);
             border-radius: 8px;
             background: var(--card);
             color: transparent;
@@ -1260,7 +1282,7 @@
             z-index: 40;
             padding: var(--top-gap) 0 10px;
             background: var(--paper);
-            border-bottom: 2px dashed var(--line-strong);
+            border-bottom: 1.5px dashed var(--line-strong);
         }
         .icon-btn {
             display: grid;
@@ -1296,7 +1318,7 @@
             align-items: center;
             gap: 2px;
             min-height: 52px;
-            border: 2px solid var(--line-strong);
+            border: 1.5px solid var(--line-strong);
             border-radius: var(--r-chip);
             background: var(--card);
             color: var(--ink);
@@ -1332,7 +1354,7 @@
             align-items: flex-start;
             min-height: 48px;
             padding: 5px 12px 6px;
-            border: 2px solid var(--line-strong);
+            border: 1.5px solid var(--line-strong);
             border-radius: var(--r-chip);
             background: var(--card);
             text-align: left;
@@ -1373,7 +1395,7 @@
             gap: 6px;
             min-height: 44px;
             padding: 4px 12px 4px 6px;
-            border: 2px solid var(--line-strong);
+            border: 1.5px solid var(--line-strong);
             border-radius: var(--r-pill);
             background: var(--card);
             font-size: calc(15px * var(--fs));
@@ -1441,7 +1463,7 @@
             top: 14px;
             bottom: 18px;
             left: 15px;
-            border-left: 2px dashed var(--line-strong);
+            border-left: 1.5px dashed var(--line-strong);
         }
         .stop {
             display: grid;
@@ -1466,7 +1488,7 @@
             width: 32px;
             height: 32px;
             margin-top: 2px;
-            border: 2px solid var(--ink);
+            border: 1.5px solid var(--ink);
             border-radius: 50%;
             background: var(--cat);
             color: var(--on-cat);
@@ -1475,13 +1497,13 @@
 
         /* 四種卡片共用同樣的上緣裝飾帶（--card-top）和最小高度，按鈕列固定在底部，並排時才不會高高低低 */
         .card {
-            --card-top: 24px;
+            --card-top: 18px;
             position: relative;
             display: flex;
             flex-direction: column;
             min-height: calc(115px + 90px * var(--fs));
             padding: var(--card-top) 14px 10px;
-            border: 2px solid var(--line-strong);
+            border: 1.5px solid var(--line-strong);
             border-radius: var(--r-card);
             background: var(--card);
             box-shadow: var(--shadow);
@@ -1665,107 +1687,19 @@
         .choices-track::-webkit-scrollbar { display: none; }
         .choices-track > .card { flex: 0 0 88%; scroll-snap-align: start; }
 
-        /* ---------- 依分類換卡片樣式（統一底色，僅以頂部繪本飾條區分） ---------- */
-        /* 景點：溫和的山丘波浪邊 */
-        .card--sight::before {
+        /* ---------- 分類：卡片上緣一條 4px 分類色細帶（博多織五色），靠顏色＋分類文字辨識 ---------- */
+        .card::before {
             content: "";
             position: absolute;
             top: 0;
             left: 0;
             right: 0;
-            height: 8px;
-            background: var(--cat);
-            -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='80' height='8'%3E%3Cpath d='M0 0h80v4C68 4 62 1 48 3S28 8 16 5 6 3 0 5z'/%3E%3C/svg%3E") repeat-x 0 0 / 80px 8px;
-            mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='80' height='8'%3E%3Cpath d='M0 0h80v4C68 4 62 1 48 3S28 8 16 5 6 3 0 5z'/%3E%3C/svg%3E") repeat-x 0 0 / 80px 8px;
-        }
-
-        /* 美食：優雅的咖啡館遮陽棚圓弧簷邊（Scallop Awning） */
-        .card--food::before {
-            content: "";
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            height: 8px;
-            background: var(--cat);
-            -webkit-mask: radial-gradient(circle 5px at 10px 0, var(--cat) 99%, transparent 100%) repeat-x 0 0 / 20px 8px;
-            mask: radial-gradient(circle 5px at 10px 0, var(--cat) 99%, transparent 100%) repeat-x 0 0 / 20px 8px;
-        }
-
-        /* 購物：俐落的禮品包裝紙鋸齒飾條（底色保持與一般卡片一致） */
-        .card--shop::before {
-            content: "";
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            height: 7px;
-            background: var(--cat);
-            -webkit-mask: repeating-linear-gradient(135deg, var(--cat) 0 5px, transparent 5px 6px, var(--cat) 6px 11px) top / 100% 7px;
-            mask: repeating-linear-gradient(135deg, var(--cat) 0 5px, transparent 5px 6px, var(--cat) 6px 11px) top / 100% 7px;
-        }
-
-        /* 交通：車票質感頂邊 */
-        .card--move::before {
-            content: "";
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            height: 6px;
+            height: 4px;
             background: var(--cat);
         }
-        .card--move .card-head {
-            position: relative;
-            margin: 0 -14px;
-            padding: 0 14px 8px;
-            border-bottom: 2px dashed var(--line-strong);
-        }
-        .card--move .card-head::before,
-        .card--move .card-head::after {
-            content: "";
-            position: absolute;
-            bottom: -10px;
-            width: 18px;
-            height: 18px;
-            border: 2px solid var(--line-strong);
-            border-radius: 50%;
-            background: var(--paper);
-        }
-        .card--move .card-head::before { left: -11px; }
-        .card--move .card-head::after { right: -11px; }
-        .card--move .card-desc { margin-top: 8px; }
+        .card--move .card-desc { margin-top: 6px; }
         .route { display: flex; flex-wrap: wrap; align-items: center; gap: 2px 8px; }
         .route-arrow { display: inline-grid; color: var(--ink-soft); }
-
-        /* 住宿：溫馨旅宿屋簷飾條與精緻門牌風格 */
-        .card--stay::before {
-            content: "";
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            height: 8px;
-            background: var(--cat);
-            -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='32' height='8'%3E%3Cpath d='M0 0h32v2l-8 5-8-5-8 5-8-5z'/%3E%3C/svg%3E") repeat-x 0 0 / 32px 8px;
-            mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='32' height='8'%3E%3Cpath d='M0 0h32v2l-8 5-8-5-8 5-8-5z'/%3E%3C/svg%3E") repeat-x 0 0 / 32px 8px;
-        }
-        .card--stay .card-cat {
-            display: inline-flex;
-            align-items: center;
-            gap: 5px;
-            color: var(--ink);
-            font-weight: 600;
-        }
-        .card--stay .card-cat::before {
-            content: "";
-            display: inline-block;
-            width: 7px;
-            height: 7px;
-            border-radius: 2px;
-            background: var(--cat);
-            transform: rotate(45deg);
-        }
 
         /* 內容撐開剩下的高度，按鈕列才會固定在卡片底部 */
         .card-body { flex: 1 0 auto; }
@@ -1788,7 +1722,7 @@
             gap: 5px;
             min-height: 44px;
             padding: 4px 12px;
-            border: 2px solid var(--line-strong);
+            border: 1.5px solid var(--line-strong);
             border-radius: var(--r-chip);
             background: transparent;
             font-size: calc(15px * var(--fs));
@@ -1808,7 +1742,7 @@
             width: 56px;
             height: 56px;
             padding: 0;
-            border: 2px dashed var(--line-strong);
+            border: 1.5px dashed var(--line-strong);
             border-radius: 50%;
             background: transparent;
             color: var(--ink-soft);
@@ -1859,7 +1793,7 @@
             display: inline-grid;
             place-items: center;
             padding: 0 8px;
-            border: 2px solid var(--stamp);
+            border: 1.5px solid var(--stamp);
             border-radius: var(--r-inner);
             color: var(--stamp);
             font-size: calc(14px * var(--fs));
@@ -1879,7 +1813,7 @@
         .trip-error pre {
             margin: 0;
             padding: 12px 14px;
-            border: 2px dashed var(--line-strong);
+            border: 1.5px dashed var(--line-strong);
             border-radius: var(--r-chip);
             background: var(--card);
             color: var(--ink);
@@ -1940,7 +1874,7 @@
             gap: 6px;
             min-height: 44px;
             padding: 4px 12px;
-            border: 2px solid var(--line-strong);
+            border: 1.5px solid var(--line-strong);
             border-radius: var(--r-pill);
             background: var(--card);
             font-size: calc(15px * var(--fs));
@@ -1965,7 +1899,7 @@
             position: relative;
             flex: 1 1 0;
             min-height: 0;
-            border: 2px solid var(--ink);
+            border: 1.5px solid var(--ink);
             border-radius: var(--r-card);
             overflow: hidden;
             box-shadow: var(--shadow);
@@ -1982,7 +1916,7 @@
             gap: 6px;
             min-height: 44px;
             padding: 6px 14px;
-            border: 2px solid var(--ink);
+            border: 1.5px solid var(--ink);
             border-radius: var(--r-chip);
             background: var(--card);
             box-shadow: var(--shadow);
@@ -1995,19 +1929,19 @@
         [data-theme="night"] .leaflet-tile-pane {
             filter: invert(1) hue-rotate(180deg) sepia(.45) hue-rotate(178deg) saturate(1.3) brightness(.82) contrast(.88);
         }
-        .leaflet-bar { border: 2px solid var(--ink) !important; border-radius: 14px !important; overflow: hidden; box-shadow: var(--shadow) !important; }
+        .leaflet-bar { border: 1.5px solid var(--ink) !important; border-radius: 14px !important; overflow: hidden; box-shadow: var(--shadow) !important; }
         .leaflet-bar a { background: var(--card); color: var(--ink); border-bottom-color: var(--line) !important; width: 44px !important; height: 44px !important; line-height: 42px !important; font-size: 22px !important; }
         .leaflet-bar a:hover { background: var(--paper-2); }
         .leaflet-control-attribution { background: color-mix(in srgb, var(--card) 85%, transparent) !important; color: var(--ink-soft) !important; font-size: calc(10px * var(--fs)); }
         .leaflet-control-attribution a { color: var(--ink-soft) !important; }
         .leaflet-popup-content-wrapper {
-            border: 2px solid var(--ink);
+            border: 1.5px solid var(--ink);
             border-radius: var(--r-card);
             background: var(--card);
             color: var(--ink);
             box-shadow: var(--shadow);
         }
-        .leaflet-popup-tip { background: var(--card); border: 2px solid var(--ink); box-shadow: none; }
+        .leaflet-popup-tip { background: var(--card); border: 1.5px solid var(--ink); box-shadow: none; }
         .leaflet-popup-content { margin: 12px 44px 12px 14px; font-size: calc(15px * var(--fs)); line-height: 1.5; }
         .leaflet-container a.leaflet-popup-close-button { color: var(--ink-soft); width: 44px; height: 44px; line-height: 44px; font-size: calc(20px * var(--fs)); }
         .popup-meta { font-size: calc(13px * var(--fs)); color: var(--ink-soft); }
@@ -2021,7 +1955,7 @@
             height: 34px;
             display: grid;
             place-items: center;
-            border: 2px solid var(--ink);
+            border: 1.5px solid var(--ink);
             border-radius: 50% 50% 50% 4px;
             background: var(--cat);
             color: var(--on-cat);
@@ -2046,7 +1980,7 @@
             min-width: 22px;
             height: 22px;
             padding: 0 4px;
-            border: 2px solid var(--ink);
+            border: 1.5px solid var(--ink);
             border-radius: 999px;
             background: var(--card);
             color: var(--ink);
@@ -2073,7 +2007,7 @@
             gap: 8px;
             min-height: 56px;
             padding: 6px 12px 6px 8px;
-            border: 2px solid var(--line-strong);
+            border: 1.5px solid var(--line-strong);
             border-radius: var(--r-chip);
             background: var(--card);
             color: var(--ink);
@@ -2087,7 +2021,7 @@
             place-items: center;
             width: 30px;
             height: 30px;
-            border: 2px solid var(--ink);
+            border: 1.5px solid var(--ink);
             border-radius: 50%;
             background: var(--cat);
             color: var(--on-cat);
@@ -2104,7 +2038,7 @@
             bottom: calc(var(--tabbar-h) + env(safe-area-inset-bottom) + 8px);
             transform: translateX(-50%);
             padding: 4px 14px;
-            border: 2px solid var(--ink);
+            border: 1.5px solid var(--ink);
             border-radius: var(--r-pill);
             background: var(--paper-2);
             color: var(--ink);
@@ -2128,7 +2062,7 @@
             height: calc(var(--tabbar-h) + env(safe-area-inset-bottom));
             padding: 6px 8px env(safe-area-inset-bottom);
             background: var(--card);
-            border-top: 2px solid var(--line-strong);
+            border-top: 1.5px solid var(--line-strong);
         }
         /* iOS 26 Safari 的工具列浮在網頁上、而且半透明：分頁的底色往下延伸，蓋住工具列後面，不會看到後面捲動的內容 */
         .tabbar::after {
@@ -2174,7 +2108,7 @@
             right: 8px;
             width: 10px;
             height: 10px;
-            border: 2px solid var(--card);
+            border: 1.5px solid var(--card);
             border-radius: 50%;
             background: var(--stamp);
         }
@@ -2189,7 +2123,7 @@
             max-width: 420px;
             margin: 0 auto;
             padding: 16px 16px 14px 92px;
-            border: 2px solid var(--ink);
+            border: 1.5px solid var(--ink);
             border-radius: var(--r-card);
             background: var(--card);
             box-shadow: 0 4px 0 var(--line-strong);
@@ -2212,7 +2146,7 @@
             width: max-content;
             max-width: calc(100vw - 32px);
             padding: 8px 14px;
-            border: 2px solid var(--ink);
+            border: 1.5px solid var(--ink);
             border-radius: var(--r-chip);
             background: var(--card);
             box-shadow: var(--shadow);
@@ -2230,7 +2164,7 @@
             .list-col {
                 display: block !important;
                 padding-bottom: 40px;
-                border-right: 2px dashed var(--line-strong);
+                border-right: 1.5px dashed var(--line-strong);
             }
             .tabbar { display: none; }
             .hero-text { padding-right: 20px; }
@@ -4092,6 +4026,7 @@
 
             if (next) {
                 const first = next[0];
+                box.style.setProperty('--cat', catOf(first).color);
                 box.innerHTML = `
                     <p class="next-label"><span class="tape" style="--tape:${catOf(first).color}">下一站</span><span class="next-time">${esc(first.time)}${tzTag(first)}</span>${next.length > 1 ? `<span class="next-count">${next.length} 個選一個</span>` : ''}</p>
                     ${next.map((it) => `
@@ -4104,6 +4039,7 @@
                 return;
             }
             // 今天都走完了：給今晚的住宿
+            box.style.setProperty('--cat', 'var(--c-stay)');
             const tonight = hotelStays().find((h) => h.days.includes(currentHomeDay));
             box.innerHTML = `
                 <p class="next-label"><span class="tape" style="--tape:var(--c-stay)">今天的行程走完了</span></p>
