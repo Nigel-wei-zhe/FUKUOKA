@@ -74,6 +74,12 @@
             --on-sign: #FBF5E8;
             --sign-nav: #D9B25E;
             --on-sign-nav: #2B1E17;
+            /* 發車看板：首頁、各頁頂端的深色看板，琥珀色 LED 數字 */
+            --board: #211915;
+            --on-board: #F7F0E3;
+            --board-soft: #BDAC97;
+            --led: #F4B63F;
+            --on-led: #211915;
 
             --hill: #D6E6CF;
             --sea: #C3D7E6;
@@ -135,6 +141,11 @@
             --on-sign: #FBF5E8;
             --sign-nav: #D9B25E;
             --on-sign-nav: #17110E;
+            --board: #0A0706;
+            --on-board: #F3E9D8;
+            --board-soft: #AD9C86;
+            --led: #F2B544;
+            --on-led: #0A0706;
 
             --hill: #22304F;
             --sea: #1F3A5E;
@@ -2561,50 +2572,227 @@
         .day-title small { display: block; margin-top: 4px; }
         .day-title .day-done { margin-left: 8px; vertical-align: middle; }
 
-        /* ================= 九州觀光列車 ================= */
-        /* 網站名稱：像列車銘牌的字，不用圓體 */
-        .hero h1 { font-family: var(--font); font-weight: 700; letter-spacing: .08em; }
+        /* ================= 發車看板 =================
+           參考日本車站月台的發車標：每一頁頂端是一塊深色看板（--board），時刻用琥珀色 LED（--led）的大數字；
+           下面的行程是時刻表：表頭、等高的列、隔列淡底、左邊一條分類色。不用卡片、不用框 */
 
-        /* 招牌：「下一站」黃銅銘牌（漆紅底、黃銅雙細框、四角鉚釘、黃銅大時間） */
-        .next-card {
-            padding: 22px 20px 20px;
-            background:
-                linear-gradient(180deg, color-mix(in srgb, #FFFFFF 7%, transparent), transparent 50%),
-                var(--sign);
-            box-shadow:
-                inset 0 0 0 1px var(--brass),
-                inset 0 0 0 5px var(--sign),
-                inset 0 0 0 6px color-mix(in srgb, var(--brass) 70%, transparent),
-                0 6px 18px -8px color-mix(in srgb, var(--sign) 60%, transparent);
+        /* ---- 看板：首頁（網站名稱＋下一站）、行程頁工具列、地圖上方、資訊頁上方 ---- */
+        .home-hero-wrap, #home-next, .toolbar, .map-top, .info-board {
+            background: var(--board);
+            color: var(--on-board);
         }
-        .next-card::before {
-            inset: 9px;
-            height: auto;
+        .home-hero-wrap { margin: 0 -16px; }
+        .home-hero-wrap .hero-text { position: relative; padding: var(--top-gap) 16px 14px; }
+        .hero h1 { font-family: var(--font); font-weight: 700; font-size: calc(22px * var(--fs)); letter-spacing: .08em; color: var(--on-board); }
+        .home-hero-wrap .hero-sub { font-size: calc(14px * var(--fs)); color: var(--board-soft); }
+        .home-hero-wrap .hero-sub strong { color: var(--on-board); }
+        .home-hero-wrap .scene, .home-hero-wrap .mascot-btn, .home-hero-wrap .mascot-bubble { display: none; }
+        .board-clock {
+            position: absolute;
+            top: var(--top-gap);
+            right: 16px;
+            display: flex;
+            flex-direction: column;
+            align-items: flex-end;
+            line-height: 1.1;
+        }
+        .board-clock[hidden] { display: none; }
+        .board-clock small { font-size: calc(13px * var(--fs)); color: var(--board-soft); }
+        .board-clock b { font-size: calc(24px * var(--fs)); font-weight: 700; color: var(--led); font-variant-numeric: tabular-nums; letter-spacing: -.01em; }
+        .home-hero-wrap:has(.board-clock:not([hidden])) h1 { padding-right: calc(76px * var(--fs)); }
+
+        /* 下一站：看板的主體。琥珀色大時刻、象牙白大地名，一個琥珀色的導航鈕 */
+        #home-next.next-card {
+            margin: 0 -16px;
+            padding: 16px 16px 20px;
             border: 0;
-            background:
-                radial-gradient(circle at 0 0, var(--brass-hi) 0 2.5px, transparent 3px) top left / 10px 10px no-repeat,
-                radial-gradient(circle at 100% 0, var(--brass-hi) 0 2.5px, transparent 3px) top right / 10px 10px no-repeat,
-                radial-gradient(circle at 0 100%, var(--brass-hi) 0 2.5px, transparent 3px) bottom left / 10px 10px no-repeat,
-                radial-gradient(circle at 100% 100%, var(--brass-hi) 0 2.5px, transparent 3px) bottom right / 10px 10px no-repeat;
-            pointer-events: none;
+            border-top: 1px solid color-mix(in srgb, var(--on-board) 14%, var(--board));
+            border-radius: 0;
+            box-shadow: none;
+            overflow: visible;
         }
-        .next-card .next-time, .next-card .next-countdown b { color: var(--brass-hi); }
-        .next-card .chip-btn.nav { box-shadow: 0 4px 14px -4px color-mix(in srgb, var(--brass) 55%, transparent) !important; }
-        .next-progress span { background: var(--brass-hi); }
+        #home-next.next-card::before { display: none; }
+        #home-next .next-label { display: flex; align-items: baseline; gap: 10px; }
+        #home-next .tape { font-size: calc(15px * var(--fs)); font-weight: 600; letter-spacing: .12em; color: var(--board-soft); opacity: 1; }
+        #home-next .next-count { font-size: calc(15px * var(--fs)); color: var(--board-soft); opacity: 1; }
+        #home-next .next-until { margin-left: auto; font-size: calc(17px * var(--fs)); font-weight: 700; color: var(--led); font-variant-numeric: tabular-nums; }
+        #home-next .next-time {
+            margin: 2px 0 0;
+            font-size: calc(56px * var(--fs));
+            font-weight: 700;
+            line-height: 1.05;
+            letter-spacing: -.02em;
+            color: var(--led);
+        }
+        #home-next .next-time small { margin-left: 8px; font-size: calc(15px * var(--fs)); font-weight: 400; letter-spacing: 0; color: var(--board-soft); opacity: 1; }
+        #home-next .next-cat { margin-top: 8px; color: var(--board-soft); opacity: 1; }
+        #home-next .next-cat .ico { color: var(--cat); }
+        #home-next .next-title { margin-top: 2px; font-size: calc(28px * var(--fs)); font-weight: 700; line-height: 1.3; color: var(--on-board); }
+        #home-next .next-title:first-child { margin-top: 0; }
+        #home-next .next-sub { color: var(--board-soft); opacity: 1; }
+        #home-next .next-countdown { font-size: calc(22px * var(--fs)); }
+        #home-next .next-countdown b { font-size: calc(56px * var(--fs)); color: var(--led); }
+        #home-next .next-progress { background: color-mix(in srgb, var(--on-board) 16%, var(--board)); }
+        #home-next .next-progress span { background: var(--led); }
+        #home-next .next-now,
+        #home-next .next-choice + .next-choice { border-top: 1px solid color-mix(in srgb, var(--on-board) 14%, var(--board)); opacity: 1; color: var(--board-soft); }
+        #home-next .next-now b { color: var(--on-board); }
+        #home-next .next-actions { margin-top: 16px; }
+        #home-next :focus-visible { outline-color: var(--led); }
 
-        /* 停車站案內：黃銅圓點，現在這站漆紅實心 */
-        .stop::before { border-left-color: color-mix(in srgb, var(--brass) 40%, var(--paper)); }
-        .stop-node { border-color: var(--paper); box-shadow: 0 0 0 1.5px var(--brass); }
-        .stop.is-now .stop-node { background: var(--accent); box-shadow: 0 0 0 1.5px var(--accent), 0 0 0 6px color-mix(in srgb, var(--accent) 25%, transparent); }
+        /* ---- 看板裡的按鈕：次要＝半透明淡底；選中＝象牙白實心；動作（導航）＝琥珀實心 ---- */
+        .home-hero-wrap .chip-btn:not(.nav), #home-next .chip-btn:not(.nav), #home-next .next-option,
+        .toolbar .day-step, .toolbar .cat-chip:not([aria-pressed="true"]),
+        .map-top .day-step, .info-board .info-cat:not([aria-pressed="true"]) {
+            border: 0 !important;
+            background: color-mix(in srgb, var(--on-board) 11%, var(--board)) !important;
+            color: var(--on-board) !important;
+            box-shadow: inset 0 -2px 0 color-mix(in srgb, var(--on-board) 10%, transparent) !important;
+        }
+        #home-next .chip-btn:not(.nav):active, #home-next .next-option:active,
+        .toolbar .day-step:active, .toolbar .cat-chip:active, .map-top .day-step:active, .info-board .info-cat:active {
+            background: color-mix(in srgb, var(--on-board) 20%, var(--board)) !important;
+        }
+        .toolbar .day-step:disabled, .map-top .day-step:disabled { background: transparent !important; box-shadow: none !important; opacity: .35; }
+        #home-next .chip-btn.nav {
+            border: 0 !important;
+            background: var(--led) !important;
+            color: var(--on-led) !important;
+            box-shadow: none !important;
+            font-weight: 700;
+        }
+        .toolbar .day-current, .map-top .day-current,
+        .toolbar .cat-chip[aria-pressed="true"],
+        .info-board .info-cat[aria-pressed="true"] {
+            border: 0 !important;
+            background: var(--on-board) !important;
+            color: var(--board) !important;
+            box-shadow: none !important;
+        }
+        .toolbar .day-current small, .map-top .day-current small { color: var(--board); opacity: .75; }
+        .toolbar .cat-chip[aria-pressed="true"] .dot { box-shadow: 0 0 0 1.5px var(--board); }
+        .toolbar :focus-visible, .map-top :focus-visible, .info-board :focus-visible { outline-color: var(--led); }
 
-        /* 車廂內裝：底部分頁列深胡桃色，選中的分頁是黃銅 */
+        /* 行程頁工具列、地圖上方：看板底色延伸到最上方 */
+        .toolbar { border-bottom: 0; }
+        .map-top { margin: calc(-1 * var(--top-gap)) -12px 0; padding: var(--top-gap) 12px 10px; }
+        .map-head h2 { color: var(--on-board); }
+        .map-head p { color: var(--board-soft); }
+
+        /* 資訊頁：標題和分類按鈕放在看板上 */
+        .info-board { margin: calc(-1 * var(--top-gap)) -16px 0; padding: var(--top-gap) 16px 18px; }
+        .info-board .info-head h1 { font-weight: 700; color: var(--on-board); }
+        .info-board .info-sub { color: var(--board-soft); }
+
+        /* ---- 時刻表：表頭＋等高的列＋隔列淡底＋左邊分類色條 ---- */
+        .tt-head {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 8px 16px;
+            border-bottom: 2px solid var(--ink);
+            font-size: calc(13px * var(--fs));
+            font-weight: 600;
+            letter-spacing: .12em;
+            color: var(--ink-soft);
+        }
+        .tt-head span:first-child { width: calc(56px * var(--fs)); flex: none; }
+        .tt-head span:nth-child(2) { flex: 1; }
+        .tt-head span:last-child { width: 60px; text-align: center; }
+        #home-today-list .tt-head, #home-today-list .stops { margin-left: -16px; margin-right: -16px; }
+        #home-today-list .past-toggle { margin: 0; }
+
+        .stop {
+            grid-template-columns: calc(56px * var(--fs)) minmax(0, 1fr);
+            column-gap: 12px;
+            padding: 0 12px 0 16px;
+            border-bottom: 1px solid var(--line);
+            background: var(--paper);
+            box-shadow: inset 5px 0 0 var(--cat);
+        }
+        .stop:nth-child(even) { background: color-mix(in srgb, var(--ink) 4%, var(--paper)); }
+        .stop::before, .stop-node { display: none; }
+        .stop-time {
+            padding-top: 15px;
+            text-align: left;
+            font-size: calc(20px * var(--fs));
+            font-weight: 700;
+            letter-spacing: -.01em;
+        }
+        .stop-time .time-now { margin: 6px 0 0; padding: 1px 8px; font-size: calc(13px * var(--fs)); }
+        .stop-body { padding: 2px 0 4px; border-bottom: 0; }
+        .row-swatch { display: none; }
+        .row-cat { font-size: calc(13px * var(--fs)); letter-spacing: .04em; }
+        .row-open { min-height: 64px; padding: 12px 0; }
+        .row-nav { min-width: 60px; min-height: 52px; border-radius: var(--r-inner); }
+        .stop.is-now { background: color-mix(in srgb, var(--accent) 10%, var(--paper)); box-shadow: inset 5px 0 0 var(--accent); }
+        .stop.is-now .stop-time { color: var(--accent); }
+        .stop.is-past .stop-time, .stop.is-past .row-title { color: var(--ink-soft); }
+        .day-section { padding: 20px 0 4px; }
+        .day-section .day-title { margin: 0 16px 12px; font-size: calc(22px * var(--fs)); font-weight: 700; }
+        .list-end { margin-top: 8px; }
+
+        /* 首頁：天數標題、天氣條 */
+        #weather-card { margin: 0; padding: 12px 0; border-bottom: 1px solid var(--line); }
+        .home-today-section { margin-top: 18px; }
+        .home-section-head h2 { font-size: calc(22px * var(--fs)); font-weight: 700; line-height: 1.35; }
+        .home-section-head h2 .ico { display: none; }
+        .home-pane:not(.is-trip) .home-hero-wrap + #home-next[hidden] + #weather-card { margin-top: 0; }
+
+        /* ---- 底部分頁列：看板色，選中的分頁上方一條琥珀色指示燈＋粗體 ---- */
         .tabbar, .tabbar::after {
-            background: color-mix(in srgb, var(--shell) 92%, transparent);
+            background: var(--board);
+            -webkit-backdrop-filter: none;
+            backdrop-filter: none;
         }
-        .tabbar { border-top: 1px solid color-mix(in srgb, var(--brass) 45%, transparent); }
-        .tab { color: color-mix(in srgb, var(--on-shell) 78%, transparent); }
-        .tab[aria-pressed="true"] { color: var(--on-shell); }
-        .tab[aria-pressed="true"] .tab-ico { background: var(--brass-hi) !important; color: var(--shell) !important; }
+        .tabbar { padding-top: 0; border-top: 0; }
+        .tab { position: relative; padding-top: 6px; color: var(--board-soft); }
+        .tab::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 22%;
+            right: 22%;
+            height: 3px;
+            border-radius: 0 0 3px 3px;
+            background: transparent;
+        }
+        .tab[aria-pressed="true"] { color: var(--led); font-weight: 700; }
+        .tab[aria-pressed="true"]::before { background: var(--led); }
+        .tab[aria-pressed="true"] .tab-ico { background: transparent !important; color: var(--led) !important; }
+        .home-pane .home-hero-wrap, .home-pane.is-trip .home-hero-wrap { margin-bottom: 0; }
+        /* 夜晚看板和頁面底色接近：看板下緣加一條細線 */
+        :root[data-theme="night"] .toolbar, :root[data-theme="night"] .map-top, :root[data-theme="night"] .info-board,
+        :root[data-theme="night"] #home-next:not([hidden]), :root[data-theme="night"] .home-hero-wrap:has(+ #home-next[hidden]) {
+            box-shadow: 0 1px 0 var(--line);
+        }
+        /* 已過的站：時刻表裡的一列，不是浮起來的按鈕 */
+        #home-today-list .past-toggle {
+            width: auto;
+            margin: 0 -16px;
+            padding: 4px 16px;
+            min-height: 52px;
+            border-radius: 0;
+            border-bottom: 1px solid var(--line) !important;
+            background: color-mix(in srgb, var(--ink) 4%, var(--paper));
+            box-shadow: none !important;
+            font-size: calc(15px * var(--fs));
+        }
+        /* 看板右上角有日本時間時，左邊的字讓出位置 */
+        .home-hero-wrap .hero-text:has(.board-clock:not([hidden])) > :not(.board-clock) { padding-right: calc(76px * var(--fs)); }
+        /* 資訊頁的段落標題：像時刻表的表頭，下面一條粗線 */
+        .info-list .info-card { padding: 0 0 20px; border-bottom: 0; }
+        .info-list .info-card h2 { padding-bottom: 10px; border-bottom: 2px solid var(--ink); font-weight: 700; }
+        #home-today-list .past-toggle { display: flex; width: calc(100% + 32px); }
+        /* 資訊頁可以點的列（指指卡、飯店）：時刻表的列，不是一張張卡片 */
+        .info-list .phrase-row {
+            border-radius: 0;
+            border-bottom: 1px solid var(--line) !important;
+            background: none;
+            box-shadow: none !important;
+        }
+        .info-list .phrase-row:active { background: var(--fill); }
+        .info-list .phrase-row + .phrase-row { margin-top: 0; }
     </style>
 </head>
 <body>
@@ -2823,6 +3011,7 @@
         <div class="list-col">
             <header class="hero" id="main-hero">
                 <div class="hero-text">
+                    <p class="board-clock" id="board-clock" hidden><small>日本時間</small><b></b></p>
                     <h1 id="trip-title"></h1>
                     <p class="hero-sub"><span id="trip-subtitle"></span>共 <strong id="total-count">0</strong> 個地點</p>
                     <p class="hero-sub hero-sub-2">已去過 <strong id="visited-count">0</strong> 個地點</p>
@@ -3263,6 +3452,10 @@
             });
             return groups;
         }
+        // 時刻表的表頭（只是標示欄位，螢幕報讀不用唸）
+        function ttHeadHTML() {
+            return '<div class="tt-head" aria-hidden="true"><span>時刻</span><span>行程</span><span>導航</span></div>';
+        }
         function stopHTML(group) {
             const first = group[0];
             const c = catOf(first);
@@ -3337,6 +3530,7 @@
                                 <small>${dateOfDay(day) ? `${dateLabel(dateOfDay(day))}・` : ''}${dayItems.length} 個地點</small>
                                 ${items.filter((it) => it.day == day).every((it) => visited.has(it.id)) ? '<span class="day-done">完成</span>' : ''}
                             </h2>
+                            ${ttHeadHTML()}
                             <ol class="stops">${groupStops(dayItems).map(stopHTML).join('')}</ol>
                         </section>`;
                 }).join('') + listEndHTML(state.day);
@@ -4367,7 +4561,7 @@
             const dayItems = items.filter((i) => i.day === currentHomeDay);
             const container = $('#home-today-list');
             container.innerHTML = dayItems.length
-                ? `<ol class="stops">${groupStops(dayItems).map(stopHTML).join('')}</ol>`
+                ? `${ttHeadHTML()}<ol class="stops">${groupStops(dayItems).map(stopHTML).join('')}</ol>`
                 : `<div class="today-empty"><p>這一天尚未安排行程。</p></div>`;
 
             const minDay = days.length ? days[0].day : 1;
@@ -4393,8 +4587,26 @@
                 return `${String(d.getHours()).padStart(2, '0')}:${String(d.getMinutes()).padStart(2, '0')}`;
             }
         }
+        // 「再 25 分」「再 1 小時 10 分」：下一站還有多久
+        function untilText(time, zone) {
+            const toMin = (hm) => { const [h, m] = hm.split(':').map(Number); return h * 60 + m; };
+            if (!/^\d{1,2}:\d{2}$/.test(time || '')) return '';
+            const diff = toMin(time) - toMin(nowHM(zone));
+            if (diff <= 0) return '';
+            const h = Math.floor(diff / 60), m = diff % 60;
+            return `再 ${h ? `${h} 小時${m ? ` ${m} 分` : ''}` : `${m} 分`}`;
+        }
+        // 看板右上角的日本時間（有時差，長輩常搞不清楚現在當地幾點）
+        function updateBoardClock() {
+            const el = $('#board-clock');
+            if (!el) return;
+            const show = Boolean(tripToday());
+            el.hidden = !show;
+            if (show) el.querySelector('b').textContent = nowHM();
+        }
         // 旅行當天：照表算出「下一站」（家人跟著帶隊者照表走，不需要手動選）
         function renderNext() {
+            updateBoardClock();
             const box = $('#home-next');
             const pane = $('#home-pane');
             const date = dateOfDay(currentHomeDay);
@@ -4441,8 +4653,10 @@
             if (next) {
                 const first = next[0];
                 box.style.setProperty('--cat', catOf(first).color);
+                const until = untilText(first.time, first.tz);
                 box.innerHTML = `
-                    <p class="next-label"><span class="tape" style="--tape:${catOf(first).color}">下一站</span><span class="next-time">${esc(first.time)}${tzTag(first)}</span>${next.length > 1 ? `<span class="next-count">${next.length} 個選一個</span>` : ''}</p>
+                    <p class="next-label"><span class="tape">下一站</span>${next.length > 1 ? `<span class="next-count">${next.length} 個選一個</span>` : ''}${until ? `<span class="next-until">${until}</span>` : ''}</p>
+                    <p class="next-time">${esc(first.time)}${tzTag(first)}</p>
                     ${next.length === 1 ? `
                         <div class="next-choice">
                             <span class="next-cat" style="--cat:${catOf(first).color}">${icon(catOf(first).icon)}${esc(catOf(first).label)}</span>
@@ -4832,6 +5046,7 @@
                 if (!cats.length) throw new TripError('旅遊資訊格式有誤', 'data/info.json 裡找不到 "categories" 陣列。');
                 cats.forEach((c, i) => { if (!c.id) c.id = `cat-${i}`; });
                 box.innerHTML = `
+                    <div class="info-board">
                     <header class="info-head">
                         <h1>${esc(infoData.title || '旅遊資訊')}</h1>
                         ${infoData.updated ? `<p class="info-sub">${esc(infoData.updated)} 整理。規定可能會變，出發前點官方連結再確認。</p>` : ''}
@@ -4839,6 +5054,7 @@
                     <nav id="info-cats" class="info-cats" aria-label="資訊分類">
                         ${cats.map((c) => `<button class="info-cat" type="button" data-cat="${esc(c.id)}" aria-pressed="false">${icon(infoIcon(c.icon))}${esc(c.name)}</button>`).join('')}
                     </nav>
+                    </div>
                     <div id="info-list" class="info-list" aria-live="polite"></div>`;
                 $('#info-list').addEventListener('click', (e) => {
                     const row = e.target.closest('[data-phrase]');

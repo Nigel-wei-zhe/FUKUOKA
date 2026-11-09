@@ -16,6 +16,7 @@
 // --open     設定，或「地點:<id>」打開地點詳細頁
 // --scroll   頁面往下捲幾 px
 // --eval     截圖前在頁面裡執行的 JS
+// --date     假裝今天是哪一天（例如 2026-11-23），看旅行期間的首頁
 // --fs       標準、大、特大（預設 標準）
 // --theme    白天、夜晚（預設 白天）
 // --width    預設 360；--height 預設 640
@@ -75,7 +76,8 @@ const actions = {
   info: opts.info || '',
   open: opts.open || '',
   scroll: Number(opts.scroll) || 0,
-  eval: opts.eval || ''
+  eval: opts.eval || '',
+  date: opts.date || ''
 };
 const harness = `<!doctype html><meta charset="utf-8">
 <style>body{margin:0;display:flex;gap:16px;padding:8px;background:#888;font:14px sans-serif}
@@ -92,7 +94,7 @@ async function run(v, i) {
   fig.firstChild.textContent = v.label;
   document.body.append(fig);
   const f = fig.lastChild;
-  await new Promise((r) => { f.onload = r; f.src = './index.html?shot=' + i; });
+  await new Promise((r) => { f.onload = r; f.src = './index.html?shot=' + i + (A.date ? '&date=' + A.date : ''); });
   const w = f.contentWindow, d = w.document;
   // 等元素出現再點（資訊頁等切過去才產生內容）；找不到就寫在圖片標題上
   const click = async (find, what) => {
