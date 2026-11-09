@@ -1955,7 +1955,6 @@
             background: var(--accent);
             color: var(--on-accent);
             box-shadow: 0 2px 0 var(--line);
-            font-weight: 700;
         }
         .map-day-chip small {
             font-size: calc(12px * var(--fs));
@@ -2037,6 +2036,84 @@
             100% { transform: translateY(0) rotate(-45deg); opacity: 1; }
         }
         .pin.is-visited { box-shadow: 0 0 0 3px var(--stamp); }
+        /* 單日的站序號碼，跟下方清單對應 */
+        .pin-num {
+            position: absolute;
+            top: -10px;
+            right: -12px;
+            display: grid;
+            place-items: center;
+            min-width: 22px;
+            height: 22px;
+            padding: 0 4px;
+            border: 2px solid var(--ink);
+            border-radius: 999px;
+            background: var(--card);
+            color: var(--ink);
+            font-size: 13px;
+            line-height: 1;
+            font-variant-numeric: tabular-nums;
+        }
+        .map-stops {
+            display: flex;
+            gap: 8px;
+            flex-shrink: 0;
+            overflow-x: auto;
+            padding: 2px 2px 4px;
+            scroll-snap-type: x proximity;
+            scrollbar-width: none;
+        }
+        .map-stops[hidden] { display: none; }
+        .map-stops::-webkit-scrollbar { display: none; }
+        .map-stop {
+            flex: 0 0 auto;
+            max-width: 72%;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            min-height: 56px;
+            padding: 6px 12px 6px 8px;
+            border: 2px solid var(--line-strong);
+            border-radius: var(--r-chip);
+            background: var(--card);
+            color: var(--ink);
+            text-align: left;
+            scroll-snap-align: start;
+        }
+        .map-stop:active { transform: scale(.97); }
+        .map-stop-num {
+            flex: none;
+            display: grid;
+            place-items: center;
+            width: 30px;
+            height: 30px;
+            border: 2px solid var(--ink);
+            border-radius: 50%;
+            background: var(--cat);
+            color: var(--on-cat);
+            font-size: calc(15px * var(--fs));
+        }
+        .map-stop-text { display: flex; flex-direction: column; min-width: 0; line-height: 1.3; }
+        .map-stop-text small { font-size: calc(13px * var(--fs)); color: var(--ink-soft); }
+        .map-stop-text span { font-size: calc(15px * var(--fs)); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+
+        .offline-badge {
+            position: fixed;
+            z-index: 71;
+            left: 50%;
+            bottom: calc(var(--tabbar-h) + env(safe-area-inset-bottom) + 8px);
+            transform: translateX(-50%);
+            padding: 4px 14px;
+            border: 2px solid var(--ink);
+            border-radius: var(--r-pill);
+            background: var(--paper-2);
+            color: var(--ink);
+            font-size: calc(14px * var(--fs));
+            white-space: nowrap;
+            pointer-events: none;
+        }
+        .offline-badge[hidden] { display: none; }
+        @media (min-width: 960px) { .offline-badge { bottom: 16px; } }
 
         /* ---------- 底部分頁 ---------- */
         .tabbar {
@@ -2267,6 +2344,8 @@
             </div>
         </div>
     </dialog>
+
+    <p id="offline-badge" class="offline-badge" role="status" hidden>離線中・天氣可能是舊的</p>
 
     <!-- 選天數：格狀大按鈕，一眼看到全部天數 -->
     <dialog id="day-picker" class="sheet-dialog" aria-labelledby="day-picker-title">
@@ -2526,6 +2605,8 @@
                     <svg class="ico"><use href="#i-fit"/></svg>顯示全部圖釘
                 </button>
             </div>
+            <!-- 單日：照順序列出當天地點，點一下地圖就移過去（不用在地圖上找圖釘） -->
+            <nav id="map-stops" class="map-stops" aria-label="當天地點順序" hidden></nav>
         </section>
     </div>
 
@@ -3161,6 +3242,8 @@
             document.querySelectorAll('.map-day-chip').forEach((btn) => {
                 btn.setAttribute('aria-pressed', String(btn.dataset.day == mapDay));
             });
+            const pressedChip = $('#map-day-tabs [aria-pressed="true"]');
+            if (pressedChip && root.dataset.view === 'map') pressedChip.scrollIntoView({ inline: 'center', block: 'nearest' });
 
             updateMapTitle();
             updateMarkers(fit);
@@ -3210,15 +3293,16 @@
             markerLayer.clearLayers();
             markersById.clear();
             const bounds = [];
-            const pins = getMapItems();
+            const pins = getMapItems().slice().sort(byTime);
+            const numbered = mapDay !== 'all' && mapDay != null;
             let pinIndex = 0;
-            pins.forEach((item) => {
+            pins.forEach((item, n) => {
                 const c = catOf(item);
                 const marker = L.marker([item.lat, item.lng], {
                     title: item.title,
                     icon: L.divIcon({
                         className: 'pin-wrap',
-                        html: `<div class="pin${visited.has(item.id) ? ' is-visited' : ''}${fit ? ' drop' : ''}" style="--cat:${c.color};--delay:${Math.min(pinIndex++ * 0.03, 0.6).toFixed(2)}s">${icon(c.icon)}</div>`,
+                        html: `<div class="pin${visited.has(item.id) ? ' is-visited' : ''}${fit ? ' drop' : ''}" style="--cat:${c.color};--delay:${Math.min(pinIndex++ * 0.03, 0.6).toFixed(2)}s">${icon(c.icon)}</div>${numbered ? `<span class="pin-num">${n + 1}</span>` : ''}`,
                         iconSize: [34, 34],
                         iconAnchor: [17, 40],
                         popupAnchor: [0, -34]
@@ -3231,6 +3315,14 @@
                 if (!item.tz) bounds.push([item.lat, item.lng]);
             });
             if (!bounds.length) pins.forEach((item) => bounds.push([item.lat, item.lng]));
+            const strip = $('#map-stops');
+            strip.hidden = !numbered || !pins.length;
+            strip.innerHTML = numbered ? pins.map((item, n) => `
+                <button class="map-stop" type="button" data-id="${esc(item.id)}" style="--cat:${catOf(item).color}">
+                    <span class="map-stop-num">${n + 1}</span>
+                    <span class="map-stop-text"><small>${item.time ? esc(item.time) : esc(catOf(item).label)}</small><span>${esc(item.title)}</span></span>
+                </button>`).join('') : '';
+            if (numbered) setTimeout(() => map && map.invalidateSize(), 0);
             if (fit && bounds.length) map.fitBounds(bounds, { padding: [36, 36], maxZoom: 15 });
         }
 
@@ -4098,6 +4190,16 @@
             tab.addEventListener('click', () => setView(tab.dataset.view));
         });
         $('#map-fit').addEventListener('click', () => updateMarkers(true));
+        $('#map-stops').addEventListener('click', (e) => {
+            const btn = e.target.closest('.map-stop');
+            if (!btn || !map) return;
+            const item = items.find((i) => i.id === btn.dataset.id);
+            const marker = markersById.get(btn.dataset.id);
+            if (!item) return;
+            map.closePopup();
+            map.once('moveend', () => { if (marker) marker.openPopup(); });
+            map.flyTo([item.lat, item.lng], Math.max(map.getZoom(), 15), { duration: 0.6 });
+        });
         $('#map-day-tabs').addEventListener('click', (e) => {
             const btn = e.target.closest('.map-day-chip');
             if (!btn) return;
@@ -4164,8 +4266,11 @@
             clearTimeout(toastTimer);
             if (ms) toastTimer = setTimeout(() => { el.hidden = true; }, ms);
         }
-        window.addEventListener('offline', () => toast('目前離線：行程照常可看，地圖只會顯示看過的區域', 4000));
-        window.addEventListener('online', () => toast('已恢復連線', 1800));
+        // 離線時在分頁列上方一直顯示小標示，才知道天氣、地圖底圖可能是舊的
+        function updateOfflineBadge() { $('#offline-badge').hidden = navigator.onLine !== false; }
+        window.addEventListener('offline', () => { updateOfflineBadge(); toast('目前離線：行程照常可看，地圖只會顯示看過的區域', 4000); });
+        window.addEventListener('online', () => { updateOfflineBadge(); toast('已恢復連線', 1800); });
+        updateOfflineBadge();
 
         // ---------- 分享地點 ----------
         // 手機用系統的分享選單；不支援的瀏覽器改成複製名稱和地圖連結

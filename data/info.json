@@ -5,7 +5,7 @@
   "categories": [
     {
       "id": "talk",
-      "name": "指指卡",
+      "name": "日文對話",
       "icon": "chat",
       "sections": [
         {
@@ -302,7 +302,7 @@
     },
     {
       "id": "sos",
-      "name": "緊急聯絡",
+      "name": "緊急求助",
       "icon": "phone",
       "sections": [
         {

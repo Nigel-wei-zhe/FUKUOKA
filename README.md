@@ -89,7 +89,7 @@ node tools/check-trip.mjs
 
 ## 修改旅遊資訊
 
-下方「資訊」分頁的內容（指指卡、退稅、帶回台灣、緊急聯絡）在 `data/info.json`，跟行程一樣改完推上去就好。
+下方「資訊」分頁的內容（日文對話的指指卡、退稅、帶回台灣、緊急求助）在 `data/info.json`，跟行程一樣改完推上去就好。
 
 - `categories`：上方的分類按鈕，建議 4 個以內；每個分類有 `id`、`name`、`icon`、`sections`
 - `sections`：分類底下的區塊，有 `title`、`points`，可加 `lead`（醒目的開頭說明）、`warn: true`（警告樣式）、`links`（官方連結或 `tel:` 電話）
