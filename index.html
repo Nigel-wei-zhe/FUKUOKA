@@ -2449,6 +2449,34 @@
         }
         .tabbar { border-top: 1px solid color-mix(in srgb, var(--ink) 10%, transparent); }
         .tab-ico { transition: background-color .3s ease-out, padding .3s ease-out; }
+
+        /* ===== 天氣縮成一條：圖示｜溫度｜天氣＋地點｜高低溫與降雨；日期和穿著建議不顯示 ===== */
+        #weather-card {
+            display: grid;
+            grid-template-columns: auto auto minmax(0, 1fr) auto;
+            grid-template-areas:
+                "icon temp desc range"
+                "icon temp city range";
+            align-items: center;
+            column-gap: 10px;
+            row-gap: 0;
+            margin-bottom: 12px;
+            padding: 8px 2px 12px;
+        }
+        #weather-card .weather-header,
+        #weather-card .weather-body,
+        #weather-card .weather-body > div:not([class]) { display: contents; }
+        #weather-card .weather-icon-box { grid-area: icon; width: 36px; height: 36px; margin: 0; }
+        #weather-card .weather-icon-box .ico { width: 22px; height: 22px; }
+        #weather-card .weather-temp-main { grid-area: temp; margin: 0; }
+        #weather-card .weather-temp-now { font-size: calc(28px * var(--fs)); line-height: 1; }
+        #weather-card .weather-temp-note { display: none; }
+        #weather-card .weather-desc-text { grid-area: desc; align-self: end; margin: 0; font-size: calc(15px * var(--fs)); line-height: 1.3; color: var(--ink); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        #weather-card .weather-city-badge { grid-area: city; align-self: start; min-width: 0; margin: 0; font-size: calc(13px * var(--fs)); font-weight: 400; color: var(--ink-soft); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        #weather-card .weather-city-badge .ico { width: 13px; height: 13px; }
+        #weather-card .weather-range-box { grid-area: range; margin: 0; font-size: calc(13px * var(--fs)); line-height: 1.3; text-align: right; }
+        #weather-card .weather-status-tag,
+        #weather-card .weather-tips { display: none; }
     </style>
 </head>
 <body>
