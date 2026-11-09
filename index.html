@@ -1510,6 +1510,11 @@
             color: var(--stamp);
             border: 1px solid color-mix(in srgb, var(--stamp) 40%, transparent);
         }
+        .tag--booked {
+            background: color-mix(in srgb, var(--c-sight) 26%, var(--card));
+            color: var(--ink);
+            border: 1px solid var(--line-strong);
+        }
         .tag--closed {
             background: color-mix(in srgb, var(--c-shop) 32%, var(--card));
             color: var(--ink);
@@ -2604,7 +2609,11 @@
             text = text.trim();
 
             const tags = [];
-            if (/需預約|要預約|建議預約/.test(text) || booking) {
+            // 訂位欄寫「已訂位／已訂房／已預約…」表示已經處理好，不要再標成「需預約」
+            const booked = /^已/.test(booking.trim());
+            if (booked) {
+                tags.push({ type: 'booked', text: '已預約', icon: 'check' });
+            } else if (/需預約|要預約|建議預約/.test(text) || (booking && !/附贈|不用|免/.test(booking))) {
                 tags.push({ type: 'booking', text: '需預約', icon: 'calendar' });
             }
             const closedMatch = text.match(/(週[一二三四五六日]|禮拜[一二三四五六日天]|星期[一二三四五六日])(?:[、及與和]?(?:週|禮拜|星期)?[一二三四五六日天])*(?:只到[0-9:：]+)?(?:公休|休息|注意)/);
@@ -3541,7 +3550,7 @@
                 metaItems.push(`<div class="detail-meta-item">${icon('clock')}<div><b>營業時間</b><br>${esc(d.hours)}</div></div>`);
             }
             if (d.booking) {
-                metaItems.push(`<div class="detail-meta-item">${icon('calendar')}<div><b>訂位方式</b><br>${esc(d.booking)}</div></div>`);
+                metaItems.push(`<div class="detail-meta-item">${icon('calendar')}<div><b>${/^已/.test(d.booking) ? '訂位紀錄' : '訂位方式'}</b><br>${esc(d.booking)}</div></div>`);
             }
             if (item.price) {
                 metaItems.push(`<div class="detail-meta-item">${icon('coin')}<div><b>${esc(c.priceLabel)}</b><br>${esc(item.price)}</div></div>`);
