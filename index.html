@@ -2605,6 +2605,95 @@
         .tab { color: color-mix(in srgb, var(--on-shell) 78%, transparent); }
         .tab[aria-pressed="true"] { color: var(--on-shell); }
         .tab[aria-pressed="true"] .tab-ico { background: var(--brass-hi) !important; color: var(--shell) !important; }
+
+        /* ================= 首頁：上半部旅程地圖，面板捲上來蓋過地圖 ================= */
+        .home-pane { padding-top: 0; }
+        .home-map-wrap {
+            position: sticky;
+            top: 0;
+            z-index: 0;
+            height: 48svh;
+            min-height: 280px;
+            margin: 0 -16px;
+            background: var(--paper-2);
+        }
+        #home-map { position: absolute; inset: 0; }
+        .home-map-chip {
+            position: absolute;
+            z-index: 500;
+            top: var(--top-gap);
+            left: 16px;
+            right: 16px;
+            width: fit-content;
+            max-width: calc(100% - 32px);
+            padding: 8px 14px;
+            border-radius: var(--r-pill);
+            background: color-mix(in srgb, var(--shell) 88%, transparent);
+            color: var(--on-shell);
+            font-size: calc(15px * var(--fs));
+            font-weight: 600;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            -webkit-backdrop-filter: blur(10px);
+            backdrop-filter: blur(10px);
+            box-shadow: 0 2px 8px rgba(0, 0, 0, .2);
+        }
+        .home-map-open {
+            position: absolute;
+            z-index: 500;
+            right: 16px;
+            bottom: 44px;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            min-height: 44px;
+            padding: 6px 14px;
+            border: 0;
+            border-radius: var(--r-chip);
+            background: var(--card);
+            color: var(--ink);
+            font-size: calc(15px * var(--fs));
+            box-shadow: 0 2px 10px rgba(0, 0, 0, .2);
+        }
+        .home-map-open .ico { width: 18px; height: 18px; }
+        .home-map-wrap .leaflet-control-attribution { margin-bottom: 30px !important; }
+        .home-panel {
+            position: relative;
+            z-index: 1;
+            margin: -28px -16px 0;
+            padding: 22px 16px 0;
+            border-radius: 22px 22px 0 0;
+            background: var(--paper);
+            box-shadow: 0 -8px 24px -6px rgba(0, 0, 0, .18);
+        }
+        /* 面板上方的把手：提示可以往上捲（只是裝飾，捲動照常） */
+        .home-panel::before {
+            content: "";
+            position: absolute;
+            top: 9px;
+            left: 50%;
+            width: 44px;
+            height: 5px;
+            margin-left: -22px;
+            border-radius: 99px;
+            background: var(--line-strong);
+            opacity: .6;
+        }
+        /* 網站名稱移到地圖上的小牌，首頁不再顯示封面標題 */
+        .home-pane .home-hero-wrap { display: none; }
+        .pin.is-next {
+            width: 44px;
+            height: 44px;
+            margin: -10px 0 0 -5px;
+            background: var(--accent);
+            color: var(--on-accent);
+            box-shadow: 0 0 0 3px var(--paper), 0 4px 12px rgba(0, 0, 0, .3);
+        }
+        .pin.is-next .ico { width: 22px; height: 22px; }
+        @media (min-width: 960px) {
+            .home-map-wrap { height: 42vh; border-radius: 0 0 18px 18px; overflow: hidden; }
+        }
     </style>
 </head>
 <body>
@@ -2765,6 +2854,13 @@
     <div class="app">
         <!-- 首頁：封面插畫、天氣看板、今日行程 -->
         <section id="home-pane" class="home-pane" aria-label="首頁概覽">
+            <!-- 首頁上半部：今天路線的地圖（出發前是整趟旅程）；下面的面板捲上來會蓋過地圖 -->
+            <div class="home-map-wrap">
+                <div id="home-map" role="img" aria-label="今天的路線地圖"></div>
+                <p class="home-map-chip" id="home-map-chip"></p>
+                <button class="home-map-open" id="home-map-open" type="button"><svg class="ico"><use href="#i-map"/></svg>看大地圖</button>
+            </div>
+            <div class="home-panel">
             <div class="home-hero-wrap" id="home-hero-container"></div>
 
             <!-- 旅行期間：接下來去哪 -->
@@ -2818,6 +2914,7 @@
                     <svg class="ico"><use href="#i-book"/></svg>前往完整行程清單
                 </button>
             </section>
+            </div>
         </section>
 
         <div class="list-col">
@@ -4379,6 +4476,7 @@
 
             markNow();
             renderNext();
+            renderHomeMap();
             fetchWeatherForDay(currentHomeDay);
         }
 
@@ -4393,6 +4491,59 @@
                 return `${String(d.getHours()).padStart(2, '0')}:${String(d.getMinutes()).padStart(2, '0')}`;
             }
         }
+        // ---------- 首頁地圖：今天的路線（站序圖釘＋黃銅連線）；出發前是整趟旅程 ----------
+        let homeMap = null;
+        let homeLayer = null;
+        let homeNextId = null;
+        function renderHomeMap() {
+            const el = $('#home-map');
+            if (!el || !window.L || !items.length) return;
+            if (!homeMap) {
+                homeMap = L.map(el, { zoomControl: false, attributionControl: true, scrollWheelZoom: false });
+                L.tileLayer(TILE_URL, { attribution: TILE_ATTRIBUTION, maxZoom: 19 }).addTo(homeMap);
+                homeLayer = L.layerGroup().addTo(homeMap);
+            }
+            homeLayer.clearLayers();
+            const until = trip.startDate ? daysBetween(todayIn(weatherConf.timezone), trip.startDate) : -1;
+            const overview = until > 0;
+            const pts = items
+                .filter((it) => it.lat && it.lng && !it.tz && (overview || it.day === currentHomeDay))
+                .sort((a, b) => a.day - b.day || byTime(a, b));
+            const dayInfo = days.find((d) => d.day === currentHomeDay);
+            $('#home-map-chip').textContent = overview
+                ? `${trip.title}・全部 ${pts.length} 個地點`
+                : `${dayLabel(currentHomeDay)}${dayInfo ? ' ' + dayInfo.name : ''}`;
+            if (!pts.length) { homeMap.setView([33.59, 130.40], 11); return; }
+            if (!overview && pts.length > 1) {
+                L.polyline(pts.map((it) => [it.lat, it.lng]), { color: getComputedStyle(root).getPropertyValue('--brass').trim() || '#B08A3E', weight: 4, opacity: .9, dashArray: '1 8', lineCap: 'round' }).addTo(homeLayer);
+            }
+            pts.forEach((item, n) => {
+                const c = catOf(item);
+                const isNext = !overview && item.id === homeNextId;
+                const m = L.marker([item.lat, item.lng], {
+                    title: item.title,
+                    zIndexOffset: isNext ? 1000 : 0,
+                    icon: L.divIcon({
+                        className: 'pin-wrap',
+                        html: `<div class="pin${isNext ? ' is-next' : ''}${visited.has(item.id) ? ' is-visited' : ''}" style="--cat:${c.color}">${icon(c.icon)}</div>${overview ? '' : `<span class="pin-num">${n + 1}</span>`}`,
+                        iconSize: [34, 34],
+                        iconAnchor: [17, 40]
+                    })
+                });
+                m.on('click', () => showDetailModal(item.id));
+                m.addTo(homeLayer);
+            });
+            const fit = () => {
+                homeMap.invalidateSize();
+                homeMap.fitBounds(pts.map((it) => [it.lat, it.lng]), { paddingTopLeft: [36, 56], paddingBottomRight: [36, 56], maxZoom: 15 });
+            };
+            requestAnimationFrame(fit);
+        }
+        $('#home-map-open').addEventListener('click', () => {
+            if (typeof currentHomeDay === 'number') setViewDay(currentHomeDay);
+            setView('map');
+        });
+
         // 旅行當天：照表算出「下一站」（家人跟著帶隊者照表走，不需要手動選）
         function renderNext() {
             const box = $('#home-next');
@@ -4438,6 +4589,7 @@
                 </div>`;
             const nowLine = current ? `<p class="next-now">現在：<b>${esc(current[0].time)} ${esc(current[0].title)}</b>${current.length > 1 ? `（${current.length} 選 1）` : ''}</p>` : '';
 
+            homeNextId = next ? next[0].id : null;
             if (next) {
                 const first = next[0];
                 box.style.setProperty('--cat', catOf(first).color);
