@@ -302,6 +302,23 @@
         .next-actions .next-nav { flex: 1.4; background: var(--accent); color: var(--on-accent); }
         .next-actions .ico { width: 22px; height: 22px; }
         .next-actions > *:active { transform: scale(.97); }
+        .next-quick { display: flex; gap: 10px; margin-top: 14px; }
+        .next-quick button {
+            flex: 1;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            min-height: 48px;
+            padding: 6px 10px;
+            border: 2px solid var(--line-strong);
+            border-radius: var(--r-inner);
+            background: var(--paper);
+            color: var(--ink);
+            font-size: calc(16px * var(--fs));
+        }
+        .next-quick .ico { width: 20px; height: 20px; }
+        .next-quick button:active { transform: scale(.97); }
         .next-now {
             margin-top: 14px;
             padding-top: 12px;
@@ -3850,6 +3867,11 @@
                     <button type="button" data-open="${esc(it.id)}">${icon('book')}詳細</button>
                     <a class="next-nav" href="${esc(mapLink(it))}" target="_blank" rel="noopener" aria-label="${esc(it.title)}：用 Google 地圖導航">${icon('nav')}導航</a>
                 </div>`;
+            const quick = `
+                <div class="next-quick">
+                    <button type="button" data-quick="hotel">${icon('bed')}回飯店</button>
+                    <button type="button" data-quick="sos">${icon('phone')}求助</button>
+                </div>`;
             const nowLine = current ? `<p class="next-now">現在：<strong>${esc(current[0].time)} ${esc(current[0].title)}</strong>${current.length > 1 ? `（${current.length} 選 1）` : ''}</p>` : '';
 
             if (next) {
@@ -3861,7 +3883,7 @@
                             <h2 class="next-title">${esc(it.title)}</h2>
                             ${actions(it)}
                         </div>`).join('')}
-                    ${nowLine}`;
+                    ${nowLine}${quick}`;
                 return;
             }
             // 今天都走完了：給今晚的住宿
@@ -3873,7 +3895,7 @@
                         <h2 class="next-title">今晚住：${esc(tonight.stay.title)}</h2>
                         ${actions(tonight.stay)}
                     </div>` : ''}
-                ${nowLine}`;
+                ${nowLine}${quick}`;
         }
 
         function markNow() {
@@ -3905,7 +3927,22 @@
         });
         $('#home-next').addEventListener('click', (e) => {
             const btn = e.target.closest('[data-open]');
-            if (btn) showDetailModal(btn.dataset.open);
+            if (btn) { showDetailModal(btn.dataset.open); return; }
+            const quick = e.target.closest('[data-quick]');
+            if (!quick) return;
+            if (quick.dataset.quick === 'sos') {
+                infoCat = 'sos';
+                setView('info');
+                window.scrollTo(0, 0);
+                return;
+            }
+            // 回飯店：直接打開今晚飯店的日文大字卡（給司機看、可導航）
+            const hotels = hotelStays();
+            const h = hotels.find((x) => x.days.includes(currentHomeDay)) || hotels[hotels.length - 1];
+            if (!h) return;
+            const sec = infoCategories().flatMap((c) => c.sections).find((x) => x && x.type === 'hotel');
+            const phrase = (sec && sec.phrase) || {};
+            showPhrase({ zh: `${phrase.zh || '請帶我到這間飯店'}：${h.stay.title}`, ja: phrase.ja || 'このホテルまでお願いします。', place: h.stay });
         });
 
         $('#home-prev-day-btn').addEventListener('click', () => {
