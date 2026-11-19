@@ -108,7 +108,7 @@
             --paper-2: #16203B;
             --card: #18233F;
             --ink: #F1EDE4;
-            --ink-soft: #B4B3B8;
+            --ink-soft: #B3B9C9;
             --line: #26324F;
             --line-strong: #5F6E96;
             --accent: #F2C14E;
@@ -1894,7 +1894,7 @@
         /* 底圖調成紙張色調；夜晚反轉成博多灣的深藍 */
         .leaflet-tile-pane { filter: sepia(.2) saturate(.8) brightness(1.02); }
         [data-theme="night"] .leaflet-tile-pane {
-            filter: invert(1) hue-rotate(180deg) sepia(.45) hue-rotate(178deg) saturate(1.3) brightness(.82) contrast(.88);
+            filter: invert(1) hue-rotate(180deg) grayscale(1) sepia(.7) hue-rotate(190deg) saturate(2.2) brightness(.78) contrast(.92);
         }
         .leaflet-bar { border: 1.5px solid var(--ink) !important; border-radius: 14px !important; overflow: hidden; box-shadow: var(--shadow) !important; }
         .leaflet-bar a { background: var(--card); color: var(--ink); border-bottom-color: var(--line) !important; width: 44px !important; height: 44px !important; line-height: 42px !important; font-size: 22px !important; }
@@ -2449,6 +2449,186 @@
         }
         .tabbar { border-top: 1px solid color-mix(in srgb, var(--ink) 10%, transparent); }
         .tab-ico { transition: background-color .3s ease-out, padding .3s ease-out; }
+
+        /* ================= 質感層：只調細節，不改版面與資料 =================
+           1. 字：標題收緊字距、避免單字落行、標點擠壓
+           2. 次要按鈕：拿掉底部斜面（像鍵盤按鍵），改成平的色調底＋極細內框
+           3. 清單「導航」：明太子紅（夜晚燈籠黃）的淡色調，有品牌感又不搶站牌主按鈕
+           4. 小細節：天氣圖示跟天氣同色、進度條、分段控制、按下回饋 */
+
+        /* 1. 字 */
+        /* 標題、地名不用 text-wrap：balance／pretty 會把中文地名從中間切開；只給長段說明避免最後一行剩一個字 */
+        h1, h2, h3, .row-title, .day-title, .next-title, .phrase-row-zh, .info-point-title { font-feature-settings: "palt" 1; }
+        .info-points li, .info-lead, .weather-tips { text-wrap: pretty; }
+        .hero h1 { letter-spacing: .06em; }
+        .info-head h1 { font-weight: 700; letter-spacing: .02em; }
+        .day-title { font-weight: 700; letter-spacing: .01em; }
+        .row-title { letter-spacing: .005em; }
+        .row-cat { letter-spacing: .04em; }
+        .row-swatch { width: 9px; height: 9px; border-radius: 50%; }
+        .tape { letter-spacing: .08em; }
+        ::selection { background: color-mix(in srgb, var(--accent) 28%, transparent); }
+
+        /* 2. 次要按鈕：平的色調底＋極細內框（戶外仍看得出邊界） */
+        :root { --hairline: color-mix(in srgb, var(--ink) 9%, transparent); }
+        :root[data-theme="night"] { --hairline: color-mix(in srgb, var(--ink) 10%, transparent); }
+        .chip-btn:not(.nav), .day-step:not(:disabled), .day-tab:not([aria-pressed="true"]),
+        .cat-chip:not([aria-pressed="true"]), .info-cat:not([aria-pressed="true"]),
+        .seg button:not([aria-pressed="true"]), .phrase-row, .map-stop, .today-view-all-btn {
+            box-shadow: inset 0 0 0 1px var(--hairline) !important;
+        }
+        /* 白天：次要按鈕用白色卡片底＋細框，比灰底乾淨；夜晚維持淡底色 */
+        :root:not([data-theme="night"]) :is(.chip-btn:not(.nav), .day-step:not(:disabled), .day-tab:not([aria-pressed="true"]),
+        .cat-chip:not([aria-pressed="true"]), .info-cat:not([aria-pressed="true"]), .seg button:not([aria-pressed="true"]),
+        .phrase-row, .map-stop, .today-view-all-btn) {
+            background: var(--card);
+            box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--ink) 16%, transparent), 0 1px 2px color-mix(in srgb, var(--ink) 8%, transparent) !important;
+        }
+        :root:not([data-theme="night"]) :is(.chip-btn:not(.nav), .day-step, .cat-chip, .info-cat, .phrase-row, .map-stop):active { background: var(--paper-2); }
+        :root:not([data-theme="night"]) .next-card .chip-btn:not(.nav) { box-shadow: none !important; }
+        .chip-btn, .day-step, .day-current, .day-tab, .cat-chip, .info-cat, .info-subtab,
+        .seg button, .phrase-row, .map-stop, .row-nav, .today-view-all-btn {
+            transition: background-color .15s ease, color .15s ease, transform .15s ease, box-shadow .15s ease;
+        }
+        /* 選中（你在這裡）：實心再加一點立體，跟未選的平面拉開層次 */
+        .day-current, .day-tab[aria-pressed="true"], .cat-chip[aria-pressed="true"],
+        .info-cat[aria-pressed="true"], .seg button[aria-pressed="true"] {
+            box-shadow: 0 1px 2px color-mix(in srgb, var(--ink) 18%, transparent), inset 0 1px 0 color-mix(in srgb, var(--paper) 12%, transparent) !important;
+        }
+        .next-card .chip-btn:not(.nav) { box-shadow: none !important; }
+        .next-card .chip-btn.nav { box-shadow: 0 4px 14px color-mix(in srgb, var(--sign-nav) 40%, transparent) !important; }
+
+        /* 3. 清單的導航：主色淡色調 */
+        .row-nav {
+            min-width: calc(58px * var(--fs));
+            border-radius: var(--r-card);
+            background: color-mix(in srgb, var(--accent) 9%, var(--paper)) !important;
+            color: var(--link) !important;
+            box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--accent) 16%, transparent) !important;
+        }
+        .row-nav:active { background: color-mix(in srgb, var(--accent) 16%, var(--paper)) !important; }
+        :root[data-theme="night"] .row-nav { background: color-mix(in srgb, var(--accent) 12%, var(--paper)) !important; }
+
+        /* 時間軸：圓點和直線細一點、乾淨一點 */
+        .stop::before { border-left-width: 1.5px; border-left-color: color-mix(in srgb, var(--line-strong) 45%, var(--paper)); }
+        .stop-node { box-shadow: 0 0 0 1.5px color-mix(in srgb, var(--ink) 75%, transparent); }
+        .stop-time { letter-spacing: -.01em; }
+        .stop-time .time-tz { border-radius: 6px; padding: 0 4px; }
+
+        /* 4. 小細節 */
+        /* 天氣圖示的圓底跟著天氣換淡色 */
+        .weather-icon-box { box-shadow: inset 0 0 0 1px var(--hairline); }
+        .weather-card[data-sky="sun"] .weather-icon-box { background: color-mix(in srgb, var(--lamp) 26%, var(--paper)); }
+        .weather-card[data-sky="cloud"] .weather-icon-box { background: color-mix(in srgb, var(--c-move) 22%, var(--paper)); }
+        .weather-card[data-sky="rain"] .weather-icon-box { background: color-mix(in srgb, var(--c-move) 30%, var(--paper)); }
+        .weather-temp-now { font-weight: 700; }
+        .weather-tips {
+            padding: 10px 12px;
+            border-radius: var(--r-chip);
+            background: color-mix(in srgb, var(--ink) 4%, var(--paper));
+        }
+
+        /* 自檢表：進度條改成實心軌道，勾選框圓一點 */
+        .check-bar {
+            height: 10px;
+            border: 0;
+            background: color-mix(in srgb, var(--ink) 10%, var(--paper));
+        }
+        .check-bar span { border-radius: inherit; }
+        .check-box { border-radius: 9px; border-color: color-mix(in srgb, var(--ink) 70%, transparent); }
+
+        /* 分段控制：容器更淡，選中那格的浮起陰影更柔 */
+        .info-subtabs { background: color-mix(in srgb, var(--ink) 6%, var(--paper)); box-shadow: inset 0 0 0 1px var(--hairline); }
+        .info-subtab[aria-pressed="true"] {
+            box-shadow: 0 1px 2px color-mix(in srgb, var(--ink) 14%, transparent), 0 2px 8px color-mix(in srgb, var(--ink) 8%, transparent) !important;
+        }
+        :root[data-theme="night"] .info-subtab[aria-pressed="true"] { background: color-mix(in srgb, var(--ink) 14%, var(--card)) !important; }
+
+        /* 標籤：細一點的邊，看起來不像按鈕 */
+        .tag-pill { letter-spacing: .02em; }
+
+        /* 按下回饋統一 */
+        .chip-btn:active, .day-step:active, .cat-chip:active, .info-cat:active, .row-nav:active { transform: scale(.97); }
+
+        /* ================= 夜晚色系調和 =================
+           燈籠黃、明太子粉跟紺色混在一起會變成土黃、橄欖色的髒色。
+           夜晚的底色一律留在紺色系（--card、--fill），顏色只放在框線、飾條和文字上 */
+        :root[data-theme="night"] .row-nav {
+            background: var(--fill) !important;
+            box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--accent) 30%, transparent) !important;
+        }
+        :root[data-theme="night"] .row-nav:active { background: var(--fill-strong) !important; }
+        :root[data-theme="night"] .info-lead {
+            background: var(--card);
+            box-shadow: inset 3px 0 0 var(--c-shop), inset 0 0 0 1px color-mix(in srgb, var(--c-shop) 30%, transparent);
+            padding-left: 15px;
+        }
+        /* 標籤：夜晚淡底改用紺色系，分類色只留在框線 */
+        :root[data-theme="night"] :is(.tag--booked, .tag--closed, .tag--queue, .tag--stay) { background: var(--card); }
+        :root[data-theme="night"] .tag--booked { border-color: color-mix(in srgb, var(--c-sight) 60%, transparent); }
+        :root[data-theme="night"] .tag--closed { border-color: color-mix(in srgb, var(--c-shop) 60%, transparent); }
+        :root[data-theme="night"] .tag--queue { border-color: color-mix(in srgb, var(--c-food) 60%, transparent); }
+        :root[data-theme="night"] .tag--stay { border-color: color-mix(in srgb, var(--c-stay) 60%, transparent); }
+        :root[data-theme="night"] .tag--booking { background: var(--card); border-color: color-mix(in srgb, var(--stamp) 60%, transparent); }
+        :root[data-theme="night"] .weather-card[data-sky="sun"] .weather-icon-box {
+            background: var(--fill);
+            box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--lamp) 45%, transparent);
+        }
+
+        /* ================= 行程頁、地圖頂端：兩層分清楚 =================
+           天數列＝一張白色長卡片（箭頭在裡面、天數用紺色字），是「現在看哪一天」的標題；
+           分類列＝淡色分段軌道，只有選中那格是實心紺色。整個頂端只剩一個實心重點 */
+        :root .day-bar {
+            gap: 0;
+            margin: 2px 16px 6px;
+            padding: 3px;
+            border-radius: var(--r-card);
+            background: var(--card);
+            box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--ink) 14%, transparent), 0 1px 3px color-mix(in srgb, var(--ink) 7%, transparent);
+        }
+        :root .day-bar.map-day-bar { margin: 2px 0 6px; }
+        :root .day-bar > .day-step.day-step.day-step,
+        :root .day-bar > .day-current.day-current.day-current {
+            min-height: 48px;
+            border: 0 !important;
+            border-radius: var(--r-inner);
+            background: transparent !important;
+            color: var(--ink) !important;
+            box-shadow: none !important;
+        }
+        :root .day-bar > .day-step.day-step.day-step { width: 48px; color: var(--ink-soft) !important; }
+        :root .day-bar > .day-step.day-step.day-step:disabled { opacity: .3; }
+        :root .day-bar > .day-step.day-step.day-step:active:not(:disabled),
+        :root .day-bar > .day-current.day-current.day-current:active { background: var(--fill) !important; }
+        :root .day-bar > .day-current.day-current.day-current {
+            justify-content: center;
+            gap: 8px;
+            padding: 4px 8px;
+            text-align: center;
+        }
+        :root .day-bar .day-current-text { flex: 0 1 auto; min-width: 0; max-width: 100%; align-items: center; }
+        :root .day-bar .day-current-text > * { max-width: 100%; }
+        :root .day-bar .day-current-text small { color: var(--ink-soft); opacity: 1; }
+        :root .day-bar .day-current-text span { font-weight: 600; }
+        :root .day-bar .day-current .ico { color: var(--ink-soft); }
+
+        /* 分類：一條淡色軌道，裡面的按鈕平的，選中的那格實心紺色 */
+        :root #cat-chips {
+            gap: 3px;
+            margin: 2px 16px 8px;
+            padding: 3px;
+            border-radius: var(--r-card);
+            background: color-mix(in srgb, var(--ink) 6%, var(--paper));
+            box-shadow: inset 0 0 0 1px var(--hairline);
+        }
+        :root .toolbar.cats-hidden #cat-chips { margin-top: 0; margin-bottom: 0; padding: 0; box-shadow: none; }
+        :root #cat-chips .cat-chip:not([aria-pressed="true"]) {
+            background: transparent;
+            box-shadow: none !important;
+        }
+        :root #cat-chips .cat-chip:not([aria-pressed="true"]):active { background: var(--fill); }
+        :root #cat-chips .cat-chip { border-radius: var(--r-inner); min-height: 44px; }
+        :root #cat-chips .cat-chip .dot { width: 9px; height: 9px; border-radius: 50%; }
     </style>
 </head>
 <body>
@@ -2856,7 +3036,7 @@
     <script>
         // ✏️ 行程資料放在 data/trip.json，換一趟旅程只要換這個檔案
         // 版本號：每次合回 dev 時更新（日期.當天第幾次），設定最下方顯示，回報問題時用來確認是哪一版
-        const APP_VERSION = '2026.11.19.3';
+        const APP_VERSION = '2026.11.19.4';
         const TRIP_URL = './data/trip.json';
         const INFO_URL = './data/info.json';
         const CHECKLIST_URL = './data/checklist.json';
